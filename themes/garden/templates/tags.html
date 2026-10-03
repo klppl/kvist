@@ -1,0 +1,14 @@
+{{define "main" -}}
+<article class="listing">
+  <h1>Tags</h1>
+  {{- if .Site.AllTags}}
+  <ul class="tag-cloud">
+    {{- range .Site.AllTags}}
+    <li><a class="tag" href="{{.URL}}">#{{.Name}}</a> <span class="count">{{len .Notes}}</span></li>
+    {{- end}}
+  </ul>
+  {{- else}}
+  <p class="muted">No tags yet.</p>
+  {{- end}}
+</article>
+{{- end}}

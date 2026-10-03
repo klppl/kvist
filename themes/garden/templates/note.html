@@ -1,0 +1,30 @@
+{{define "main" -}}
+<article class="note">
+  <header class="note-header">
+    {{- with .Note.Params}}{{with .stage}}{{template "stage" .}}{{end}}{{end}}
+    <h1>{{.Note.Title}}</h1>
+    <p class="meta">
+      <span>Planted <time datetime="{{isoDate .Note.Created}}">{{dateFormat (param "date_format") .Note.Created}}</time></span>
+      {{- if ne (isoDate .Note.Created) (isoDate .Note.Updated)}}
+      <span>Tended <time datetime="{{isoDate .Note.Updated}}">{{dateFormat (param "date_format") .Note.Updated}}</time></span>{{end}}
+      <span>{{.Note.ReadingTime}} min read</span>
+    </p>
+    {{- with .Note.Tags}}
+    <p class="tags">{{range .}}<a class="tag" href="{{.URL}}">#{{.Name}}</a> {{end}}</p>{{end}}
+  </header>
+  <div class="content">{{.Note.Content}}</div>
+  {{- if param "show_backlinks"}}{{template "backlinks" .Note}}{{end}}
+</article>
+{{- end}}
+
+{{define "aside" -}}
+{{- if param "show_graph"}}
+<section class="local-graph" aria-label="Graph of linked notes" hidden><h2>Connections</h2><div class="graph-canvas"></div></section>
+{{- end}}
+{{- if and (param "show_toc") .Note.TOC}}
+<nav class="toc" aria-labelledby="toc-title">
+  <h2 id="toc-title">On this page</h2>
+  {{template "toc" .Note.TOC}}
+</nav>
+{{- end}}
+{{- end}}

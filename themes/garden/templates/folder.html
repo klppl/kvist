@@ -1,0 +1,9 @@
+{{define "main" -}}
+<article class="listing">
+  <h1>{{.Folder.Name}}</h1>
+  {{- with .Folder.Children}}
+  <ul class="folders">{{range .}}<li><a href="{{.URL}}">{{.Name}}/</a></li>{{end}}</ul>
+  {{- end}}
+  <ul class="cards">{{range .Folder.Notes}}{{template "card" .}}{{end}}</ul>
+</article>
+{{- end}}

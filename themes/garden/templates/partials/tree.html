@@ -1,0 +1,30 @@
+{{/*
+  The folder tree shows the path to the current page: top-level folders,
+  then each folder on the way down opened with its notes. Other folders link
+  to their folder page. This keeps every page small however big the garden
+  is (a full tree on every page grows with notes × pages).
+*/}}
+{{define "tree" -}}
+<nav class="tree">
+  {{- template "tree-folder" (dict "F" .Site.Root "Cur" .URL)}}
+</nav>
+{{- end}}
+
+{{define "tree-folder" -}}
+{{- $max := 40 -}}
+<ul>
+  {{- range .F.Children}}
+  {{- $here := hasPrefix $.Cur .URL}}
+  <li class="tree-folder{{if $here}} open{{end}}">
+    <a href="{{.URL}}"{{if eq $.Cur .URL}} aria-current="page"{{end}}>{{.Name}}</a>
+    {{- if $here}}{{template "tree-folder" (dict "F" . "Cur" $.Cur)}}{{end}}
+  </li>
+  {{- end}}
+  {{- range $i, $n := .F.Notes}}{{if and (ne $n.URL $.F.URL) (or (lt $i $max) (eq $n.URL $.Cur))}}
+  <li class="tree-note"><a href="{{$n.URL}}"{{if eq $.Cur $n.URL}} aria-current="page"{{end}}>{{$n.Title}}</a></li>
+  {{- end}}{{end}}
+  {{- if gt (len .F.Notes) $max}}
+  <li class="tree-more"><a href="{{.F.URL}}">{{sub (len .F.Notes) $max}} more…</a></li>
+  {{- end}}
+</ul>
+{{- end}}

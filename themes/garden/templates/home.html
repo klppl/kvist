@@ -1,0 +1,18 @@
+{{define "main" -}}
+{{- with .Note}}
+<article class="note home-note">
+  <div class="content">{{.Content}}</div>
+</article>
+{{- else}}
+<section class="intro">
+  <h1>{{.Site.Config.Title}}</h1>
+  {{- with .Site.Config.Description}}<p class="lead">{{.}}</p>{{end}}
+</section>
+{{- end}}
+{{- with recent (param "home_recent")}}
+<section class="recent" aria-labelledby="recent-title">
+  <h2 id="recent-title">Recently tended</h2>
+  <ul class="cards">{{range .}}{{template "card" .}}{{end}}</ul>
+</section>
+{{- end}}
+{{- end}}

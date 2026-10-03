@@ -1,0 +1,10 @@
+{
+  "id": "kvist",
+  "name": "kvist",
+  "version": "0.1.0",
+  "minAppVersion": "1.4.0",
+  "description": "Publish selected notes to your own kvist server as a digital garden.",
+  "author": "klppl",
+  "authorUrl": "https://github.com/klppl/kvist",
+  "isDesktopOnly": false
+}

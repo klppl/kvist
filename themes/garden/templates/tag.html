@@ -1,0 +1,9 @@
+{{define "main" -}}
+<article class="listing">
+  <h1>#{{.Tag.Name}}</h1>
+  {{- with .Tag.Children}}
+  <p class="tags">{{range .}}<a class="tag" href="{{.URL}}">#{{.Name}}</a> {{end}}</p>
+  {{- end}}
+  <ul class="cards">{{range .Tag.Notes}}{{template "card" .}}{{end}}</ul>
+</article>
+{{- end}}

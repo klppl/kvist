@@ -1,0 +1,23 @@
+# One host serves both the site and the API (/api/…).
+garden.example.com {
+	encode zstd gzip
+	reverse_proxy kvist:8080
+}
+
+# Alternative: serve the built files straight from disk with Caddy and only
+# proxy the API. Mount the kvist data volume read-only into Caddy first.
+#
+# garden.example.com {
+# 	encode zstd gzip
+# 	handle /api/* {
+# 		reverse_proxy kvist:8080
+# 	}
+# 	handle {
+# 		root * /kvist-data/sites/garden/public
+# 		file_server
+# 		handle_errors {
+# 			rewrite * /404.html
+# 			file_server
+# 		}
+# 	}
+# }

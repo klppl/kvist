@@ -1,0 +1,40 @@
+{
+  "rules": {
+    "always_public_folders": ["Garden", "Docs/Public"],
+    "exclude_folders": ["Private", "Garden/Drafts"],
+    "public_tag": "public",
+    "private_tag": "private",
+    "frontmatter_key": "publish",
+    "attachment_extensions": ["png", "pdf"]
+  },
+  "cases": [
+    {"path": "Garden/a.md", "published": true, "reason": "public_folder"},
+    {"path": "Docs/Public/x.md", "published": true, "reason": "public_folder"},
+    {"path": "Docs/x.md", "published": false, "reason": "no_rule"},
+    {"path": "garden/a.md", "published": false, "reason": "no_rule"},
+    {"path": "Gardener/a.md", "published": false, "reason": "no_rule"},
+    {"path": "Garden/Drafts/a.md", "tags": ["public"], "published": false, "reason": "excluded_folder"},
+    {"path": "private/a.md", "tags": ["public"], "published": false, "reason": "excluded_folder"},
+    {"path": "Garden/a.md", "tags": ["#private"], "published": false, "reason": "private_tag"},
+    {"path": "Garden/a.md", "tags": ["#Private"], "published": false, "reason": "private_tag"},
+    {"path": "Garden/a.md", "frontmatter": {"publish": false}, "published": false, "reason": "frontmatter_false"},
+    {"path": "Garden/a.md", "frontmatter": {"Publish": "false"}, "published": false, "reason": "frontmatter_false"},
+    {"path": "x.md", "frontmatter": {"publish": true, "PUBLISH": false}, "published": false, "reason": "frontmatter_false"},
+    {"path": "x.md", "tags": ["public"], "published": true, "reason": "public_tag"},
+    {"path": "x.md", "tags": ["#PUBLIC"], "published": true, "reason": "public_tag"},
+    {"path": "x.md", "tags": ["public/sub"], "published": false, "reason": "no_rule"},
+    {"path": "x.md", "frontmatter": {"publish": true}, "published": true, "reason": "frontmatter_true"},
+    {"path": "x.md", "frontmatter": {"publish": "TRUE"}, "published": true, "reason": "frontmatter_true"},
+    {"path": "x.md", "frontmatter": {"publish": "yes"}, "published": false, "reason": "no_rule"},
+    {"path": "x.md", "frontmatter": {"publish": 1}, "published": false, "reason": "no_rule"},
+    {"path": "x.md", "tags": ["public", "private"], "published": false, "reason": "private_tag"},
+    {"path": "x.png", "published": false, "reason": "not_a_note"},
+    {"path": "X.MD", "tags": ["public"], "published": true, "reason": "public_tag"}
+  ],
+  "attachments": [
+    {"path": "Garden/pic.png", "allowed": true},
+    {"path": "Private/pic.png", "allowed": false},
+    {"path": "PRIVATE/pic.png", "allowed": false},
+    {"path": "Garden/Drafts/pic.png", "allowed": false}
+  ]
+}

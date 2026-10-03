@@ -1,0 +1,30 @@
+# kvist behind Caddy (automatic HTTPS). Run from this folder:
+#   docker compose up -d
+#   docker compose exec kvist kvist token create --site garden --name laptop
+services:
+  kvist:
+    build: ..                     # builds the image from the repository
+    restart: unless-stopped
+    volumes:
+      - kvist-data:/data
+      - ./kvist.toml:/etc/kvist/kvist.toml:ro
+    environment:
+      - CF_API_TOKEN=${CF_API_TOKEN:-}
+    expose:
+      - "8080"
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+    depends_on:
+      - kvist
+
+volumes:
+  kvist-data:
+  caddy-data:

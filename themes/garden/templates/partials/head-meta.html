@@ -1,0 +1,11 @@
+{{define "head-meta" -}}
+<meta property="og:site_name" content="{{.Site.Config.Title}}">
+<meta property="og:title" content="{{.Title}}">
+<meta property="og:type" content="{{if .Note}}article{{else}}website{{end}}">
+{{- if ne .Kind "404"}}
+<meta property="og:url" content="{{absURL .URL}}">{{end}}
+{{- with .Description}}
+<meta property="og:description" content="{{.}}">{{end}}
+{{- with .Note}}
+<meta property="article:modified_time" content="{{isoDate .Updated}}">{{end}}
+{{- end}}

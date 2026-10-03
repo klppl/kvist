@@ -1,0 +1,7 @@
+.git
+bin
+plugin
+docs
+example-vault
+testdata
+*.md

@@ -1,0 +1,27 @@
+# systemd unit for running kvist without Docker.
+#   sudo useradd --system --home /var/lib/kvist --create-home kvist
+#   sudo install -m 0755 kvist /usr/local/bin/kvist
+#   sudo install -D -m 0640 -o root -g kvist kvist.toml /etc/kvist/kvist.toml
+#   sudo cp kvist.service /etc/systemd/system/ && sudo systemctl enable --now kvist
+[Unit]
+Description=kvist digital garden server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=kvist
+Group=kvist
+Environment=KVIST_CONFIG=/etc/kvist/kvist.toml
+# EnvironmentFile=-/etc/kvist/env    # e.g. CF_API_TOKEN=…
+ExecStart=/usr/local/bin/kvist serve
+Restart=on-failure
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/kvist
+CapabilityBoundingSet=
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+[Install]
+WantedBy=multi-user.target

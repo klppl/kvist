@@ -1,0 +1,22 @@
+name    = "garden"
+version = "0.1.0"
+license = "MIT"
+model   = [1]
+
+[params]
+accent           = "#3f7d4e"   # links and highlights
+date_format      = "2 Jan 2006"
+home_recent      = 12          # cards on the home page
+show_tree        = true        # folder tree in the sidebar
+show_toc         = true
+show_backlinks   = true
+code_style_light = "github"
+code_style_dark  = "github-dark"
+footer           = ""          # Markdown, shown at the bottom of every page
+show_graph       = true        # local graph on note pages and a global graph view
+# Mermaid is ~5 MB, so it is not bundled. It loads only on pages with a
+# diagram. Point mermaid_url at a self-hosted copy to avoid the CDN request:
+# a theme file such as "vendor/mermaid.min.js" (see docs/themes.md) or a URL,
+# and set mermaid_integrity to its hash, or "" to skip the check.
+mermaid_url       = "https://cdn.jsdelivr.net/npm/mermaid@12.1.0/dist/mermaid.min.js"
+mermaid_integrity = "sha384-EbBpjO7rlR6eqZEcG7GaPpyk9H9WrMyPWX4d3KvPYltgt8Z8l0z6R56B1qP40pR4"

@@ -1,6 +1,6 @@
 # kvist — design document
 
-Status: **draft for review** · Protocol v1 · Content model v1 · 2026-10-03
+Status: **approved; Phases 1–7 implemented** (GitHub Pages publishing not done; see §11) · Protocol v1 ([reference](protocol.md)) · Content model v1 · 2026-10-03
 · Go module `github.com/klppl/kvist`
 
 kvist publishes selected notes from an Obsidian vault as a themeable static
@@ -150,6 +150,8 @@ plugin                                            server
    checks the base (§3.3), applies gate 2 note-level rules (§5.2), then
    atomically writes revision N+1 and moves `HEAD`. It enqueues a build and
    returns immediately with a `build_id`. Nothing visible changes before this.
+   If the result equals `HEAD` (same paths and hashes), no revision or build
+   is created and the response says `unchanged`.
 6. **Delete by omission.** Anything not in the committed manifest is not in the
    revision, so the next build doesn't contain it. Unreferenced blobs are
    garbage-collected after the retention window (§3.5).
@@ -268,7 +270,17 @@ Snapshot ─► Parse ─► Publish filter ─► Resolve ─► Model ─► R
 | Render | `render` | model + theme → files | `html/template`, chroma highlighting, theme static assets. |
 | Output | `build` | files → `builds/<id>` → swap `public` | Atomic; unchanged files hard-linked from the previous build. |
 
-**Incremental builds.** Parsing is cached by blob hash. Resolution and model
+**Incremental builds (as built in Phase 5).** Each build still renders every
+page: a 5 000-note vault builds in about 7 s. A full render is simple and always
+correct, and the folder tree and backlinks make most pages depend on many
+notes anyway. What is incremental is the I/O: files whose bytes match the
+previous build, and attachments already present (their URLs are
+content-hashed), are hard-linked instead of written, so large attachments
+are neither re-read nor re-stripped, and retained builds share disk space.
+The page-level cache below remains an option if render time becomes a
+problem.
+
+*Original plan:* Parsing is cached by blob hash. Resolution and model
 building are global but cheap (no I/O, no rendering). Each output page has a
 key = hash(note content, resolved dependency signature — embedded notes, link
 targets' URL/title, backlinks —, theme hash, site config hash). Unchanged keys
@@ -304,12 +316,17 @@ Evaluated per note; order matters:
 4. Otherwise excluded.
 
 Tags match Obsidian semantics: case-insensitive, from body and frontmatter
-`tags`/`tag`, not inside code or comments. Exact match only: `#public/x` does
+`tags`/`tag`, not inside code. Tags inside `%% %%` and HTML comments *do*
+count (Obsidian indexes them, and `%% #private %%` is a natural way to hide
+the tag from the reading view), so a commented-out `#private` fails closed.
+Links inside comments are ignored, since comment content is never rendered. Exact match only: `#public/x` does
 **not** publish. Tag names and the frontmatter key are configurable. Control
 tags (`#public`, `#private`) are hidden from tag pages by default.
 
 Attachments (non-`.md`) have no rules of their own: an attachment is published
-iff referenced (link or embed) by a published note's *rendered* content.
+iff referenced (link or embed) by a published note's *rendered* content, and
+never if it lies in an `exclude_folders` folder (the leak suite caught a
+published note linking straight into `Private/`).
 
 ### 5.2 Two gates
 
@@ -334,7 +351,7 @@ Trusted: the server operator, the theme, the plugin (but verified).
 | Link to private note | Rendered as muted text (`<span class="link-unpublished">`), identical to a link to a nonexistent note — no existence oracle. Warning (configurable: `ignore`/`warn`/`error`). Text shown is the alias if any, else the link text the author wrote in the published note. |
 | Embed of private note/section | Omitted entirely (configurable neutral placeholder without title). Warning. Recursion through published embeds is checked at every level; cycle + depth limit. |
 | Attachments | Only reachable-from-published attachments are output. Plugin pushes only those; server re-derives. |
-| Image metadata | EXIF/XMP/text chunks (GPS, device, author) stripped from JPEG/PNG/WebP without re-encoding (configurable). |
+| Image metadata | EXIF/XMP/IPTC/comments/text chunks (GPS, device, author) stripped from JPEG/PNG/WebP without re-encoding (configurable); JPEG orientation is kept as a minimal EXIF block. A file that can't be parsed is not published. SVG, GIF, AVIF and PDF are copied as-is: **residual risk, documented**. |
 | Backlinks | Computed from published notes only. |
 | Graph | Published nodes and edges only; **no ghost nodes** for unresolved links. |
 | Search index | Built from rendered, filtered text of published notes. |
@@ -428,9 +445,12 @@ themes/garden/
   dark/light with system default + toggle, OpenGraph tags.
 - Client-side JS is progressive enhancement: pages read fine without JS
   (except math/Mermaid/graph/search).
-- Vendored, MIT-compatible libraries: MiniSearch (search), d3-force (graph),
-  KaTeX (math), Mermaid (diagrams; ~1 MB, loaded lazily only on pages with
-  `Features.Mermaid`).
+- Vendored, MIT-licensed libraries: MiniSearch (search) and KaTeX (math).
+  The graph is a small canvas force layout in the theme's own script (no
+  d3). *Changed during Phase 4:* Mermaid's bundle is ~5 MB, so it is not
+  vendored. Pages with a diagram load it from a pinned jsDelivr URL with a
+  subresource-integrity hash, and the `mermaid_url` theme param points it at
+  a self-hosted copy for sites that want no third-party requests.
 
 **Decision: math and Mermaid render client-side** in v1. Go has no native
 KaTeX/Mermaid; embedding a JS engine (goja) for KaTeX is possible later
@@ -443,9 +463,11 @@ KaTeX/Mermaid; embedding a JS engine (goja) for KaTeX is possible later
 TypeScript, Obsidian API only (no Node/Electron APIs → works on mobile).
 Uses `requestUrl` (avoids CORS on mobile) and `crypto.subtle` for SHA-256.
 
-- **Settings:** server URL, site, token (stored in plugin data; note: plugin
-  data syncs via LiveSync unless excluded — docs recommend per-device tokens),
-  device name, auto-publish on/off (per device), debounce (default 30 s).
+- **Settings:** server URL and site in plugin data (synced with the vault);
+  token, device name, auto-publish, debounce (default 30 s), client id, last
+  revision and the hash cache in Obsidian's per-device local storage, so
+  LiveSync never copies a token or makes two devices share one client id.
+  *(Changed in Phase 6; the plan kept the token in plugin data.)*
 - **Manifest builder:** rules from server → published notes via metadataCache
   (`getAllTags`, frontmatter, folder) → attachments via resolved links/embeds →
   hints file. Hash cache keyed by (path, mtime, size) to avoid rehashing.
@@ -556,6 +578,10 @@ harness, lets contributors work without Obsidian, and keeps the plugin honest.
 5. Dev server (live reload) + incremental builds.
 6. Obsidian plugin (desktop + mobile).
 7. Docker, Hetzner + Cloudflare guide, optional CF/GitHub Pages publish + CF purge, CONTRIBUTING.
+   *Done:* Docker, compose + Caddy, systemd unit, deploy guide, Cloudflare
+   purge after each build, CI, CONTRIBUTING. *Not done:* publishing to
+   Cloudflare Pages or GitHub Pages (project pages need sub-path base URLs,
+   which v1 rejects).
 
 ---
 
