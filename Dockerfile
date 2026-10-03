@@ -1,7 +1,7 @@
 # kvist server image. Themes are embedded in the binary.
 # The build stage runs on the build machine and cross-compiles, so
 # multi-arch images (amd64, arm64) build without emulating Go.
-FROM --platform=$BUILDPLATFORM golang:1.24-alpine AS build
+FROM --platform=$BUILDPLATFORM golang:1.27-alpine AS build
 WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
@@ -12,7 +12,7 @@ ARG VERSION=dev
 ARG TARGETOS TARGETARCH
 RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -trimpath -ldflags "-s -w -X main.version=${VERSION}" -o /out/kvist ./cmd/kvist
 
-FROM alpine:3.20
+FROM alpine:3.24
 LABEL org.opencontainers.image.source="https://github.com/klppl/kvist" \
       org.opencontainers.image.description="kvist: publish an Obsidian vault as a digital garden" \
       org.opencontainers.image.licenses="MIT"
