@@ -1,0 +1,26 @@
+# kvist server configuration. Copy to kvist.toml and adjust.
+data_dir = "/var/lib/kvist"
+listen   = "127.0.0.1:8080"   # API; put Caddy/nginx with TLS in front
+# sync_ttl = "1h"             # how long an unfinished sync may take
+
+[[site]]
+id       = "garden"
+base_url = "https://garden.example.com"
+title    = "My garden"
+theme    = "garden"
+
+  [site.publish]
+  always_public_folders = ["Garden"]
+  exclude_folders       = ["Templates", "Private"]
+  public_tag            = "public"
+  private_tag           = "private"
+  frontmatter_key       = "publish"
+  # attachment_extensions = ["png", "jpg", "jpeg", "gif", "webp", "svg", "avif", "pdf", "mp3", "m4a", "ogg", "wav", "mp4", "webm"]
+
+  # [site.limits]
+  # max_file_size = 52428800   # 50 MiB, below Cloudflare's 100 MB limit
+  # max_files     = 20000
+
+  # [site.retention]
+  # revisions = 10             # unpublished content stays on disk until it drops out
+  # builds    = 3

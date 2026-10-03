@@ -1,6 +1,6 @@
 # kvist — design document
 
-Status: **draft for review** · Protocol v1 · Content model v1 · 2026-10-03
+Status: **approved; Phase 1 implemented** · Protocol v1 ([reference](protocol.md)) · Content model v1 · 2026-10-03
 · Go module `github.com/klppl/kvist`
 
 kvist publishes selected notes from an Obsidian vault as a themeable static
@@ -150,6 +150,8 @@ plugin                                            server
    checks the base (§3.3), applies gate 2 note-level rules (§5.2), then
    atomically writes revision N+1 and moves `HEAD`. It enqueues a build and
    returns immediately with a `build_id`. Nothing visible changes before this.
+   If the result equals `HEAD` (same paths and hashes), no revision or build
+   is created and the response says `unchanged`.
 6. **Delete by omission.** Anything not in the committed manifest is not in the
    revision, so the next build doesn't contain it. Unreferenced blobs are
    garbage-collected after the retention window (§3.5).
@@ -304,7 +306,10 @@ Evaluated per note; order matters:
 4. Otherwise excluded.
 
 Tags match Obsidian semantics: case-insensitive, from body and frontmatter
-`tags`/`tag`, not inside code or comments. Exact match only: `#public/x` does
+`tags`/`tag`, not inside code. Tags inside `%% %%` and HTML comments *do*
+count (Obsidian indexes them, and `%% #private %%` is a natural way to hide
+the tag from the reading view), so a commented-out `#private` fails closed.
+Links inside comments are ignored, since comment content is never rendered. Exact match only: `#public/x` does
 **not** publish. Tag names and the frontmatter key are configurable. Control
 tags (`#public`, `#private`) are hidden from tag pages by default.
 

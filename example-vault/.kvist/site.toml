@@ -1,0 +1,4 @@
+# Presentation settings you can edit from Obsidian. Publish rules, theme and
+# base URL stay in the server config.
+title = "Example garden"
+description = "A demo vault for kvist"
