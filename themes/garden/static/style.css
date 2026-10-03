@@ -103,7 +103,10 @@ img { height: auto; border-radius: 6px; }
 .tree ul { list-style: none; margin: 0; padding-left: .9rem; }
 .tree > ul { padding-left: 0; }
 .tree li { margin: .15rem 0; }
-.tree summary { cursor: pointer; color: var(--muted); }
+.tree-folder > a { color: var(--muted); }
+.tree-folder > a::before { content: "▸"; display: inline-block; width: 1em; font-size: .8em; }
+.tree-folder.open > a::before { content: "▾"; }
+.tree-more a { color: var(--muted); font-style: italic; }
 .tree a { color: var(--fg); text-decoration: none; }
 .tree a:hover { color: var(--accent); }
 .tree a[aria-current="page"] { color: var(--accent); font-weight: 600; }

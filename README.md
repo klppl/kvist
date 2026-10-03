@@ -5,7 +5,7 @@ a themeable static website: a digital garden. An Obsidian plugin decides what
 is public and pushes it. A self-hosted Go server checks it again, stores it,
 builds the site and serves it.
 
-**Status: early development.** Phases 1–4 of [the plan](docs/design.md#11-phases)
+**Status: early development.** Phases 1–5 of [the plan](docs/design.md#11-phases)
 are done. The server accepts pushes, enforces the publish rules, builds the
 site with the built-in garden theme, publishes it atomically and can serve
 it. The Obsidian plugin comes in Phase 6; until then, push with `kvist push`.
@@ -16,8 +16,8 @@ it. The Obsidian plugin comes in Phase 6; until then, push with `kvist push`.
 | 2 | Markdown, link resolution, content model, leak tests | done |
 | 3 | Renderer, themes, garden theme, atomic builds, static serving | done |
 | 4 | Search, graph, RSS, sitemap, image metadata stripping, KaTeX/Mermaid | done |
-| 5 | Dev server with live reload, incremental builds | next |
-| 6 | Obsidian plugin | |
+| 5 | Dev server with live reload, incremental builds | done |
+| 6 | Obsidian plugin | next |
 | 7 | Docker, deployment guide, Cloudflare | |
 
 ## Try it
@@ -43,6 +43,17 @@ without a server (`--emit-model model.json` shows what a theme receives).
 With `serve = true` in a site's config, `kvist serve` also serves the built
 site for requests to the site's host. With a single served site, any host
 works, so `http://127.0.0.1:8080/` shows it.
+
+## Preview locally
+
+```sh
+./kvist dev --dir ~/Vault --config kvist.toml   # same rules and theme as the server
+./kvist dev --dir example-vault --public Garden # without a config
+```
+
+This serves the site at http://127.0.0.1:1313/ and rebuilds when a note or
+theme file changes. The browser reloads by itself, and build errors show at
+the bottom of the page while the last good build stays up.
 
 ## What gets published
 

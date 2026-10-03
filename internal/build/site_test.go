@@ -132,3 +132,43 @@ func TestSiteOutput(t *testing.T) {
 		t.Errorf("robots: %s", s)
 	}
 }
+
+func TestIncrementalLinksUnchangedFiles(t *testing.T) {
+	cfg, _ := config.Parse([]byte(fixtureConfig))
+	sc := cfg.Sites[0]
+	theme, err := LoadTheme("", sc)
+	if err != nil {
+		t.Fatal(err)
+	}
+	snap, err := dir.New(filepath.Join("..", "..", "testdata", "leaks", "basic")).Snapshot(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	base := t.TempDir()
+	first, second := filepath.Join(base, "a"), filepath.Join(base, "b")
+	if _, err := WriteSite(context.Background(), sc, theme, snap, first); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := WriteSiteIncremental(context.Background(), sc, theme, snap, second, first); err != nil {
+		t.Fatal(err)
+	}
+	same := func(p string) bool {
+		a, err1 := os.Stat(filepath.Join(first, p))
+		b, err2 := os.Stat(filepath.Join(second, p))
+		return err1 == nil && err2 == nil && os.SameFile(a, b)
+	}
+	assets, _ := filepath.Glob(filepath.Join(second, "_assets", "*", "*"))
+	if len(assets) != 1 || !same(strings.TrimPrefix(assets[0], second+"/")) {
+		t.Errorf("asset not linked: %v", assets)
+	}
+	if !same("garden/hub/index.html") || !same("search-index.json") {
+		t.Error("unchanged page not linked")
+	}
+	// Both builds are complete on their own.
+	if err := os.RemoveAll(first); err != nil {
+		t.Fatal(err)
+	}
+	if b, err := os.ReadFile(filepath.Join(second, "garden/hub/index.html")); err != nil || !bytes.Contains(b, []byte("Hub")) {
+		t.Error("second build broken after removing the first")
+	}
+}

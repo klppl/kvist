@@ -1,6 +1,7 @@
 package build
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -53,18 +54,55 @@ func LoadTheme(themesDir string, site *config.Site) (*render.Theme, error) {
 	return render.LoadTheme(fsys, overrides)
 }
 
-// dirOutput writes files below a directory.
-type dirOutput struct{ root string }
+// dirOutput writes files below a directory. With prev set (the previous
+// build), a file whose content is unchanged is hard-linked from there
+// instead of written, so retained builds share their unchanged files.
+type dirOutput struct {
+	root string
+	prev string
 
-func (o dirOutput) WriteFile(p string, data []byte) error {
+	linked, written int
+}
+
+func (o *dirOutput) WriteFile(p string, data []byte) error {
 	dst := filepath.Join(o.root, filepath.FromSlash(p))
 	if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
 		return err
 	}
+	if o.prev != "" {
+		old := filepath.Join(o.prev, filepath.FromSlash(p))
+		if fi, err := os.Stat(old); err == nil && fi.Mode().IsRegular() && fi.Size() == int64(len(data)) {
+			if b, err := os.ReadFile(old); err == nil && bytes.Equal(b, data) && os.Link(old, dst) == nil {
+				o.linked++
+				return nil
+			}
+		}
+	}
+	o.written++
 	return os.WriteFile(dst, data, 0o644)
 }
 
-func (o dirOutput) copy(p string, r io.Reader) error {
+// reuse hard-links p from the previous build if it exists there. Asset
+// URLs contain a content hash, so the same path means the same bytes.
+func (o *dirOutput) reuse(p string) bool {
+	if o.prev == "" {
+		return false
+	}
+	old := filepath.Join(o.prev, filepath.FromSlash(p))
+	fi, err := os.Stat(old)
+	if err != nil || !fi.Mode().IsRegular() {
+		return false
+	}
+	dst := filepath.Join(o.root, filepath.FromSlash(p))
+	if os.MkdirAll(filepath.Dir(dst), 0o755) != nil || os.Link(old, dst) != nil {
+		return false
+	}
+	o.linked++
+	return true
+}
+
+func (o *dirOutput) copy(p string, r io.Reader) error {
+	o.written++
 	dst := filepath.Join(o.root, filepath.FromSlash(p))
 	if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
 		return err
@@ -83,6 +121,16 @@ func (o dirOutput) copy(p string, r io.Reader) error {
 // WriteSite builds the site from a snapshot into dir, which must be empty
 // or absent. It returns the build's warnings.
 func WriteSite(ctx context.Context, site *config.Site, theme *render.Theme, snap source.Snapshot, dir string) ([]protocol.Warning, error) {
+	return writeSite(ctx, site, theme, snap, dir, "")
+}
+
+// WriteSiteIncremental is WriteSite, hard-linking unchanged files from the
+// previous build in prev.
+func WriteSiteIncremental(ctx context.Context, site *config.Site, theme *render.Theme, snap source.Snapshot, dir, prev string) ([]protocol.Warning, error) {
+	return writeSite(ctx, site, theme, snap, dir, prev)
+}
+
+func writeSite(ctx context.Context, site *config.Site, theme *render.Theme, snap source.Snapshot, dir, prev string) ([]protocol.Warning, error) {
 	m, err := model.Build(site, snap)
 	if err != nil {
 		return nil, err
@@ -93,7 +141,7 @@ func WriteSite(ctx context.Context, site *config.Site, theme *render.Theme, snap
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return nil, err
 	}
-	out := dirOutput{root: dir}
+	out := &dirOutput{root: dir, prev: prev}
 	if err := render.Render(m, theme, out); err != nil {
 		return nil, err
 	}
@@ -109,6 +157,9 @@ func WriteSite(ctx context.Context, site *config.Site, theme *render.Theme, snap
 			return nil, fmt.Errorf("asset %s is missing from the snapshot", a.Path)
 		}
 		dst := strings.TrimPrefix(a.URL, "/")
+		if out.reuse(dst) {
+			continue
+		}
 		r, err := snap.Open(f)
 		if err != nil {
 			return nil, err
@@ -172,7 +223,11 @@ func (b *SiteBuilder) Build(ctx context.Context, siteID, revision, buildID strin
 	final := filepath.Join(builds, buildID)
 	tmp := final + ".tmp"
 	_ = os.RemoveAll(tmp)
-	warnings, err := WriteSite(ctx, sc, theme, snap, tmp)
+	prev := ""
+	if target, err := os.Readlink(filepath.Join(ss.Dir(), "public")); err == nil {
+		prev = filepath.Join(ss.Dir(), target)
+	}
+	warnings, err := WriteSiteIncremental(ctx, sc, theme, snap, tmp, prev)
 	if err != nil {
 		_ = os.RemoveAll(tmp)
 		return warnings, err

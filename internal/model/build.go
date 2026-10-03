@@ -15,6 +15,7 @@ import (
 	"github.com/BurntSushi/toml"
 
 	"github.com/klppl/kvist/internal/config"
+	"github.com/klppl/kvist/internal/imagemeta"
 	"github.com/klppl/kvist/internal/markdown"
 	"github.com/klppl/kvist/internal/protocol"
 	"github.com/klppl/kvist/internal/publish"
@@ -493,7 +494,7 @@ func (r *noteResolver) Resolve(ref markdown.Ref) markdown.Target {
 	}
 	if f, ok := b.assets[target]; ok {
 		b.used[target] = true
-		return markdown.Target{Kind: markdown.AssetTarget, URL: assetURL(f), Path: target, Media: mediaKind(target)}
+		return markdown.Target{Kind: markdown.AssetTarget, URL: b.assetURL(f), Path: target, Media: mediaKind(target)}
 	}
 	r.report(ref)
 	return markdown.Target{}
@@ -608,8 +609,14 @@ func tagURL(name string) string { return "/tags/" + slug.Path(name) + "/" }
 
 // --- assets ---
 
-func assetURL(f source.File) string {
+// assetURL is content-addressed. For images whose metadata is stripped the
+// hash also covers that setting, so a file published unstripped is never
+// reused as the stripped one (or the other way round).
+func (b *builder) assetURL(f source.File) string {
 	h := strings.TrimPrefix(f.Hash, protocol.HashPrefix)
+	if strip := b.cfg.Publish.StripImageMetadata; strip != nil && *strip && imagemeta.Supported(path.Ext(f.Path)) {
+		h = strings.TrimPrefix(protocol.HashBytes([]byte(f.Hash+":stripped")), protocol.HashPrefix)
+	}
 	if len(h) > 8 {
 		h = h[:8]
 	}
@@ -643,7 +650,7 @@ func (b *builder) makeAssets(s *Site) {
 		if mt == "" {
 			mt = "application/octet-stream"
 		}
-		s.Assets = append(s.Assets, &Asset{Path: p, URL: assetURL(f), Size: f.Size, MediaType: mt, Hash: f.Hash})
+		s.Assets = append(s.Assets, &Asset{Path: p, URL: b.assetURL(f), Size: f.Size, MediaType: mt, Hash: f.Hash})
 	}
 	sort.Slice(s.Assets, func(i, j int) bool { return s.Assets[i].URL < s.Assets[j].URL })
 }

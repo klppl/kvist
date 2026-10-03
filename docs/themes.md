@@ -119,6 +119,10 @@ Params (set them in `theme_params`):
 | `footer` | `""` | Markdown at the bottom of every page |
 | `mermaid_url`, `mermaid_integrity` | jsDelivr, pinned with an SRI hash | see below |
 
+The folder tree shows the path to the current page (top-level folders, and
+each folder on the way down opened with up to 40 notes), not the whole
+vault. A full tree on every page made a 5 000-note site 2 GB.
+
 It shows the growth stage from the frontmatter `stage` (`seedling`,
 `budding`, `evergreen`) when `stage` is listed in `expose_frontmatter`.
 

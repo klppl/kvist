@@ -1,6 +1,6 @@
 # kvist — design document
 
-Status: **approved; Phases 1–4 implemented** · Protocol v1 ([reference](protocol.md)) · Content model v1 · 2026-10-03
+Status: **approved; Phases 1–5 implemented** · Protocol v1 ([reference](protocol.md)) · Content model v1 · 2026-10-03
 · Go module `github.com/klppl/kvist`
 
 kvist publishes selected notes from an Obsidian vault as a themeable static
@@ -270,7 +270,17 @@ Snapshot ─► Parse ─► Publish filter ─► Resolve ─► Model ─► R
 | Render | `render` | model + theme → files | `html/template`, chroma highlighting, theme static assets. |
 | Output | `build` | files → `builds/<id>` → swap `public` | Atomic; unchanged files hard-linked from the previous build. |
 
-**Incremental builds.** Parsing is cached by blob hash. Resolution and model
+**Incremental builds (as built in Phase 5).** Each build still renders every
+page: a 5 000-note vault builds in about 7 s. A full render is simple and always
+correct, and the folder tree and backlinks make most pages depend on many
+notes anyway. What is incremental is the I/O: files whose bytes match the
+previous build, and attachments already present (their URLs are
+content-hashed), are hard-linked instead of written, so large attachments
+are neither re-read nor re-stripped, and retained builds share disk space.
+The page-level cache below remains an option if render time becomes a
+problem.
+
+*Original plan:* Parsing is cached by blob hash. Resolution and model
 building are global but cheap (no I/O, no rendering). Each output page has a
 key = hash(note content, resolved dependency signature — embedded notes, link
 targets' URL/title, backlinks —, theme hash, site config hash). Unchanged keys

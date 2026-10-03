@@ -15,6 +15,7 @@ Usage:
   kvist serve    [--config kvist.toml]               run the server
   kvist push     --server URL --site ID [--dir .]    push a vault folder (token in KVIST_TOKEN)
   kvist build    --dir VAULT --out DIR               build a site from a folder (--emit-model FILE for the model)
+  kvist dev      [--dir VAULT] [--config FILE]       preview a vault with live reload
   kvist token    create|list|revoke [flags]          manage push tokens
   kvist rollback [--config kvist.toml] SITE REV      make an earlier revision current again
   kvist gc       [--config kvist.toml]               remove expired syncs and unreferenced blobs
@@ -37,6 +38,8 @@ func main() {
 		err = cmdPush(args)
 	case "build":
 		err = cmdBuild(args)
+	case "dev":
+		err = cmdDev(args)
 	case "token":
 		err = cmdToken(args)
 	case "rollback":
