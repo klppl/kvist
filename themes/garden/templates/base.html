@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="{{.Site.Config.Language}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{if eq .Kind "home"}}{{.Site.Config.Title}}{{else}}{{.Title}} · {{.Site.Config.Title}}{{end}}</title>
+{{- with .Description}}
+<meta name="description" content="{{.}}">{{end}}
+{{- if ne .Kind "404"}}
+<link rel="canonical" href="{{absURL .URL}}">{{end}}
+{{template "head-meta" .}}
+<meta name="color-scheme" content="light dark">
+<script>try{var t=localStorage.getItem("kvist-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<style>:root{--accent:{{param "accent"}}}</style>
+<link rel="stylesheet" href="{{asset "style.css"}}">
+{{- if .Features.Code}}
+<link rel="stylesheet" href="{{asset "syntax.css"}}">{{end}}
+</head>
+<body class="kind-{{.Kind}}">
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <button class="icon-button tree-toggle" type="button" aria-label="Show folders" aria-expanded="false" hidden><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+  <a class="site-title" href="/">{{.Site.Config.Title}}</a>
+  <nav class="site-nav" aria-label="Site">
+    {{- range .Site.Config.Nav}}<a href="{{.URL}}">{{.Title}}</a>{{end}}
+    <a href="/tags/">Tags</a>
+  </nav>
+  <button class="icon-button theme-toggle" type="button" aria-label="Switch color theme" hidden><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
+</header>
+<div class="layout">
+  {{- if param "show_tree"}}
+  <aside class="sidebar sidebar-left" aria-label="Folders">{{template "tree" .}}</aside>
+  {{- end}}
+  <main id="main">{{block "main" .}}{{end}}</main>
+  <aside class="sidebar sidebar-right">{{block "aside" .}}{{end}}</aside>
+</div>
+<footer class="site-footer">
+  {{- with param "footer"}}<div>{{markdownify (str .)}}</div>{{end}}
+  <p>Grown with <a href="https://github.com/klppl/kvist">kvist</a>.</p>
+</footer>
+<script src="{{asset "garden.js"}}" defer></script>
+</body>
+</html>

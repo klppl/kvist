@@ -1,0 +1,47 @@
+{{define "stage" -}}
+{{- $s := lower (str .) -}}
+<span class="stage stage-{{$s}}" title="Growth stage">
+{{- if eq $s "seedling"}}🌱{{else if eq $s "budding"}}🌿{{else if eq $s "evergreen"}}🌳{{else}}•{{end}} {{$s}}</span>
+{{- end}}
+
+{{define "card" -}}
+<li class="card">
+  <a class="card-link" href="{{.URL}}">
+    <span class="card-title">{{.Title}}</span>
+    {{- with .Description}}<span class="card-desc">{{truncate 160 .}}</span>{{end}}
+    <span class="card-meta">
+      {{- with .Params}}{{with .stage}}{{template "stage" .}}{{end}}{{end}}
+      <time datetime="{{isoDate .Updated}}">{{dateFormat (param "date_format") .Updated}}</time>
+    </span>
+  </a>
+</li>
+{{- end}}
+
+{{define "note-list" -}}
+<ul class="note-list">
+  {{- range .}}
+  <li><a href="{{.URL}}">{{.Title}}</a>{{with .Description}} <span class="muted">— {{truncate 120 .}}</span>{{end}}</li>
+  {{- end}}
+</ul>
+{{- end}}
+
+{{define "toc" -}}
+<ul>
+  {{- range .}}
+  <li><a href="#{{.ID}}">{{.Text}}</a>{{if .Children}}{{template "toc" .Children}}{{end}}</li>
+  {{- end}}
+</ul>
+{{- end}}
+
+{{define "backlinks" -}}
+{{- if .Backlinks}}
+<section class="backlinks" aria-labelledby="backlinks-title">
+  <h2 id="backlinks-title">Links to this note</h2>
+  <ul>
+    {{- range .Backlinks}}
+    <li><a href="{{.Source.URL}}">{{.Source.Title}}</a>{{with .Context}}<p class="context">{{.}}</p>{{end}}</li>
+    {{- end}}
+  </ul>
+</section>
+{{- end}}
+{{- end}}

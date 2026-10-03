@@ -191,7 +191,9 @@ func writePlain(b *strings.Builder, n ast.Node, src []byte) {
 				b.WriteString(c.Label())
 			}
 		case *Tag:
-			b.WriteString("#" + c.Name)
+			if c.URL != "" { // hidden (control) and not yet resolved tags are left out
+				b.WriteString("#" + c.Name)
+			}
 		case *Math:
 			b.WriteString(c.TeX)
 		case *ast.Image:

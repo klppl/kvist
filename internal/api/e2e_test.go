@@ -46,6 +46,7 @@ base_url = "https://other.example.com"
 
 type env struct {
 	t      *testing.T
+	cfg    *config.Config
 	srv    *httptest.Server
 	store  *store.Store
 	svc    *syncer.Service
@@ -58,7 +59,10 @@ type env struct {
 	now time.Time
 }
 
-func newEnv(t *testing.T) *env {
+func newEnv(t *testing.T) *env { return newEnvWith(t, nil) }
+
+// newEnvWith uses the builder from mk, or a stub that only counts builds.
+func newEnvWith(t *testing.T, mk func(*config.Config, *store.Store) build.Builder) *env {
 	t.Helper()
 	cfg, err := config.Parse([]byte(testConfig))
 	if err != nil {
@@ -72,13 +76,18 @@ func newEnv(t *testing.T) *env {
 	}
 	e := &env{t: t, store: st, now: time.Date(2026, 10, 3, 12, 0, 0, 0, time.UTC)}
 	log := slog.New(slog.NewTextHandler(io.Discard, nil))
-	q := build.NewQueue(build.BuilderFunc(func(ctx context.Context, site, rev, id string) ([]protocol.Warning, error) {
+	var b build.Builder = build.BuilderFunc(func(ctx context.Context, site, rev, id string) ([]protocol.Warning, error) {
 		e.builds.Add(1)
 		if e.fail.Load() {
 			return nil, errors.New("theme exploded")
 		}
 		return nil, nil
-	}), func(site string) string { return filepath.Join(data, "sites", site) }, log)
+	})
+	if mk != nil {
+		b = mk(cfg, st)
+	}
+	e.cfg = cfg
+	q := build.NewQueue(b, func(site string) string { return filepath.Join(data, "sites", site) }, log)
 	t.Cleanup(q.Close)
 	e.svc = syncer.New(cfg, st, q, log)
 	e.svc.Now = e.clock

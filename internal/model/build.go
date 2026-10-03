@@ -261,6 +261,7 @@ func (b *builder) makeNotes(s *Site) {
 				n.Params[k] = v
 			}
 		}
+		ns.doc.RemoveLeadingTitle(n.Title)
 		n.TOC = toc(ns.doc.Headings)
 		n.Features = ns.doc.Features
 		for _, a := range n.Aliases {

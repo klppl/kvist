@@ -35,6 +35,7 @@ type Site struct {
 	Author      string         `toml:"author"`
 	Language    string         `toml:"language"`
 	Theme       string         `toml:"theme"`
+	ThemeDir    string         `toml:"theme_overrides"` // folder whose files override the theme's
 	Serve       bool           `toml:"serve"`
 	Publish     Publish        `toml:"publish"`
 	Limits      Limits         `toml:"limits"`
@@ -251,6 +252,8 @@ func (c *Config) Validate() error {
 			errs = append(errs, fmt.Errorf("%s: base_url is required", where))
 		} else if u, err := url.Parse(s.BaseURL); err != nil || u.Host == "" || (u.Scheme != "http" && u.Scheme != "https") {
 			errs = append(errs, fmt.Errorf("%s: base_url must be an absolute http(s) URL", where))
+		} else if strings.Trim(u.Path, "/") != "" || u.RawQuery != "" || u.Fragment != "" {
+			errs = append(errs, fmt.Errorf("%s: base_url must be the root of a host (sites under a sub-path are not supported yet)", where))
 		}
 		p := s.Publish
 		for _, v := range []struct{ key, val string }{

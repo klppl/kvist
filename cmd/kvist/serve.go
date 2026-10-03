@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
+	"strings"
 	"syscall"
 	"time"
 
@@ -15,6 +17,8 @@ import (
 	"github.com/klppl/kvist/internal/auth"
 	"github.com/klppl/kvist/internal/build"
 	"github.com/klppl/kvist/internal/config"
+	"github.com/klppl/kvist/internal/protocol"
+	"github.com/klppl/kvist/internal/serve"
 	"github.com/klppl/kvist/internal/store"
 	"github.com/klppl/kvist/internal/syncer"
 )
@@ -38,7 +42,8 @@ func cmdServe(args []string) error {
 	if err != nil {
 		return err
 	}
-	q := build.NewQueue(build.Placeholder, func(site string) string {
+	builder := &build.SiteBuilder{Config: cfg, Store: st, Log: log}
+	q := build.NewQueue(builder, func(site string) string {
 		s, err := st.Site(site)
 		if err != nil {
 			return os.TempDir()
@@ -52,9 +57,30 @@ func cmdServe(args []string) error {
 	defer stop()
 	go svc.Run(ctx, 10*time.Minute, 2*time.Second)
 
+	apiHandler := api.New(svc, auth.Open(cfg.DataDir), version, log)
+	var served []serve.Site
+	for _, sc := range cfg.Sites {
+		if !sc.Serve {
+			continue
+		}
+		ss, err := st.Site(sc.ID)
+		if err != nil {
+			return err
+		}
+		served = append(served, serve.Site{Host: serve.HostOf(sc.BaseURL), PublicDir: filepath.Join(ss.Dir(), "public")})
+	}
+	static := serve.New(served)
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasPrefix(r.URL.Path, "/api/") || len(served) == 0 {
+			apiHandler.ServeHTTP(w, r)
+			return
+		}
+		static.ServeHTTP(w, r)
+	})
+
 	srv := &http.Server{
 		Addr:              cfg.Listen,
-		Handler:           api.New(svc, auth.Open(cfg.DataDir), version, log),
+		Handler:           handler,
 		ReadHeaderTimeout: 10 * time.Second,
 		IdleTimeout:       2 * time.Minute,
 	}
@@ -91,7 +117,10 @@ func cmdGC(args []string) error {
 	if err != nil {
 		return err
 	}
-	q := build.NewQueue(build.Placeholder, nil, nil)
+	// GC never builds; the queue only satisfies the service.
+	q := build.NewQueue(build.BuilderFunc(func(context.Context, string, string, string) ([]protocol.Warning, error) {
+		return nil, nil
+	}), nil, nil)
 	defer q.Close()
 	syncer.New(cfg, st, q, slog.New(slog.NewTextHandler(os.Stderr, nil))).GCAll()
 	return nil

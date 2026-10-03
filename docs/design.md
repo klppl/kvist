@@ -1,6 +1,6 @@
 # kvist — design document
 
-Status: **approved; Phases 1–2 implemented** · Protocol v1 ([reference](protocol.md)) · Content model v1 · 2026-10-03
+Status: **approved; Phases 1–3 implemented** · Protocol v1 ([reference](protocol.md)) · Content model v1 · 2026-10-03
 · Go module `github.com/klppl/kvist`
 
 kvist publishes selected notes from an Obsidian vault as a themeable static

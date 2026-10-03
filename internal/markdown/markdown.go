@@ -193,6 +193,21 @@ func normalizeHeading(s string) string {
 	return strings.ToLower(strings.Join(strings.Fields(s), " "))
 }
 
+// RemoveLeadingTitle drops a level-1 heading that opens the note and
+// repeats its title, so themes can show the title once. It reports whether
+// it removed one.
+func (d *Doc) RemoveLeadingTitle(title string) bool {
+	h, ok := d.root.FirstChild().(*ast.Heading)
+	if !ok || h.Level != 1 || normalizeHeading(plainText(h, d.src)) != normalizeHeading(title) {
+		return false
+	}
+	d.root.RemoveChild(d.root, h)
+	if len(d.Headings) > 0 && d.Headings[0].Level == 1 {
+		d.Headings = d.Headings[1:]
+	}
+	return true
+}
+
 // Tags returns the inline tags of the note in order of appearance. Tags in
 // comments are not included: comments are stripped before parsing.
 func (d *Doc) Tags() []string {

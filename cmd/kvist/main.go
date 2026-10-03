@@ -14,7 +14,7 @@ const usage = `kvist — publish an Obsidian vault as a digital garden
 Usage:
   kvist serve    [--config kvist.toml]               run the server
   kvist push     --server URL --site ID [--dir .]    push a vault folder (token in KVIST_TOKEN)
-  kvist build    --dir VAULT --emit-model FILE       build the content model from a folder
+  kvist build    --dir VAULT --out DIR               build a site from a folder (--emit-model FILE for the model)
   kvist token    create|list|revoke [flags]          manage push tokens
   kvist rollback [--config kvist.toml] SITE REV      make an earlier revision current again
   kvist gc       [--config kvist.toml]               remove expired syncs and unreferenced blobs

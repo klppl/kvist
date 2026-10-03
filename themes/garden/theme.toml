@@ -1,0 +1,15 @@
+name    = "garden"
+version = "0.1.0"
+license = "MIT"
+model   = [1]
+
+[params]
+accent           = "#3f7d4e"   # links and highlights
+date_format      = "2 Jan 2006"
+home_recent      = 12          # cards on the home page
+show_tree        = true        # folder tree in the sidebar
+show_toc         = true
+show_backlinks   = true
+code_style_light = "github"
+code_style_dark  = "github-dark"
+footer           = ""          # Markdown, shown at the bottom of every page

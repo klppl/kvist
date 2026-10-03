@@ -1,0 +1,21 @@
+{{define "tree" -}}
+<nav class="tree">
+  {{- template "tree-folder" (dict "F" .Site.Root "Cur" .URL "Root" true)}}
+</nav>
+{{- end}}
+
+{{define "tree-folder" -}}
+<ul>
+  {{- range .F.Children}}
+  <li class="tree-folder">
+    <details{{if hasPrefix $.Cur .URL}} open{{end}}>
+      <summary>{{if .Index}}<a href="{{.URL}}"{{if eq $.Cur .URL}} aria-current="page"{{end}}>{{.Name}}</a>{{else}}{{.Name}}{{end}}</summary>
+      {{- template "tree-folder" (dict "F" . "Cur" $.Cur "Root" false)}}
+    </details>
+  </li>
+  {{- end}}
+  {{- range .F.Notes}}{{if ne .URL $.F.URL}}
+  <li class="tree-note"><a href="{{.URL}}"{{if eq $.Cur .URL}} aria-current="page"{{end}}>{{.Title}}</a></li>
+  {{- end}}{{end}}
+</ul>
+{{- end}}
