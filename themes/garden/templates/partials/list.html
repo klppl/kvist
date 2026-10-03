@@ -1,0 +1,51 @@
+{{/*
+  The list pane: the notes around the current page. A note shows its
+  folder, a folder page its notes, a tag page the tagged notes and the home
+  page the most recent ones. Long lists stop at list_max and link to the
+  full folder or tag page, so pages stay small in big folders.
+*/}}
+{{define "list-pane" -}}
+{{- $cur := .URL}}
+{{- $max := param "list_max"}}
+<section class="list-pane" aria-labelledby="list-title">
+  {{- if eq .Kind "home"}}
+  {{template "list-body" (dict "Title" "Recently tended" "URL" "" "Notes" (recent (param "home_recent")) "Cur" $cur "Max" $max)}}
+  {{- else if eq .Kind "tag"}}
+  {{template "list-body" (dict "Title" (print "#" .Tag.Name) "URL" .Tag.URL "Notes" .Tag.Notes "Cur" $cur "Max" $max)}}
+  {{- else}}
+  {{- $f := .Folder}}{{with .Note}}{{$f = .Folder}}{{end}}
+  {{template "list-body" (dict "Title" (default "Notes" $f.Name) "URL" $f.URL "Notes" $f.Notes "Folders" $f.Children "Parent" $f.Parent "Cur" $cur "Max" $max)}}
+  {{- end}}
+</section>
+{{- end}}
+
+{{define "list-body" -}}
+<header class="list-head">
+  <h2 id="list-title">{{if and .URL (ne .URL .Cur)}}<a href="{{.URL}}">{{.Title}}</a>{{else}}{{.Title}}{{end}}</h2>
+  <input class="list-filter" type="search" placeholder="Filter {{len .Notes}} notes" aria-label="Filter notes" autocomplete="off" hidden>
+</header>
+<ul class="list-items">
+  {{- with .Parent}}{{if ne .URL "/"}}
+  <li class="list-folder"><a href="{{.URL}}">{{template "icon" "folder"}}<span>{{.Name}}</span><span class="list-up">↑</span></a></li>
+  {{- end}}{{end}}
+  {{- range .Folders}}
+  <li class="list-folder"><a href="{{.URL}}">{{template "icon" "folder"}}<span>{{.Name}}</span><span class="count">{{len .Notes}}</span></a></li>
+  {{- end}}
+  {{- range $i, $n := .Notes}}{{if and (ne $n.URL $.URL) (ne $n.URL "/") (or (lt $i $.Max) (eq $n.URL $.Cur))}}
+  <li class="list-note">
+    <a href="{{$n.URL}}"{{if eq $n.URL $.Cur}} aria-current="page"{{end}}>
+      <span class="list-title">{{$n.Title}}</span>
+      {{- with $n.Description}}<span class="list-desc">{{truncate 110 .}}</span>{{end}}
+      <span class="list-meta">
+        {{- with $n.Params}}{{with .stage}}{{template "stage" .}}{{end}}{{end}}
+        <time datetime="{{isoDate $n.Updated}}">{{dateFormat (param "date_format") $n.Updated}}</time>
+      </span>
+    </a>
+  </li>
+  {{- end}}{{end}}
+  {{- if and .URL (gt (len .Notes) .Max)}}
+  <li class="list-more"><a href="{{.URL}}">{{sub (len .Notes) .Max}} more…</a></li>
+  {{- end}}
+</ul>
+<p class="list-empty" hidden>No matching notes here. <button class="link-button list-search" type="button">Search everywhere</button></p>
+{{- end}}

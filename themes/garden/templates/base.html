@@ -23,32 +23,21 @@
 {{- $m := str (param "mermaid_url")}}
 <script defer src="{{if or (hasPrefix $m "https://") (hasPrefix $m "/")}}{{$m}}{{else}}{{asset $m}}{{end}}"{{with param "mermaid_integrity"}} integrity="{{.}}" crossorigin="anonymous"{{end}}></script>{{end}}
 </head>
-<body class="kind-{{.Kind}}"{{with .Note}} data-note="{{.ID}}"{{end}}>
+{{- $list := and (param "show_list") (eq .Kind "home" "note" "folder" "tag")}}
+<body class="kind-{{.Kind}}{{if $list}} has-list{{end}}"{{with .Note}} data-note="{{.ID}}"{{end}}>
 <a class="skip" href="#main">Skip to content</a>
-<header class="site-header">
-  <button class="icon-button tree-toggle" type="button" aria-label="Show folders" aria-expanded="false" hidden><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-  <a class="site-title" href="/">{{.Site.Config.Title}}</a>
-  <nav class="site-nav" aria-label="Site">
-    {{- range .Site.Config.Nav}}<a href="{{.URL}}">{{.Title}}</a>{{end}}
-    <a href="/tags/">Tags</a>
-  </nav>
-  <button class="icon-button search-toggle" type="button" aria-label="Search (press /)" title="Search (/)" hidden data-index="/search-index.json" data-lib="{{asset "vendor/minisearch/minisearch.min.js"}}"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-  {{- if param "show_graph"}}
-  <button class="icon-button graph-toggle" type="button" aria-label="Show graph" title="Graph" hidden><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="7" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8.3 8.2 10.8 15.8M15.7 7.4 13.2 15.7M8.5 6.8l7-.6"/></g></svg></button>
+<div class="shell">
+  {{template "nav-pane" .}}
+  {{- if $list}}
+  {{template "list-pane" .}}
   {{- end}}
-  <button class="icon-button theme-toggle" type="button" aria-label="Switch color theme" hidden><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
-</header>
-<div class="layout">
-  {{- if param "show_tree"}}
-  <aside class="sidebar sidebar-left" aria-label="Folders">{{template "tree" .}}</aside>
-  {{- end}}
-  <main id="main">{{block "main" .}}{{end}}</main>
-  <aside class="sidebar sidebar-right">{{block "aside" .}}{{end}}</aside>
+  <main id="main">
+    <div class="page">
+      <div class="page-main">{{block "main" .}}{{end}}</div>
+      <aside class="page-aside">{{block "aside" .}}{{end}}</aside>
+    </div>
+  </main>
 </div>
-<footer class="site-footer">
-  {{- with param "footer"}}<div>{{markdownify (str .)}}</div>{{end}}
-  <p>Grown with <a href="https://github.com/klppl/kvist">kvist</a>.</p>
-</footer>
 <script src="{{asset "garden.js"}}" defer></script>
 </body>
 </html>

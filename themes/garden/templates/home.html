@@ -9,10 +9,23 @@
   {{- with .Site.Config.Description}}<p class="lead">{{.}}</p>{{end}}
 </section>
 {{- end}}
-{{- with recent (param "home_recent")}}
-<section class="recent" aria-labelledby="recent-title">
-  <h2 id="recent-title">Recently tended</h2>
-  <ul class="cards">{{range .}}{{template "card" .}}{{end}}</ul>
+{{- with .Site.Root.Children}}
+<section class="explore" aria-labelledby="explore-title">
+  <h2 id="explore-title" class="section-label">Explore</h2>
+  <ul class="cards">
+    {{- range .}}
+    <li class="card"><a class="card-link" href="{{.URL}}">
+      <span class="card-title">{{.Name}}</span>
+      <span class="card-meta">{{len .Notes}} {{if eq (len .Notes) 1}}note{{else}}notes{{end}}{{with .Children}} · {{len .}} {{if eq (len .) 1}}folder{{else}}folders{{end}}{{end}}</span>
+    </a></li>
+    {{- end}}
+  </ul>
 </section>
 {{- end}}
+{{- if not (param "show_list")}}{{with recent (param "home_recent")}}
+<section class="recent" aria-labelledby="recent-title">
+  <h2 id="recent-title" class="section-label">Recently tended</h2>
+  <ul class="cards">{{range .}}{{template "card" .}}{{end}}</ul>
+</section>
+{{- end}}{{end}}
 {{- end}}

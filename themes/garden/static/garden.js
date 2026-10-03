@@ -28,14 +28,44 @@
     });
   }
 
-  // ---- folder tree on small screens ----
-  var treeToggle = $(".tree-toggle");
-  if (treeToggle && $(".sidebar-left")) {
-    treeToggle.hidden = false;
-    treeToggle.addEventListener("click", function () {
-      var open = document.body.classList.toggle("tree-open");
-      treeToggle.setAttribute("aria-expanded", open ? "true" : "false");
+  // ---- nav menu on small screens ----
+  var menuToggle = $(".menu-toggle");
+  if (menuToggle) {
+    menuToggle.hidden = false;
+    menuToggle.addEventListener("click", function () {
+      var open = document.body.classList.toggle("nav-open");
+      menuToggle.setAttribute("aria-expanded", open ? "true" : "false");
     });
+  }
+
+  // ---- list pane: keep the current note in view, filter the list ----
+  var listPane = $(".list-pane");
+  if (listPane) {
+    var current = $('.list-items [aria-current="page"]', listPane);
+    if (current && listPane.scrollHeight > listPane.clientHeight) {
+      listPane.scrollTop = current.offsetTop - listPane.clientHeight / 3; // the pane is the offset parent
+    }
+    var filter = $(".list-filter", listPane);
+    var empty = $(".list-empty", listPane);
+    var items = listPane.querySelectorAll(".list-items > li");
+    if (filter && items.length > 1) {
+      filter.hidden = false;
+      filter.addEventListener("input", function () {
+        var q = filter.value.trim().toLowerCase();
+        var shown = 0;
+        items.forEach(function (li) {
+          var hit = !q || li.textContent.toLowerCase().indexOf(q) >= 0;
+          li.hidden = !hit;
+          if (hit) shown++;
+        });
+        if (empty) empty.hidden = shown > 0;
+      });
+      filter.addEventListener("keydown", function (e) {
+        if (e.key !== "Enter") return;
+        var first = listPane.querySelector(".list-items > li:not([hidden]) a");
+        if (first) location.href = first.href;
+      });
+    }
   }
 
   document.querySelectorAll(".link-unpublished").forEach(function (el) { el.title = "Not published"; });
@@ -189,16 +219,19 @@
       paint();
     };
 
-    var open = function () {
+    var open = function (query) {
       if (!dialog) build();
       dialog.showModal();
+      if (typeof query === "string") input.value = query;
       input.select();
       ready().then(run).catch(function () {
         list.textContent = "";
         list.appendChild(el("li", "search-empty", "Search is not available."));
       });
     };
-    searchBtn.addEventListener("click", open);
+    searchBtn.addEventListener("click", function () { open(); });
+    var listSearch = $(".list-search");
+    if (listSearch) listSearch.addEventListener("click", function () { open($(".list-filter").value); });
     document.addEventListener("keydown", function (e) {
       var t = e.target;
       var typing = t && (t.isContentEditable || /^(input|textarea|select)$/i.test(t.tagName));

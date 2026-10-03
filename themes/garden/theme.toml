@@ -1,13 +1,14 @@
 name    = "garden"
-version = "0.1.0"
+version = "0.2.0"
 license = "MIT"
 model   = [1]
 
 [params]
 accent           = "#3f7d4e"   # links and highlights
 date_format      = "2 Jan 2006"
-home_recent      = 12          # cards on the home page
-show_tree        = true        # folder tree in the sidebar
+home_recent      = 12          # notes in the home page list
+show_list        = true        # list pane: the notes in the current folder
+list_max         = 100         # notes in the list pane before "more…"
 show_toc         = true
 show_backlinks   = true
 code_style_light = "github"

@@ -1,0 +1,64 @@
+{{/*
+  The nav pane: site title, the main links, the top-level folders and the
+  site's nav links. It lists only the top of the garden, so every page stays
+  small however big the garden is. The list pane shows the current folder.
+*/}}
+{{define "nav-pane" -}}
+{{- $cur := .URL -}}
+<aside class="nav-pane" aria-label="Site">
+  <div class="nav-head">
+    <a class="site-title" href="/">{{.Site.Config.Title}}</a>
+    <button class="icon-button theme-toggle" type="button" aria-label="Switch color theme" hidden>{{template "icon" "theme"}}</button>
+    <button class="icon-button menu-toggle" type="button" aria-label="Menu" aria-expanded="false" hidden>{{template "icon" "menu"}}</button>
+  </div>
+  <nav class="nav-body">
+    <ul class="nav-list">
+      <li><a href="/"{{if eq $cur "/"}} aria-current="page"{{end}}>{{template "icon" "home"}}Home</a></li>
+      <li><button class="search-toggle" type="button" title="Search (/)" hidden data-index="/search-index.json" data-lib="{{asset "vendor/minisearch/minisearch.min.js"}}">{{template "icon" "search"}}Search<kbd>/</kbd></button></li>
+      {{- if param "show_graph"}}
+      <li><button class="graph-toggle" type="button" hidden>{{template "icon" "graph"}}Graph</button></li>
+      {{- end}}
+      <li><a href="/tags/"{{if hasPrefix $cur "/tags/"}} aria-current="page"{{end}}>{{template "icon" "tag"}}Tags</a></li>
+    </ul>
+    {{- $root := .Site.Root}}
+    {{- if or $root.Children $root.Notes}}
+    <h2 class="nav-section">Content</h2>
+    <ul class="nav-list">
+      {{- range $root.Children}}
+      <li><a href="{{.URL}}"{{if hasPrefix $cur .URL}} aria-current="{{if eq $cur .URL}}page{{else}}true{{end}}"{{end}}>{{template "icon" "folder"}}{{.Name}}</a></li>
+      {{- end}}
+      {{- range $i, $n := $root.Notes}}{{if and (ne $n.URL "/") (lt $i 20)}}
+      <li><a href="{{$n.URL}}"{{if eq $cur $n.URL}} aria-current="page"{{end}}>{{template "icon" "note"}}{{$n.Title}}</a></li>
+      {{- end}}{{end}}
+    </ul>
+    {{- end}}
+    {{- with .Site.Config.Nav}}
+    <h2 class="nav-section">Links</h2>
+    <ul class="nav-list">
+      {{- range .}}
+      {{- $ext := or (hasPrefix .URL "https://") (hasPrefix .URL "http://")}}
+      <li><a href="{{.URL}}"{{if $ext}} class="nav-external" rel="noopener"{{else if eq $cur .URL}} aria-current="page"{{end}}>{{.Title}}{{if $ext}}{{template "icon" "external"}}{{end}}</a></li>
+      {{- end}}
+    </ul>
+    {{- end}}
+  </nav>
+  <footer class="nav-foot">
+    {{- with param "footer"}}<div class="footer-text">{{markdownify (str .)}}</div>{{end}}
+    <p>Grown with <a href="https://github.com/klppl/kvist">kvist</a> · <a href="/index.xml">RSS</a></p>
+  </footer>
+</aside>
+{{- end}}
+
+{{define "icon" -}}
+<svg class="icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+{{- if eq . "home"}}<path d="M4 11 12 4l8 7v8.5a.5.5 0 0 1-.5.5H15v-6H9v6H4.5a.5.5 0 0 1-.5-.5z"/>
+{{- else if eq . "search"}}<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/>
+{{- else if eq . "graph"}}<circle cx="6" cy="7" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8.3 8.2 10.8 15.8M15.7 7.4 13.2 15.7M8.5 6.8l7-.6"/>
+{{- else if eq . "tag"}}<path d="M3.5 12.2V4.5a1 1 0 0 1 1-1h7.7l8.3 8.3a1 1 0 0 1 0 1.4l-7 7a1 1 0 0 1-1.4 0z"/><circle cx="8" cy="8" r="1.3"/>
+{{- else if eq . "folder"}}<path d="M3.5 6.5a1 1 0 0 1 1-1h4.6l2 2h8.4a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1z"/>
+{{- else if eq . "note"}}<path d="M6.5 3.5h7l4 4v12a1 1 0 0 1-1 1h-10a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1z"/><path d="M13.5 3.5v4h4"/>
+{{- else if eq . "external"}}<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>
+{{- else if eq . "menu"}}<path d="M4 7h16M4 12h16M4 17h16"/>
+{{- else if eq . "theme"}}<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/>
+{{- end}}</svg>
+{{- end}}

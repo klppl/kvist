@@ -113,15 +113,22 @@ Params (set them in `theme_params`):
 |---|---|---|
 | `accent` | `#3f7d4e` | link and highlight color |
 | `date_format` | `2 Jan 2006` | Go time layout |
-| `home_recent` | `12` | cards on the home page |
-| `show_tree`, `show_toc`, `show_backlinks`, `show_graph` | `true` | sidebar parts |
+| `home_recent` | `12` | notes in the home page's list |
+| `show_list` | `true` | the list pane (below) |
+| `list_max` | `100` | notes in the list pane before a "more…" link |
+| `show_toc`, `show_backlinks`, `show_graph` | `true` | note page parts |
 | `code_style_light`, `code_style_dark` | `github`, `github-dark` | highlighting |
 | `footer` | `""` | Markdown at the bottom of every page |
 | `mermaid_url`, `mermaid_integrity` | jsDelivr, pinned with an SRI hash | see below |
 
-The folder tree shows the path to the current page (top-level folders, and
-each folder on the way down opened with up to 40 notes), not the whole
-vault. A full tree on every page made a 5 000-note site 2 GB.
+Pages have three panes: the nav pane (main links, top-level folders and
+the site's `nav` links), the list pane, and the page. The list pane shows
+the notes around the page: a note's folder, a folder's notes, a tag's notes,
+or the most recent notes on the home page. It has a filter box, and on
+small screens it moves below the page. Neither pane lists the whole vault,
+and the list stops at `list_max`, because a full tree on every page made a
+5 000-note site 2 GB. On wide screens the table of contents and the local
+graph sit to the right of a note; otherwise they follow it.
 
 It shows the growth stage from the frontmatter `stage` (`seedling`,
 `budding`, `evergreen`) when `stage` is listed in `expose_frontmatter`.
