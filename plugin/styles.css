@@ -1,0 +1,6 @@
+.kvist-status.kvist-warn { color: var(--text-warning); }
+.kvist-status.kvist-error { color: var(--text-error); }
+.kvist-report-list { padding-left: 1.1em; }
+.kvist-report-list li { margin: 0.3em 0; word-break: break-word; }
+.kvist-muted { color: var(--text-muted); }
+.kvist-report-status { color: var(--text-muted); }

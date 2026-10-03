@@ -1,6 +1,6 @@
 # kvist — design document
 
-Status: **approved; Phases 1–5 implemented** · Protocol v1 ([reference](protocol.md)) · Content model v1 · 2026-10-03
+Status: **approved; Phases 1–6 implemented** · Protocol v1 ([reference](protocol.md)) · Content model v1 · 2026-10-03
 · Go module `github.com/klppl/kvist`
 
 kvist publishes selected notes from an Obsidian vault as a themeable static
@@ -463,9 +463,11 @@ KaTeX/Mermaid; embedding a JS engine (goja) for KaTeX is possible later
 TypeScript, Obsidian API only (no Node/Electron APIs → works on mobile).
 Uses `requestUrl` (avoids CORS on mobile) and `crypto.subtle` for SHA-256.
 
-- **Settings:** server URL, site, token (stored in plugin data; note: plugin
-  data syncs via LiveSync unless excluded — docs recommend per-device tokens),
-  device name, auto-publish on/off (per device), debounce (default 30 s).
+- **Settings:** server URL and site in plugin data (synced with the vault);
+  token, device name, auto-publish, debounce (default 30 s), client id, last
+  revision and the hash cache in Obsidian's per-device local storage, so
+  LiveSync never copies a token or makes two devices share one client id.
+  *(Changed in Phase 6; the plan kept the token in plugin data.)*
 - **Manifest builder:** rules from server → published notes via metadataCache
   (`getAllTags`, frontmatter, folder) → attachments via resolved links/embeds →
   hints file. Hash cache keyed by (path, mtime, size) to avoid rehashing.

@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/klppl/kvist/internal/config"
+	"github.com/klppl/kvist/internal/protocol"
 	"github.com/klppl/kvist/internal/source"
 	"github.com/klppl/kvist/internal/source/dir"
 )
@@ -189,5 +190,24 @@ func TestURLCollision(t *testing.T) {
 	_, err := Build(cfg.Sites[0], snap)
 	if err == nil || !strings.Contains(err.Error(), "/garden/my-note/") {
 		t.Errorf("expected a URL collision error, got %v", err)
+	}
+}
+
+// TestURLParity runs the URL fixtures shared with the plugin
+// (plugin/test/parity.test.ts), which computes "open published page" URLs.
+func TestURLParity(t *testing.T) {
+	b, err := os.ReadFile("../../testdata/parity/urls.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var cases []struct{ Path, Permalink, URL string }
+	if err := json.Unmarshal(b, &cases); err != nil {
+		t.Fatal(err)
+	}
+	bl := &builder{}
+	for _, c := range cases {
+		if got := bl.noteURL(protocol.NormalizePath(c.Path), c.Permalink); got != c.URL {
+			t.Errorf("%q (permalink %q): %q, want %q", c.Path, c.Permalink, got, c.URL)
+		}
 	}
 }

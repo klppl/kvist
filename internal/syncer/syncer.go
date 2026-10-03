@@ -65,6 +65,7 @@ func (s *Service) SiteInfo(site string) (protocol.SiteInfo, error) {
 	rules := sc.Rules()
 	return protocol.SiteInfo{
 		Site:      site,
+		BaseURL:   strings.TrimRight(sc.BaseURL, "/"),
 		Rules:     rules,
 		RulesHash: rules.Hash(),
 		Limits:    sc.ProtocolLimits(),

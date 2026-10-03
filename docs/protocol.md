@@ -58,6 +58,7 @@ Clients must stop if their version is outside `[min, max]`.
 ```json
 {
   "site": "garden",
+  "base_url": "https://garden.example.com",
   "rules": {
     "always_public_folders": ["Garden"],
     "exclude_folders": ["Templates", "Private"],

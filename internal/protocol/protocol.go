@@ -87,6 +87,7 @@ type Limits struct {
 // SiteInfo is returned by GET /api/v1/sites/{site}.
 type SiteInfo struct {
 	Site      string `json:"site"`
+	BaseURL   string `json:"base_url"` // public URL of the site, for "open published page"
 	Rules     Rules  `json:"rules"`
 	RulesHash string `json:"rules_hash"`
 	Limits    Limits `json:"limits"`

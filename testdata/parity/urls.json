@@ -1,0 +1,12 @@
+[
+  {"path": "Garden/My Note.md", "url": "/garden/my-note/"},
+  {"path": "Garden/Räksmörgås & co.md", "url": "/garden/räksmörgås-co/"},
+  {"path": "Café.md", "url": "/café/"},
+  {"path": "C++ & Go (2026).md", "url": "/c-go-2026/"},
+  {"path": "Recipes/Recipes.md", "url": "/recipes/"},
+  {"path": "Recipes/index.md", "url": "/recipes/"},
+  {"path": "index.md", "url": "/"},
+  {"path": "A/B/Note.md", "permalink": "/About Me/", "url": "/about-me/"},
+  {"path": "A/x.md", "permalink": "/", "url": "/"},
+  {"path": "A/y.md", "permalink": "../escape", "url": "/a/y/"}
+]
