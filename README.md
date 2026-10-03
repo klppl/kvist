@@ -5,7 +5,7 @@ a themeable static website: a digital garden. An Obsidian plugin decides what
 is public and pushes it. A self-hosted Go server checks it again, stores it,
 builds the site and serves it.
 
-**Status: early development.** Phases 1–3 of [the plan](docs/design.md#11-phases)
+**Status: early development.** Phases 1–4 of [the plan](docs/design.md#11-phases)
 are done. The server accepts pushes, enforces the publish rules, builds the
 site with the built-in garden theme, publishes it atomically and can serve
 it. The Obsidian plugin comes in Phase 6; until then, push with `kvist push`.
@@ -15,8 +15,8 @@ it. The Obsidian plugin comes in Phase 6; until then, push with `kvist push`.
 | 1 | Config, content store, sync protocol and API, tokens, `kvist push` | done |
 | 2 | Markdown, link resolution, content model, leak tests | done |
 | 3 | Renderer, themes, garden theme, atomic builds, static serving | done |
-| 4 | Search, graph, RSS, sitemap, image metadata stripping, KaTeX/Mermaid | next |
-| 5 | Dev server with live reload, incremental builds | |
+| 4 | Search, graph, RSS, sitemap, image metadata stripping, KaTeX/Mermaid | done |
+| 5 | Dev server with live reload, incremental builds | next |
 | 6 | Obsidian plugin | |
 | 7 | Docker, deployment guide, Cloudflare | |
 

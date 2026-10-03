@@ -130,6 +130,19 @@ and never if it is in an `exclude_folders` folder.
 `{Source, Target}` for every resolved link between published notes. There
 are no nodes for unresolved links.
 
+## Generated files
+
+Besides the pages, every build writes these files, all from the model
+(published notes only):
+
+| File | |
+|---|---|
+| `/search-index.json` | `{"version": 1, "docs": [{id, title, url, description, tags, aliases, text}]}`, with `text` limited to 20 000 characters per note |
+| `/graph.json` | `Graph` as above |
+| `/index.xml` | RSS 2.0, the 30 newest notes by `Created`, with title, link, description and tags |
+| `/sitemap.xml` | home, notes (with `lastmod`), folders and tags |
+| `/robots.txt` | allows everything and points at the sitemap |
+
 ## Compatibility
 
 Additions (new fields, new CSS classes) keep version 1. Removing or changing

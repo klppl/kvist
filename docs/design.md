@@ -1,6 +1,6 @@
 # kvist — design document
 
-Status: **approved; Phases 1–3 implemented** · Protocol v1 ([reference](protocol.md)) · Content model v1 · 2026-10-03
+Status: **approved; Phases 1–4 implemented** · Protocol v1 ([reference](protocol.md)) · Content model v1 · 2026-10-03
 · Go module `github.com/klppl/kvist`
 
 kvist publishes selected notes from an Obsidian vault as a themeable static
@@ -341,7 +341,7 @@ Trusted: the server operator, the theme, the plugin (but verified).
 | Link to private note | Rendered as muted text (`<span class="link-unpublished">`), identical to a link to a nonexistent note — no existence oracle. Warning (configurable: `ignore`/`warn`/`error`). Text shown is the alias if any, else the link text the author wrote in the published note. |
 | Embed of private note/section | Omitted entirely (configurable neutral placeholder without title). Warning. Recursion through published embeds is checked at every level; cycle + depth limit. |
 | Attachments | Only reachable-from-published attachments are output. Plugin pushes only those; server re-derives. |
-| Image metadata | EXIF/XMP/text chunks (GPS, device, author) stripped from JPEG/PNG/WebP without re-encoding (configurable). |
+| Image metadata | EXIF/XMP/IPTC/comments/text chunks (GPS, device, author) stripped from JPEG/PNG/WebP without re-encoding (configurable); JPEG orientation is kept as a minimal EXIF block. A file that can't be parsed is not published. SVG, GIF, AVIF and PDF are copied as-is: **residual risk, documented**. |
 | Backlinks | Computed from published notes only. |
 | Graph | Published nodes and edges only; **no ghost nodes** for unresolved links. |
 | Search index | Built from rendered, filtered text of published notes. |
@@ -435,9 +435,12 @@ themes/garden/
   dark/light with system default + toggle, OpenGraph tags.
 - Client-side JS is progressive enhancement: pages read fine without JS
   (except math/Mermaid/graph/search).
-- Vendored, MIT-compatible libraries: MiniSearch (search), d3-force (graph),
-  KaTeX (math), Mermaid (diagrams; ~1 MB, loaded lazily only on pages with
-  `Features.Mermaid`).
+- Vendored, MIT-licensed libraries: MiniSearch (search) and KaTeX (math).
+  The graph is a small canvas force layout in the theme's own script (no
+  d3). *Changed during Phase 4:* Mermaid's bundle is ~5 MB, so it is not
+  vendored. Pages with a diagram load it from a pinned jsDelivr URL with a
+  subresource-integrity hash, and the `mermaid_url` theme param points it at
+  a self-hosted copy for sites that want no third-party requests.
 
 **Decision: math and Mermaid render client-side** in v1. Go has no native
 KaTeX/Mermaid; embedding a JS engine (goja) for KaTeX is possible later

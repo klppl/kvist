@@ -208,3 +208,36 @@ pre.mermaid { background: none; text-align: center; }
 
 .site-footer { border-top: 1px solid var(--border); color: var(--muted); font-size: .85rem; text-align: center; padding: 1.5rem 1rem 2.5rem; }
 .site-footer a { color: inherit; }
+
+/* search */
+.search-dialog, .graph-dialog {
+  border: 1px solid var(--border); border-radius: 14px; padding: 0;
+  background: var(--bg); color: var(--fg);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .25);
+}
+.search-dialog::backdrop, .graph-dialog::backdrop { background: rgba(20, 22, 18, .45); backdrop-filter: blur(2px); }
+.search-dialog { width: min(40rem, calc(100vw - 2rem)); margin-top: 12vh; }
+.search-dialog form { margin: 0; }
+.search-dialog input {
+  width: 100%; border: 0; border-bottom: 1px solid var(--border); background: transparent; color: inherit;
+  font: inherit; font-size: 1.1rem; padding: 1rem 1.2rem; outline: none;
+}
+.search-results { list-style: none; margin: 0; padding: .4rem; max-height: 55vh; overflow: auto; }
+.search-results a { display: block; padding: .6rem .8rem; border-radius: 8px; text-decoration: none; color: var(--fg); }
+.search-results [aria-selected="true"] a, .search-results a:hover { background: var(--bg-soft); }
+.search-title { display: block; font-weight: 600; }
+.search-snippet { display: block; color: var(--muted); font-size: .88rem; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.search-empty { padding: .8rem; color: var(--muted); }
+.search-hint { margin: 0; padding: .5rem 1.2rem .8rem; color: var(--muted); font-size: .78rem; border-top: 1px solid var(--border); }
+
+/* graph */
+.local-graph h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; }
+.local-graph .graph-canvas { height: 15rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-soft); margin-bottom: 1.5rem; overflow: hidden; }
+.graph-canvas canvas { display: block; cursor: grab; touch-action: none; }
+.graph-dialog { width: min(70rem, calc(100vw - 2rem)); height: min(48rem, calc(100vh - 3rem)); }
+.graph-dialog .graph-canvas { width: 100%; height: 100%; }
+.graph-close { position: absolute; top: .7rem; right: .7rem; font-size: 1.3rem; line-height: 1; }
+
+/* math once KaTeX has rendered it */
+.math .katex { font-family: KaTeX_Main, "Times New Roman", serif; font-size: 1.08em; }
+.math-inline:has(.katex) { font-family: inherit; }

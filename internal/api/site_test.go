@@ -17,6 +17,9 @@ import (
 	"github.com/klppl/kvist/internal/store"
 )
 
+// tinyPNG is a valid 1×1 PNG (assets are parsed to strip metadata).
+const tinyPNG = "\x89\x50\x4e\x47\x0d\x0a\x1a\x0a\x00\x00\x00\x0d\x49\x48\x44\x52\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02\x00\x00\x00\x90\x77\x53\xde\x00\x00\x00\x0c\x49\x44\x41\x54\x78\x9c\x63\xb0\xaf\xf5\x03\x00\x02\x09\x01\x0b\x21\xed\x84\x45\x00\x00\x00\x00\x49\x45\x4e\x44\xae\x42\x60\x82"
+
 func realBuilder(cfg *config.Config, st *store.Store) build.Builder {
 	return &build.SiteBuilder{Config: cfg, Store: st}
 }
@@ -37,7 +40,7 @@ func TestPushBuildServe(t *testing.T) {
 	d := e.device("laptop")
 	d.write("Garden/Hello World.md", "---\nstage: seedling\n---\nHello! See [[Second]] and [[Diary]].", time.Time{})
 	d.write("Garden/Second.md", "Second note ![[pic.png]]", time.Time{})
-	d.write("Garden/pic.png", "PNG", time.Time{})
+	d.write("Garden/pic.png", tinyPNG, time.Time{})
 	d.write("Journal/Diary.md", "SECRET diary", time.Time{})
 	res := d.mustPush()
 	if res.Build.State != protocol.BuildSucceeded {

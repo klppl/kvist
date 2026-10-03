@@ -18,6 +18,9 @@
 {{- end}}
 
 {{define "aside" -}}
+{{- if param "show_graph"}}
+<section class="local-graph" aria-label="Graph of linked notes" hidden><h2>Connections</h2><div class="graph-canvas"></div></section>
+{{- end}}
 {{- if and (param "show_toc") .Note.TOC}}
 <nav class="toc" aria-labelledby="toc-title">
   <h2 id="toc-title">On this page</h2>

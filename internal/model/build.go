@@ -395,7 +395,7 @@ func (b *builder) render(s *Site) {
 	backlinks := map[string][]*Backlink{}
 	for _, n := range s.Notes {
 		ns := b.notes[n.Path]
-		r := &noteResolver{b: b, from: ns, stack: []string{n.Path}, top: true}
+		r := &noteResolver{b: b, from: ns, stack: []string{n.Path}, top: true, root: n}
 		ns.doc.Resolve(r)
 		html, err := ns.doc.Render()
 		if err != nil {
@@ -465,6 +465,7 @@ type noteResolver struct {
 	from  *noteState
 	stack []string // embed chain, for cycle detection
 	top   bool     // resolving the note itself, not an embed: report warnings
+	root  *Note    // the page being rendered; embeds add their features to it
 }
 
 func (r *noteResolver) Resolve(ref markdown.Ref) markdown.Target {
@@ -585,7 +586,10 @@ func (r *noteResolver) Embed(t markdown.Target, ref markdown.Ref) (string, bool)
 		body = sec
 	}
 	doc := markdown.Parse(body)
-	doc.Resolve(&noteResolver{b: r.b, from: ns, stack: append(append([]string(nil), r.stack...), t.Path)})
+	doc.Resolve(&noteResolver{b: r.b, from: ns, stack: append(append([]string(nil), r.stack...), t.Path), root: r.root})
+	r.root.Features.Math = r.root.Features.Math || doc.Features.Math
+	r.root.Features.Mermaid = r.root.Features.Mermaid || doc.Features.Mermaid
+	r.root.Features.Code = r.root.Features.Code || doc.Features.Code
 	html, err := doc.Render()
 	if err != nil {
 		return "", false

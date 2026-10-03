@@ -78,6 +78,9 @@ func Render(site *model.Site, t *Theme, out Output) error {
 	if err := r.file("/404.html", "404", &Page{Kind: "404", Title: "Not found", URL: "/404.html"}); err != nil {
 		return err
 	}
+	if err := r.generated(); err != nil {
+		return err
+	}
 	return r.static()
 }
 

@@ -108,4 +108,27 @@ func TestSiteOutput(t *testing.T) {
 	if css, _ := filepath.Glob(filepath.Join(out, "_kvist", "*", "style.css")); len(css) != 1 {
 		t.Errorf("theme static files not copied: %v", css)
 	}
+
+	read := func(p string) string {
+		b, err := os.ReadFile(filepath.Join(out, p))
+		if err != nil {
+			t.Errorf("missing %s", p)
+		}
+		return string(b)
+	}
+	if s := read("search-index.json"); !strings.Contains(s, `"url":"/garden/hub/"`) || !strings.Contains(s, "A public leaf") {
+		t.Errorf("search index: %.300s", s)
+	}
+	if s := read("graph.json"); !strings.Contains(s, `"edges"`) || !strings.Contains(s, `"garden/leaf"`) {
+		t.Errorf("graph: %.300s", s)
+	}
+	if s := read("index.xml"); !strings.Contains(s, "<link>https://garden.example.com/garden/hub/</link>") || !strings.Contains(s, `<rss version="2.0"`) {
+		t.Errorf("feed: %.400s", s)
+	}
+	if s := read("sitemap.xml"); !strings.Contains(s, "<loc>https://garden.example.com/tags/garden/leaf/</loc>") {
+		t.Errorf("sitemap: %.400s", s)
+	}
+	if s := read("robots.txt"); !strings.Contains(s, "Sitemap: https://garden.example.com/sitemap.xml") {
+		t.Errorf("robots: %s", s)
+	}
 }

@@ -1,13 +1,20 @@
 ---
 title: Welcome to the garden
 stage: evergreen
+created: 2026-09-01
+tags: [meta]
 ---
-# Welcome
+This is a demo vault for **kvist**. Every note here shows a feature, and the
+private ones show what stays private.
 
-This note is public because it lives in `Garden/`, an `always_public_folders` entry.
+- [[Seedlings]] is a public sibling.
+- [[Reading list]] is published by a `#public` tag from outside the garden.
+- [[Diary]] is private, so it renders as plain text, just like a link to a
+  note that doesn't exist: [[No such note]].
+- [[Markdown showcase]] shows what the renderer supports.
+- [[How publishing works#The rules|The publishing rules]] links to a heading.
 
-- A public sibling: [[Seedlings]]
-- A note published by tag from outside the garden: [[Reading list]]
-- A private note, rendered as plain text: [[Diary]]
+![[sprout.svg|96]]
 
-![[sprout.svg]]
+> [!tip] Try the search
+> Press <kbd>/</kbd> to search, or open the graph from the header.

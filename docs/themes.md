@@ -105,6 +105,42 @@ They are written to `syntax.css` (`{{asset "syntax.css"}}`).
 
 HTML comments are removed from every page.
 
+## The garden theme
+
+Params (set them in `theme_params`):
+
+| Param | Default | |
+|---|---|---|
+| `accent` | `#3f7d4e` | link and highlight color |
+| `date_format` | `2 Jan 2006` | Go time layout |
+| `home_recent` | `12` | cards on the home page |
+| `show_tree`, `show_toc`, `show_backlinks`, `show_graph` | `true` | sidebar parts |
+| `code_style_light`, `code_style_dark` | `github`, `github-dark` | highlighting |
+| `footer` | `""` | Markdown at the bottom of every page |
+| `mermaid_url`, `mermaid_integrity` | jsDelivr, pinned with an SRI hash | see below |
+
+It shows the growth stage from the frontmatter `stage` (`seedling`,
+`budding`, `evergreen`) when `stage` is listed in `expose_frontmatter`.
+
+Search (press <kbd>/</kbd>) loads MiniSearch and `/search-index.json` the first time
+it opens. The graph (header button, and the "Connections" box on note pages)
+reads `/graph.json` and draws on a canvas. KaTeX is vendored and loads only
+on pages with math.
+
+**Mermaid** is about 5 MB, so it is not bundled. Pages that contain a
+diagram load it from jsDelivr, pinned to one version and checked with a
+subresource-integrity hash. To avoid the third-party request, put
+`mermaid.min.js` in your `theme_overrides` folder as
+`static/vendor/mermaid.min.js` and set:
+
+```toml
+[site.theme_params]
+mermaid_url       = "vendor/mermaid.min.js"   # a theme file, or an https:// or /absolute URL
+mermaid_integrity = ""                        # or the file's sha384 hash
+```
+
+Without JavaScript, math and diagrams show their source.
+
 ## What a theme should do
 
 - Work without JavaScript. Use scripts for enhancements only (search,

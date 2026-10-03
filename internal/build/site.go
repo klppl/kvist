@@ -8,11 +8,13 @@ import (
 	"io/fs"
 	"log/slog"
 	"os"
+	"path"
 	"path/filepath"
 	"sort"
 	"strings"
 
 	"github.com/klppl/kvist/internal/config"
+	"github.com/klppl/kvist/internal/imagemeta"
 	"github.com/klppl/kvist/internal/model"
 	"github.com/klppl/kvist/internal/protocol"
 	"github.com/klppl/kvist/internal/render"
@@ -99,22 +101,43 @@ func WriteSite(ctx context.Context, site *config.Site, theme *render.Theme, snap
 	for _, f := range snap.Files() {
 		files[f.Path] = f
 	}
+	warnings := m.Warnings
+	strip := site.Publish.StripImageMetadata != nil && *site.Publish.StripImageMetadata
 	for _, a := range m.Assets {
 		f, ok := files[a.Path]
 		if !ok {
 			return nil, fmt.Errorf("asset %s is missing from the snapshot", a.Path)
 		}
+		dst := strings.TrimPrefix(a.URL, "/")
 		r, err := snap.Open(f)
 		if err != nil {
 			return nil, err
 		}
-		err = out.copy(strings.TrimPrefix(a.URL, "/"), r)
+		if strip && imagemeta.Supported(path.Ext(a.Path)) {
+			data, err := io.ReadAll(r)
+			r.Close()
+			if err != nil {
+				return nil, err
+			}
+			clean, err := imagemeta.Strip(path.Ext(a.Path), data)
+			if err != nil {
+				// Metadata that can't be removed must not be published.
+				warnings = append(warnings, protocol.Warning{Code: protocol.WarnBuild, Path: a.Path,
+					Message: "image could not be read to remove its metadata (location, camera); not published"})
+				continue
+			}
+			if err := out.WriteFile(dst, clean); err != nil {
+				return nil, err
+			}
+			continue
+		}
+		err = out.copy(dst, r)
 		r.Close()
 		if err != nil {
 			return nil, err
 		}
 	}
-	return m.Warnings, nil
+	return warnings, nil
 }
 
 // SiteBuilder builds sites from the content store. It implements Builder
