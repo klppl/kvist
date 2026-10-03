@@ -15,7 +15,7 @@ the built-in garden theme, publishes it atomically and can serve it. The
 ## Run on a server
 
 Every push to `main` publishes a Docker image, `ghcr.io/klppl/kvist`
-(amd64 and arm64). On a VPS with Docker, put
+(linux/amd64). On a VPS with Docker, put
 [`docker-compose.yml`](deploy/docker-compose.yml), the
 [`Caddyfile`](deploy/Caddyfile) and [`kvist.toml`](deploy/kvist.toml) in a
 folder, set your domain, and run:

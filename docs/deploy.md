@@ -13,7 +13,8 @@ on localhost or a private Docker network only.
 ## 2a. Run with Docker (recommended)
 
 Every push to `main` publishes an image to GitHub's container registry, for
-`linux/amd64` and `linux/arm64`:
+`linux/amd64` (Intel/AMD servers such as Hetzner CX). For an ARM server,
+add `linux/arm64` to `platforms` in `.github/workflows/docker.yml`.
 
 | Tag | |
 |---|---|
