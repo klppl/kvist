@@ -40,7 +40,37 @@ type Site struct {
 	Publish     Publish        `toml:"publish"`
 	Limits      Limits         `toml:"limits"`
 	Retention   Retention      `toml:"retention"`
+	Cloudflare  Cloudflare     `toml:"cloudflare"`
 	ThemeParams map[string]any `toml:"theme_params"`
+}
+
+// Cloudflare purges the zone's cache after every successful build. The API
+// token (permission: Zone → Cache Purge) is read from an environment
+// variable or a file, never from the config itself.
+type Cloudflare struct {
+	ZoneID       string `toml:"zone_id"`
+	APITokenEnv  string `toml:"api_token_env"`
+	APITokenFile string `toml:"api_token_file"`
+}
+
+// Token returns the Cloudflare API token, or "" if purging is off.
+func (c Cloudflare) Token() (string, error) {
+	if c.ZoneID == "" {
+		return "", nil
+	}
+	if c.APITokenEnv != "" {
+		if v := strings.TrimSpace(os.Getenv(c.APITokenEnv)); v != "" {
+			return v, nil
+		}
+	}
+	if c.APITokenFile != "" {
+		b, err := os.ReadFile(c.APITokenFile)
+		if err != nil {
+			return "", err
+		}
+		return strings.TrimSpace(string(b)), nil
+	}
+	return "", fmt.Errorf("cloudflare.zone_id is set but no API token was found (api_token_env or api_token_file)")
 }
 
 // Publish holds the publish rules and leak-handling options of a site.
@@ -279,6 +309,9 @@ func (c *Config) Validate() error {
 		}
 		if s.Limits.MaxFileSize < 0 || s.Limits.MaxFiles < 0 {
 			errs = append(errs, fmt.Errorf("%s: limits must be positive", where))
+		}
+		if cf := s.Cloudflare; cf.ZoneID != "" && cf.APITokenEnv == "" && cf.APITokenFile == "" {
+			errs = append(errs, fmt.Errorf("%s: cloudflare needs api_token_env or api_token_file", where))
 		}
 		if s.Retention.Revisions < 1 || s.Retention.Builds < 1 {
 			errs = append(errs, fmt.Errorf("%s: retention must keep at least 1", where))

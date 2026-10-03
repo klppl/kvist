@@ -23,6 +23,10 @@ serve    = true              # serve the built site from this binary (or point C
   # max_file_size = 52428800   # 50 MiB, below Cloudflare's 100 MB limit
   # max_files     = 20000
 
+  # [site.cloudflare]          # purge the CDN cache after every build
+  # zone_id       = "…"
+  # api_token_env = "CF_API_TOKEN"
+
   # [site.retention]
   # revisions = 10             # unpublished content stays on disk until it drops out
   # builds    = 3

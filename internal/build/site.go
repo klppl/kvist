@@ -14,6 +14,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/klppl/kvist/internal/cdn"
 	"github.com/klppl/kvist/internal/config"
 	"github.com/klppl/kvist/internal/imagemeta"
 	"github.com/klppl/kvist/internal/model"
@@ -238,6 +239,14 @@ func (b *SiteBuilder) Build(ctx context.Context, siteID, revision, buildID strin
 	}
 	if err := swapSymlink(filepath.Join(ss.Dir(), "public"), filepath.Join("builds", buildID)); err != nil {
 		return warnings, err
+	}
+	if token, err := sc.Cloudflare.Token(); err != nil {
+		warnings = append(warnings, protocol.Warning{Code: protocol.WarnBuild, Message: "CDN cache not purged: " + err.Error()})
+	} else if token != "" {
+		if err := cdn.PurgeCloudflare(ctx, sc.Cloudflare.ZoneID, token); err != nil {
+			warnings = append(warnings, protocol.Warning{Code: protocol.WarnBuild,
+				Message: err.Error() + "; pages may stay in the CDN cache until it expires (60 s for pages)"})
+		}
 	}
 	if err := pruneBuilds(builds, buildID, sc.Retention.Builds); err != nil && b.Log != nil {
 		b.Log.Warn("prune builds", "site", siteID, "err", err)

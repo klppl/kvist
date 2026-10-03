@@ -1,6 +1,6 @@
 # kvist — design document
 
-Status: **approved; Phases 1–6 implemented** · Protocol v1 ([reference](protocol.md)) · Content model v1 · 2026-10-03
+Status: **approved; Phases 1–7 implemented** (GitHub Pages publishing not done; see §11) · Protocol v1 ([reference](protocol.md)) · Content model v1 · 2026-10-03
 · Go module `github.com/klppl/kvist`
 
 kvist publishes selected notes from an Obsidian vault as a themeable static
@@ -578,6 +578,10 @@ harness, lets contributors work without Obsidian, and keeps the plugin honest.
 5. Dev server (live reload) + incremental builds.
 6. Obsidian plugin (desktop + mobile).
 7. Docker, Hetzner + Cloudflare guide, optional CF/GitHub Pages publish + CF purge, CONTRIBUTING.
+   *Done:* Docker, compose + Caddy, systemd unit, deploy guide, Cloudflare
+   purge after each build, CI, CONTRIBUTING. *Not done:* publishing to
+   Cloudflare Pages or GitHub Pages (project pages need sub-path base URLs,
+   which v1 rejects).
 
 ---
 

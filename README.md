@@ -5,8 +5,8 @@ a themeable static website: a digital garden. An Obsidian plugin decides what
 is public and pushes it. A self-hosted Go server checks it again, stores it,
 builds the site and serves it.
 
-**Status: early development.** Phases 1–6 of [the plan](docs/design.md#11-phases)
-are done. The server accepts pushes, enforces the publish rules, builds the
+**Status: early development.** All seven phases of [the plan](docs/design.md#11-phases)
+are implemented; it has not been run in production yet. The server accepts pushes, enforces the publish rules, builds the
 site with the built-in garden theme, publishes it atomically and can serve
 it. The [Obsidian plugin](plugin/README.md) publishes from desktop and
 mobile; `kvist push` does the same from a terminal.
@@ -19,7 +19,7 @@ mobile; `kvist push` does the same from a terminal.
 | 4 | Search, graph, RSS, sitemap, image metadata stripping, KaTeX/Mermaid | done |
 | 5 | Dev server with live reload, incremental builds | done |
 | 6 | Obsidian plugin | done |
-| 7 | Docker, deployment guide, Cloudflare | next |
+| 7 | Docker, deployment guide, Cloudflare cache purge | done |
 
 ## Try it
 
@@ -77,6 +77,9 @@ applies them again on its own.
 - [Sync protocol v1](docs/protocol.md): the client–server contract
 - [Content model v1](docs/content-model.md): what themes receive
 - [Themes](docs/themes.md): writing and customizing themes
+- [Deploying](docs/deploy.md): Docker or systemd, Caddy/nginx, Cloudflare
+- [Obsidian plugin](plugin/README.md)
+- [Contributing](CONTRIBUTING.md)
 
 ## Development
 
@@ -84,4 +87,4 @@ applies them again on its own.
 make test     # go vet + go test -race ./...
 ```
 
-Requires Go 1.24.
+Requires Go 1.24 (and Node 20+ for the plugin). MIT licensed.

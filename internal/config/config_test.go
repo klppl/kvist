@@ -84,3 +84,12 @@ publish.unpublished_links = "explode"`,
 		}
 	}
 }
+
+// TestShippedExamples keeps the example configs valid.
+func TestShippedExamples(t *testing.T) {
+	for _, p := range []string{"../../kvist.example.toml", "../../deploy/kvist.toml"} {
+		if _, err := Load(p); err != nil {
+			t.Errorf("%s: %v", p, err)
+		}
+	}
+}
