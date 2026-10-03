@@ -34,6 +34,8 @@ type Meta struct {
 	// Tags lists tag names without '#', frontmatter tags first, then body tags
 	// in order of appearance, deduplicated case-insensitively.
 	Tags []string
+	// FrontmatterTags are the tags from the frontmatter alone.
+	FrontmatterTags []string
 	// Aliases from the frontmatter `aliases`/`alias` property.
 	Aliases []string
 	// Links lists outgoing links and embeds outside code and comments.
@@ -83,6 +85,7 @@ func ParseMeta(src []byte) *Meta {
 	}
 	for _, t := range frontmatterList(m.Frontmatter, "tags", "tag") {
 		if t = strings.TrimPrefix(strings.TrimSpace(t), "#"); validTag(t) {
+			m.FrontmatterTags = append(m.FrontmatterTags, t)
 			addTag(t)
 		}
 	}

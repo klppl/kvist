@@ -78,6 +78,7 @@ type snapshot struct {
 }
 
 func (s *snapshot) Revision() string     { return s.rev.ID }
+func (s *snapshot) Time() time.Time      { return s.rev.CommittedAt }
 func (s *snapshot) Files() []source.File { return s.rev.Files }
 func (s *snapshot) Open(f source.File) (io.ReadCloser, error) {
 	return s.site.OpenBlob(f.Hash)

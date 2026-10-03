@@ -163,7 +163,7 @@ func ScanDir(dir string, rules protocol.Rules) (*Scan, error) {
 				}
 				continue
 			}
-			if protocol.AllowedPath(target, rules) {
+			if protocol.AllowedPath(target, rules) && publish.AttachmentAllowed(rules, target) {
 				include[target] = true
 			}
 		}

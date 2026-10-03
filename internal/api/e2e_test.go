@@ -208,7 +208,8 @@ func TestPushPublishesOnlyPublicContent(t *testing.T) {
 	d.write("Garden/Note.md", "public by folder", time.Time{})
 	d.write("Private/Note.md", "#public but excluded", time.Time{})
 	d.write("Journal/Secret Plans.md", "SECRET-MARKER", time.Time{})
-	d.write("Tagged.md", "#public ![](att/doc.pdf)", time.Time{})
+	d.write("Tagged.md", "#public ![](att/doc.pdf) ![](Private/photo.png)", time.Time{})
+	d.write("Private/photo.png", "PNG-PRIVATE", time.Time{})
 	d.write("att/doc.pdf", "%PDF", time.Time{})
 	d.write("map.png", "PNG", time.Time{})
 	d.write("unused.png", "PNG", time.Time{})
@@ -520,6 +521,7 @@ func TestGate2DropsPrivateNotes(t *testing.T) {
 		"Garden/private.md":  "#private",
 		"Garden/badfm.md":    "---\npublish: [\n---\n",
 		"Garden/picture.png": "PNG",
+		"Private/photo.png":  "PNG2",
 	})
 	sy, err := c.StartSync(ctx, m)
 	if err != nil {
@@ -541,7 +543,7 @@ func TestGate2DropsPrivateNotes(t *testing.T) {
 			dropped = append(dropped, w.Path)
 		}
 	}
-	eq(t, "warnings", dropped, []string{"Garden/badfm.md", "Garden/private.md", "Private/leak.md", "untagged.md"})
+	eq(t, "warnings", dropped, []string{"Garden/badfm.md", "Garden/private.md", "Private/leak.md", "Private/photo.png", "untagged.md"})
 }
 
 func TestManifestValidation(t *testing.T) {

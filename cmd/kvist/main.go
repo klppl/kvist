@@ -14,6 +14,7 @@ const usage = `kvist — publish an Obsidian vault as a digital garden
 Usage:
   kvist serve    [--config kvist.toml]               run the server
   kvist push     --server URL --site ID [--dir .]    push a vault folder (token in KVIST_TOKEN)
+  kvist build    --dir VAULT --emit-model FILE       build the content model from a folder
   kvist token    create|list|revoke [flags]          manage push tokens
   kvist rollback [--config kvist.toml] SITE REV      make an earlier revision current again
   kvist gc       [--config kvist.toml]               remove expired syncs and unreferenced blobs
@@ -34,6 +35,8 @@ func main() {
 		err = cmdServe(args)
 	case "push":
 		err = cmdPush(args)
+	case "build":
+		err = cmdBuild(args)
 	case "token":
 		err = cmdToken(args)
 	case "rollback":

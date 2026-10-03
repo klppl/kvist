@@ -113,3 +113,11 @@ func TestUnclosedCommentHidesLinksToEnd(t *testing.T) {
 		t.Errorf("links = %+v", m.Links)
 	}
 }
+
+func TestStripComments(t *testing.T) {
+	in := "a %%x%% b\n%%\nblock\n%%\n`%%code%%` <!-- h -->c\n```\n%% fenced %%\n```\n%% open"
+	want := "a  b\n\n`%%code%%` c\n```\n%% fenced %%\n```\n"
+	if got := string(StripComments([]byte(in))); got != want {
+		t.Errorf("got %q\nwant %q", got, want)
+	}
+}

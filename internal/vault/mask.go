@@ -194,3 +194,35 @@ func maskComments(b []byte) []byte {
 	}
 	return out
 }
+
+// StripComments removes %%…%% and <!-- … --> comments that lie outside code
+// from a note body. Comment bytes are deleted, not blanked, so a block
+// comment doesn't leave whitespace that changes the Markdown structure.
+func StripComments(body []byte) []byte {
+	masked := maskCode(body)
+	var out []byte
+	last := 0
+	for i := 0; i < len(masked); i++ {
+		var closer string
+		var open int
+		switch {
+		case bytes.HasPrefix(masked[i:], []byte("%%")):
+			closer, open = "%%", 2
+		case bytes.HasPrefix(masked[i:], []byte("<!--")):
+			closer, open = "-->", 4
+		default:
+			continue
+		}
+		stop := len(masked)
+		if end := bytes.Index(masked[i+open:], []byte(closer)); end >= 0 {
+			stop = i + open + end + len(closer)
+		}
+		out = append(out, body[last:i]...)
+		last = stop
+		i = stop - 1
+	}
+	if out == nil {
+		return body
+	}
+	return append(out, body[last:]...)
+}

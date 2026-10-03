@@ -6,6 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"io"
+	"time"
 
 	"github.com/klppl/kvist/internal/protocol"
 )
@@ -26,6 +27,7 @@ type File = protocol.File
 // Snapshot is one immutable state of a source.
 type Snapshot interface {
 	Revision() string // opaque, monotonic per source
+	Time() time.Time  // commit time of the revision (used as the build time)
 	Files() []File    // sorted by Path
 	Open(f File) (io.ReadCloser, error)
 	Hints() *Hints // client link hints (§3.6); nil if none

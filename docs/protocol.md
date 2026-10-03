@@ -218,7 +218,9 @@ inside `%% %%` and `<!-- -->` comments **do** count, matching Obsidian, so a
 hidden `%% #private %%` keeps a note private.
 
 Attachments have no rules of their own. Push an attachment when a published
-note links to or embeds it outside code and comments.
+note links to or embeds it outside code and comments, unless it is inside an
+`exclude_folders` folder: those are never pushed (the server drops them at
+commit with a `gate_disagreement` warning).
 
 ## Hints file (`.kvist/links.json`)
 

@@ -71,6 +71,18 @@ func Evaluate(r protocol.Rules, p string, m *vault.Meta) Decision {
 	return Decision{false, ReasonNoRule}
 }
 
+// AttachmentAllowed reports whether an attachment may be published at all.
+// Attachments have no rules of their own (a published note must reference
+// them), but nothing inside an exclude_folders entry is ever published.
+func AttachmentAllowed(r protocol.Rules, p string) bool {
+	for _, f := range r.ExcludeFolders {
+		if inFolder(p, f, true) {
+			return false
+		}
+	}
+	return true
+}
+
 // EvaluateSource parses src and evaluates the rules for it.
 func EvaluateSource(r protocol.Rules, p string, src []byte) (Decision, *vault.Meta) {
 	m := vault.ParseMeta(src)

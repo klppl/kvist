@@ -429,13 +429,18 @@ func plural(n int, one, many string) string {
 }
 
 // gate2 re-evaluates the publish rules on every note and drops the ones that
-// fail (§5.2). Attachments and reserved files pass; their reachability is
-// decided at build time.
+// fail (§5.2). Attachments pass unless they are in an excluded folder; their
+// reachability is decided at build time.
 func (s *Service) gate2(ss *store.Site, rules protocol.Rules, files []protocol.File) ([]protocol.File, []protocol.Warning, error) {
 	var keep []protocol.File
 	var warnings []protocol.Warning
 	for _, f := range files {
 		if !protocol.IsNote(f.Path) {
+			if !protocol.IsReservedPath(f.Path) && !publish.AttachmentAllowed(rules, f.Path) {
+				warnings = append(warnings, protocol.Warning{Code: protocol.WarnGateDisagreement, Path: f.Path,
+					Message: "attachment in an excluded folder; not published"})
+				continue
+			}
 			keep = append(keep, f)
 			continue
 		}

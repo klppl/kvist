@@ -1,6 +1,6 @@
 # kvist — design document
 
-Status: **approved; Phase 1 implemented** · Protocol v1 ([reference](protocol.md)) · Content model v1 · 2026-10-03
+Status: **approved; Phases 1–2 implemented** · Protocol v1 ([reference](protocol.md)) · Content model v1 · 2026-10-03
 · Go module `github.com/klppl/kvist`
 
 kvist publishes selected notes from an Obsidian vault as a themeable static
@@ -314,7 +314,9 @@ Links inside comments are ignored, since comment content is never rendered. Exac
 tags (`#public`, `#private`) are hidden from tag pages by default.
 
 Attachments (non-`.md`) have no rules of their own: an attachment is published
-iff referenced (link or embed) by a published note's *rendered* content.
+iff referenced (link or embed) by a published note's *rendered* content, and
+never if it lies in an `exclude_folders` folder (the leak suite caught a
+published note linking straight into `Private/`).
 
 ### 5.2 Two gates
 
