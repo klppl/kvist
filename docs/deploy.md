@@ -12,16 +12,107 @@ on localhost or a private Docker network only.
 
 ## 2a. Run with Docker (recommended)
 
+Every push to `main` publishes an image to GitHub's container registry, for
+`linux/amd64` and `linux/arm64`:
+
+| Tag | |
+|---|---|
+| `ghcr.io/klppl/kvist:latest` | the newest build of `main` |
+| `ghcr.io/klppl/kvist:sha-<commit>` | one exact build, to pin or roll back |
+| `ghcr.io/klppl/kvist:1.2.3`, `:1.2` | releases (git tags `v1.2.3`) |
+
+You don't need the repository on the server, only three files in one
+folder:
+
 ```sh
-git clone https://github.com/klppl/kvist && cd kvist/deploy
+mkdir -p ~/kvist && cd ~/kvist
+base=https://raw.githubusercontent.com/klppl/kvist/main/deploy
+curl -fsSLO $base/docker-compose.yml -O $base/Caddyfile -O $base/kvist.toml
 $EDITOR kvist.toml Caddyfile        # your domain, title and publish rules
 docker compose up -d
 docker compose exec kvist kvist token create --site garden --name laptop
 ```
 
+The token is printed once; enter it in the Obsidian plugin (step 3).
+
+`docker-compose.yml`:
+
+```yaml
+services:
+  kvist:
+    image: ghcr.io/klppl/kvist:latest   # or a pinned tag such as :sha-7822899
+    restart: unless-stopped
+    volumes:
+      - kvist-data:/data                       # content, builds, tokens
+      - ./kvist.toml:/etc/kvist/kvist.toml:ro  # the server config
+    environment:
+      - CF_API_TOKEN=${CF_API_TOKEN:-}  # only for the optional Cloudflare purge
+    expose:
+      - "8080"                          # reachable only from Caddy
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"                   # HTTP/3
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data                # certificates
+      - caddy-config:/config
+    depends_on:
+      - kvist
+
+volumes:
+  kvist-data:
+  caddy-data:
+  caddy-config:
+```
+
+`Caddyfile` (replace the domain):
+
+```
+garden.example.com {
+	encode zstd gzip
+	reverse_proxy kvist:8080
+}
+```
+
+`kvist.toml` needs `data_dir = "/data"` and `listen = "0.0.0.0:8080"`
+(inside the container), plus your site:
+
+```toml
+data_dir = "/data"
+listen   = "0.0.0.0:8080"
+
+[[site]]
+id       = "garden"
+base_url = "https://garden.example.com"
+title    = "My garden"
+theme    = "garden"
+serve    = true
+
+  [site.publish]
+  always_public_folders = ["Garden"]
+  exclude_folders       = ["Templates", "Private"]
+  expose_frontmatter    = ["stage"]
+```
+
 Caddy gets a certificate from Let's Encrypt and proxies everything,
 including `/api/`, to kvist, which builds the site and serves it
-(`serve = true`). The data lives in the `kvist-data` volume.
+(`serve = true`). The data lives in the `kvist-data` volume. kvist reads
+its config at startup, so run `docker compose restart kvist` after editing
+`kvist.toml`.
+
+If `docker compose pull` asks you to log in, the package is still private:
+make it public under the repository's **Packages → kvist → Package
+settings**, or run `docker login ghcr.io` with a token that has
+`read:packages`.
+
+To build the image yourself instead, clone the repository, replace
+`image:` with `build: ..` in `deploy/docker-compose.yml` and run
+`docker compose up -d --build` from `deploy/`.
 
 ## 2b. Run with systemd
 
@@ -102,8 +193,9 @@ With the DNS record proxied (orange cloud):
   keep the minimum.
 - **Disk:** builds share unchanged files through hard links, so retained
   builds cost little extra space.
-- **Upgrades:** replace the binary (or `docker compose build && docker
-  compose up -d`). The plugin and server check protocol versions and tell
+- **Upgrades:** `docker compose pull && docker compose up -d` (or replace
+  the binary). To go back, pin the previous `sha-…` tag in
+  `docker-compose.yml`. The plugin and server check protocol versions and tell
   you if one side needs an update.
 - **Logs:** `journalctl -u kvist` or `docker compose logs kvist`. Every
   commit, build and failure is logged.

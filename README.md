@@ -5,21 +5,28 @@ a themeable static website: a digital garden. An Obsidian plugin decides what
 is public and pushes it. A self-hosted Go server checks it again, stores it,
 builds the site and serves it.
 
-**Status: early development.** All seven phases of [the plan](docs/design.md#11-phases)
-are implemented; it has not been run in production yet. The server accepts pushes, enforces the publish rules, builds the
-site with the built-in garden theme, publishes it atomically and can serve
-it. The [Obsidian plugin](plugin/README.md) publishes from desktop and
-mobile; `kvist push` does the same from a terminal.
+The server accepts pushes, enforces the publish rules, builds the site with
+the built-in garden theme, publishes it atomically and can serve it. The
+[Obsidian plugin](plugin/README.md) publishes from desktop and mobile;
+`kvist push` does the same from a terminal.
 
-| Phase | | Status |
-|---|---|---|
-| 1 | Config, content store, sync protocol and API, tokens, `kvist push` | done |
-| 2 | Markdown, link resolution, content model, leak tests | done |
-| 3 | Renderer, themes, garden theme, atomic builds, static serving | done |
-| 4 | Search, graph, RSS, sitemap, image metadata stripping, KaTeX/Mermaid | done |
-| 5 | Dev server with live reload, incremental builds | done |
-| 6 | Obsidian plugin | done |
-| 7 | Docker, deployment guide, Cloudflare cache purge | done |
+**Status:** feature-complete, but not yet run in production.
+
+## Run on a server
+
+Every push to `main` publishes a Docker image, `ghcr.io/klppl/kvist`
+(amd64 and arm64). On a VPS with Docker, put
+[`docker-compose.yml`](deploy/docker-compose.yml), the
+[`Caddyfile`](deploy/Caddyfile) and [`kvist.toml`](deploy/kvist.toml) in a
+folder, set your domain, and run:
+
+```sh
+docker compose up -d
+docker compose exec kvist kvist token create --site garden --name laptop
+```
+
+Caddy handles HTTPS. [Deploying](docs/deploy.md) has the full walkthrough,
+a systemd setup without Docker, and Cloudflare settings.
 
 ## Try it
 
@@ -49,7 +56,8 @@ works, so `http://127.0.0.1:8080/` shows it.
 
 ```sh
 ./kvist dev --dir ~/Vault --config kvist.toml   # same rules and theme as the server
-./kvist dev --dir example-vault --public Garden # without a config
+./kvist dev --dir ~/Vault --public Garden       # without a config
+./kvist dev --dir example-vault --config kvist.example.toml   # the demo vault
 ```
 
 This serves the site at http://127.0.0.1:1313/ and rebuilds when a note or
