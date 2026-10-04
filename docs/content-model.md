@@ -19,7 +19,7 @@ folder, note ↔ tag, backlinks) are written as note ids.
 | `Revision` | string | The content revision that was built. |
 | `BuiltAt` | time | Commit time of the revision, never the wall clock, so builds are reproducible. |
 | `Notes` | []*Note | Sorted by URL. |
-| `Assets` | []*Asset | Attachments referenced by rendered content, sorted by URL. |
+| `Assets` | []*Asset | Attachments referenced by rendered content or by an image property (below), sorted by URL. |
 | `Tags` | []*Tag | Top-level tags; nested tags are `Children`. |
 | `AllTags` | []*Tag | Every tag, sorted by name (templates only). |
 | `Root` | *Folder | Folder tree of published notes. |
@@ -30,9 +30,14 @@ folder, note ↔ tag, backlinks) are written as note ids.
 
 `Title`, `Description`, `BaseURL` (no trailing slash), `Language`, `Author`,
 `StrictLineBreaks` (single line breaks were rendered as spaces, not `<br>`),
-`Nav` (list of `{Title, URL}`) and `Params` (theme parameters).
+`Nav` (list of `{Title, URL}`), `Params` (theme parameters), `Image` (the
+default social preview image, as `Note.Image`) and `Profile` (nil unless
+set: `{Avatar, Bio, Links}`, each link `{Title, URL, Kind}` with `Kind` one of
+`github`, `gitlab`, `mastodon`, `bluesky`, `linkedin`, `x`, `youtube`,
+`email`, `website`).
 
-The server config sets these. The vault may override `title`,
+The server config sets these. `image`, `avatar` (or `logo`), `bio` and
+`profile_links` come from the settings note only. The vault may override `title`,
 `description`, `author`, `language`, `strict_line_breaks`, `home`, the menu (`Nav`) and theme
 parameters with a **settings note**: a note named `_site.md` in any folder,
 never published as a page. Clients push its content as `.kvist/site.md`.
@@ -75,6 +80,7 @@ note wins where both set a value. The theme parameter `nav_tags` is read as
 | `Created`, `Updated` | time | Frontmatter `created`/`date` and `updated`/`modified`/`lastmod`, else the file's modification time. |
 | `Description` | string | Frontmatter `description`/`summary`, else the first paragraph (≤ 200 characters). |
 | `Params` | map | Only the frontmatter keys listed in `expose_frontmatter`. Other keys never reach a theme. |
+| `Image` | string | Social preview image from the `image` or `cover` property: the URL of a published image (`/_assets/…`), or an http(s) URL; empty if unset or not a published image. The value may be `"[[cover.png]]"`, a vault path, or a URL. |
 | `Content` | HTML | The rendered body. |
 | `TOC` | []*Heading | Nested `{Level, Text, ID, Children}`. |
 | `Links` | []*Link | Outgoing links to published notes (`Target`, `Embed`), in order, without duplicates. |
@@ -128,7 +134,9 @@ or a note would take a reserved URL (`/tags/…`, `/_assets/…`,
 
 `Path`, `URL`, `Size`, `MediaType` (MIME), `Hash`. An attachment is
 published only if the rendered content of a published note references it,
-and never if it is in an `exclude_folders` folder.
+or it is the image of an image property (a published note's
+`image`/`cover`, the settings note's `image`/`avatar`/`logo`), and never if
+it is in an `exclude_folders` folder.
 
 ## Tag
 

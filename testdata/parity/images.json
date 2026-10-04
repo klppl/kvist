@@ -1,0 +1,25 @@
+{
+  "comment": "Image property values (image, cover; image, avatar, logo in the settings note) and what they point to. Shared by internal/vault and plugin/src/rules.ts.",
+  "cases": [
+    {"value": "[[cover.png]]", "target": "cover.png"},
+    {"value": "![[cover.png]]", "target": "cover.png"},
+    {"value": " [[attachments/cover.png|A cover]] ", "target": "attachments/cover.png"},
+    {"value": "[[cover.png#x]]", "target": "cover.png"},
+    {"value": "attachments/cover.png", "target": "attachments/cover.png"},
+    {"value": "cover.png", "target": "cover.png"},
+    {"value": ["[[a.png]]", "[[b.png]]"], "target": "a.png"},
+    {"value": "https://example.com/og.png", "url": "https://example.com/og.png"},
+    {"value": "HTTP://example.com/og.png", "url": "HTTP://example.com/og.png"},
+    {"value": "javascript:alert(1)"},
+    {"value": "data:image/png;base64,AAAA"},
+    {"value": "file:///etc/passwd"},
+    {"value": ""},
+    {"value": "   "},
+    {"value": "[[]]"},
+    {"value": "[[unclosed.png"},
+    {"value": []},
+    {"value": 42},
+    {"value": true},
+    {"value": null}
+  ]
+}

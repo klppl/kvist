@@ -5,8 +5,11 @@
 // tested; main.ts adapts the real vault to VaultLike.
 
 import { HashCache, sha256 } from "./hash";
-import { HINTS_PATH, ManifestFile, Rules, SITE_CONFIG_PATH, SITE_NOTE_PATH } from "./protocol";
-import { Decision, allowedPath, attachmentAllowed, evaluate, isNote, isSettingsNote } from "./rules";
+import { HINTS_PATH, ManifestFile, Rules, SETTINGS_NOTE_NAME, SITE_CONFIG_PATH, SITE_NOTE_PATH } from "./protocol";
+import {
+  Decision, NOTE_IMAGE_KEYS, SITE_AVATAR_KEYS, SITE_IMAGE_KEYS, allowedPath, attachmentAllowed, evaluate, imageProperty,
+  isImage, isNote, isSettingsNote,
+} from "./rules";
 
 export interface VaultFile {
   path: string;
@@ -122,6 +125,16 @@ export async function scan(vault: VaultLike, rules: Rules, cache: HashCache): Pr
       }
       include.add(dest);
     }
+    includeImage(vault, rules, include, leaks, from, from, vault.meta(from)?.frontmatter, NOTE_IMAGE_KEYS);
+  }
+
+  const settingsNote = findSettingsNote(all.keys());
+  if (settingsNote) {
+    // Its images resolve from the vault root, as on the server, which only
+    // sees the note as .kvist/site.md.
+    const fm = vault.meta(settingsNote)?.frontmatter;
+    includeImage(vault, rules, include, leaks, settingsNote, SETTINGS_NOTE_NAME, fm, SITE_IMAGE_KEYS);
+    includeImage(vault, rules, include, leaks, settingsNote, SETTINGS_NOTE_NAME, fm, SITE_AVATAR_KEYS);
   }
 
   const files: ManifestFile[] = [];
@@ -139,7 +152,6 @@ export async function scan(vault: VaultLike, rules: Rules, cache: HashCache): Pr
   }
   cache.prune(new Set(all.keys()));
 
-  const settingsNote = findSettingsNote(all.keys());
   if (settingsNote) {
     // Pushed under a fixed name, so the server needn't know where it lives.
     const f = all.get(settingsNote)!;
@@ -166,6 +178,25 @@ export async function scan(vault: VaultLike, rules: Rules, cache: HashCache): Pr
 
   files.sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
   return { files, decisions, leaks, content, settingsNote };
+}
+
+/**
+ * Adds the vault image an image property points to (see NOTE_IMAGE_KEYS),
+ * under the same rules as an embedded attachment.
+ */
+function includeImage(
+  vault: VaultLike, rules: Rules, include: Set<string>, leaks: LeakItem[],
+  note: string, from: string, frontmatter: Record<string, unknown> | undefined, keys: string[],
+) {
+  const ref = imageProperty(frontmatter, keys);
+  if (!ref || !("target" in ref)) return;
+  const dest = vault.resolve(ref.target, from);
+  if (!dest || !isImage(dest) || !allowedPath(rules, dest)) return;
+  if (!attachmentAllowed(rules, dest)) {
+    leaks.push({ kind: "excluded_attachment", from: note, target: dest });
+    return;
+  }
+  include.add(dest);
 }
 
 /** JSON with sorted object keys, so equal hints hash equally. */

@@ -49,6 +49,26 @@ type SiteConfig struct {
 	StrictLineBreaks bool           `json:"strict_line_breaks,omitempty"`
 	Nav              []NavItem      `json:"nav,omitempty"`
 	Params           map[string]any `json:"params,omitempty"`
+	// Image is the default social preview image: the URL of a published
+	// attachment, or an http(s) URL.
+	Image   string   `json:"image,omitempty"`
+	Profile *Profile `json:"profile,omitempty"` // nil when not set
+}
+
+// Profile is the site owner's card: a picture, a short bio and links.
+type Profile struct {
+	Avatar string        `json:"avatar,omitempty"` // like SiteConfig.Image
+	Bio    string        `json:"bio,omitempty"`
+	Links  []ProfileLink `json:"links,omitempty"`
+}
+
+// ProfileLink is a link on the profile. Kind names the service, for an
+// icon: github, gitlab, mastodon, bluesky, linkedin, x, youtube, email or
+// website.
+type ProfileLink struct {
+	Title string `json:"title"`
+	URL   string `json:"url"`
+	Kind  string `json:"kind"`
 }
 
 // NavItem is one navigation link.
@@ -71,6 +91,7 @@ type Note struct {
 	Updated     time.Time         `json:"updated"`
 	Description string            `json:"description,omitempty"`
 	Params      map[string]any    `json:"params,omitempty"`
+	Image       string            `json:"image,omitempty"` // social preview image, like SiteConfig.Image
 	Content     template.HTML     `json:"content"`
 	TOC         []*Heading        `json:"toc,omitempty"`
 	Links       []*Link           `json:"links,omitempty"`

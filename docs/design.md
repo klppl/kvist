@@ -326,7 +326,10 @@ tags (`#public`, `#private`) are hidden from tag pages by default.
 Attachments (non-`.md`) have no rules of their own: an attachment is published
 iff referenced (link or embed) by a published note's *rendered* content, and
 never if it lies in an `exclude_folders` folder (the leak suite caught a
-published note linking straight into `Private/`).
+published note linking straight into `Private/`). *Addition:* an image named
+in a published note's `image`/`cover` property, or in the settings note's
+`image`/`avatar`/`logo`, counts as referenced (`vault.ImageProperty`,
+mirrored in the plugin's `rules.ts`, with a shared parity fixture).
 
 ### 5.2 Two gates
 
@@ -350,7 +353,7 @@ Trusted: the server operator, the theme, the plugin (but verified).
 |---|---|
 | Link to private note | Rendered as muted text (`<span class="link-unpublished">`), identical to a link to a nonexistent note — no existence oracle. Warning (configurable: `ignore`/`warn`/`error`). Text shown is the alias if any, else the link text the author wrote in the published note. |
 | Embed of private note/section | Omitted entirely (configurable neutral placeholder without title). Warning. Recursion through published embeds is checked at every level; cycle + depth limit. |
-| Attachments | Only reachable-from-published attachments are output. Plugin pushes only those; server re-derives. |
+| Attachments | Only reachable-from-published attachments are output (including images named in a published note's or the settings note's image properties). Plugin pushes only those; server re-derives. |
 | Image metadata | EXIF/XMP/IPTC/comments/text chunks (GPS, device, author) stripped from JPEG/PNG/WebP without re-encoding (configurable); JPEG orientation is kept as a minimal EXIF block. A file that can't be parsed is not published. SVG, GIF, AVIF and PDF are copied as-is: **residual risk, documented**. |
 | Backlinks | Computed from published notes only. |
 | Graph | Published nodes and edges only; **no ghost nodes** for unresolved links. |

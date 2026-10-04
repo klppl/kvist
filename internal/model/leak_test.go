@@ -100,13 +100,26 @@ func TestFixtureModel(t *testing.T) {
 	for _, n := range site.Notes {
 		paths = append(paths, n.Path)
 	}
-	want := []string{"Garden/Collide.md", "Garden/Embedder.md", "Garden/HintUser.md", "Garden/Hub.md", "Garden/Leaf.md"}
+	want := []string{"Garden/Collide.md", "Garden/Covered by path.md", "Garden/Covered.md", "Garden/Embedder.md", "Garden/HintUser.md", "Garden/Hub.md", "Garden/Leaf.md"}
 	sort.Strings(paths)
 	if strings.Join(paths, ",") != strings.Join(want, ",") {
 		t.Fatalf("published = %v\nwant %v", paths, want)
 	}
 	if len(site.Assets) != 1 || site.Assets[0].Path != "attachments/public-pic.png" {
 		t.Errorf("assets = %+v", site.Assets)
+	}
+	// Image properties pointing at private pictures are dropped; the
+	// settings note's public default image is kept.
+	for _, p := range []string{"Garden/Covered.md", "Garden/Covered by path.md"} {
+		if img := site.Note(p).Image; img != "" {
+			t.Errorf("%s: image = %q, want none", p, img)
+		}
+	}
+	if site.Config.Image != site.Assets[0].URL {
+		t.Errorf("site image = %q, want %q", site.Config.Image, site.Assets[0].URL)
+	}
+	if site.Config.Profile == nil || site.Config.Profile.Avatar != "" || site.Config.Profile.Bio != "A bio." {
+		t.Errorf("profile = %+v", site.Config.Profile)
 	}
 
 	hub := site.Note("Garden/Hub.md")
@@ -166,7 +179,7 @@ func TestFixtureModel(t *testing.T) {
 			t.Errorf("unexpected edge %+v", e)
 		}
 	}
-	if len(site.Graph.Nodes) != 5 {
+	if len(site.Graph.Nodes) != len(site.Notes) {
 		t.Errorf("graph nodes = %d", len(site.Graph.Nodes))
 	}
 }

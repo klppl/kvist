@@ -29,6 +29,10 @@ type siteSettings struct {
 	NavSet                               bool
 	NavFrom                              string
 	Params                               map[string]any
+
+	Image, Avatar *vault.ImageRef // resolved once attachments are known
+	Bio           *string
+	ProfileLinks  []ProfileLink
 }
 
 // navRef is a menu link: a URL, or a note to resolve once URLs are known.
@@ -131,6 +135,9 @@ var serverOnlyKeys = map[string]bool{
 // ignoredKeys are Obsidian's own properties, not settings.
 var ignoredKeys = map[string]bool{"tags": true, "tag": true, "aliases": true, "alias": true, "cssclasses": true, "cssclass": true, "publish": true}
 
+// imageKeys are read by vault.ImageProperty, after the other properties.
+var imageKeys = map[string]bool{"image": true, "avatar": true, "logo": true}
+
 func (b *builder) readSiteNote(st *siteSettings, src []byte) {
 	m := vault.ParseMeta(src)
 	if m.FrontmatterErr != nil {
@@ -159,6 +166,18 @@ func (b *builder) readSiteNote(st *siteSettings, src []byte) {
 			st.Language = s()
 		case lk == "home":
 			st.Home, st.HomeFrom = s(), protocol.SiteNotePath
+		case imageKeys[lk]:
+			if _, ok := vault.ParseImageValue(v); !ok {
+				b.warn(WarnSiteConfig, protocol.SiteNotePath, "%q should be an image in the vault, such as \"[[picture.png]]\", or a web address; ignored", k)
+			}
+		case lk == "bio":
+			st.Bio = s()
+		case lk == "profile_links":
+			links, bad := parseProfileLinks(v)
+			for _, x := range bad {
+				b.warn(WarnSiteConfig, protocol.SiteNotePath, "profile link %q is not a web or mailto: address; left out", x)
+			}
+			st.ProfileLinks = links
 		case lk == "strict_line_breaks":
 			if on, ok := boolValue(v); ok {
 				st.StrictLineBreaks = &on
@@ -171,6 +190,12 @@ func (b *builder) readSiteNote(st *siteSettings, src []byte) {
 		default:
 			st.Params[k] = v
 		}
+	}
+	if r, ok := vault.ImageProperty(m.Frontmatter, vault.SiteImageKeys); ok {
+		st.Image = &r
+	}
+	if r, ok := vault.ImageProperty(m.Frontmatter, vault.SiteAvatarKeys); ok {
+		st.Avatar = &r
 	}
 	if nav := parseNavList(src[m.BodyStart:]); nav != nil {
 		st.Nav, st.NavSet, st.NavFrom = nav, true, protocol.SiteNotePath
@@ -266,6 +291,87 @@ func parseNavList(body []byte) []navRef {
 	return out
 }
 
+var (
+	profileMarkdown = regexp.MustCompile(`^\[([^\]]+)\]\(\s*<?([^)>\s]+)>?\s*\)$`)
+	webOrMail       = regexp.MustCompile(`^(?i:https?://[^\s/]+|mailto:\S+@\S+)`)
+)
+
+// parseProfileLinks reads profile_links: a list whose items are a URL
+// ("https://github.com/ada"), a Markdown link ("[Code](https://…)") or a
+// "Title: URL" pair. Only http(s) and mailto: addresses are kept; the
+// others are returned as bad.
+func parseProfileLinks(v any) (links []ProfileLink, bad []string) {
+	items, ok := v.([]any)
+	if !ok {
+		items = []any{v}
+	}
+	add := func(title, u string) {
+		u = strings.TrimSpace(u)
+		if !webOrMail.MatchString(u) {
+			bad = append(bad, u)
+			return
+		}
+		kind, name := linkKind(u)
+		if title = strings.TrimSpace(title); title == "" {
+			title = name
+		}
+		links = append(links, ProfileLink{Title: title, URL: u, Kind: kind})
+	}
+	for _, it := range items {
+		switch it := it.(type) {
+		case string:
+			if m := profileMarkdown.FindStringSubmatch(strings.TrimSpace(it)); m != nil {
+				add(m[1], m[2])
+			} else {
+				add("", it)
+			}
+		case map[string]any:
+			keys := make([]string, 0, len(it))
+			for k := range it {
+				keys = append(keys, k)
+			}
+			sort.Strings(keys)
+			for _, k := range keys {
+				add(k, scalar(it[k]))
+			}
+		default:
+			bad = append(bad, scalar(it))
+		}
+	}
+	return links, bad
+}
+
+// linkKind names the service of a profile link, for its icon and default
+// title.
+func linkKind(u string) (kind, name string) {
+	if strings.HasPrefix(strings.ToLower(u), "mailto:") {
+		return "email", "Email"
+	}
+	pu, err := url.Parse(u)
+	if err != nil {
+		return "website", u
+	}
+	host := strings.TrimPrefix(strings.ToLower(pu.Hostname()), "www.")
+	switch host {
+	case "github.com":
+		return "github", "GitHub"
+	case "gitlab.com":
+		return "gitlab", "GitLab"
+	case "bsky.app":
+		return "bluesky", "Bluesky"
+	case "linkedin.com":
+		return "linkedin", "LinkedIn"
+	case "x.com", "twitter.com":
+		return "x", "X"
+	case "youtube.com", "youtu.be":
+		return "youtube", "YouTube"
+	}
+	if strings.HasPrefix(pu.Path, "/@") {
+		return "mastodon", "Mastodon" // most fediverse profiles live at /@name
+	}
+	return "website", host
+}
+
 // applySettings fills the site config from the server's values and the
 // vault's settings. Links to notes are resolved later, in finishSettings.
 func applySettings(c *SiteConfig, st siteSettings) {
@@ -283,6 +389,23 @@ func applySettings(c *SiteConfig, st siteSettings) {
 	}
 	for k, v := range st.Params {
 		c.Params[k] = v
+	}
+	if st.Bio != nil || st.ProfileLinks != nil || st.Avatar != nil {
+		c.Profile = &Profile{Links: st.ProfileLinks}
+		if st.Bio != nil {
+			c.Profile.Bio = *st.Bio
+		}
+	}
+}
+
+// siteImages resolves the settings note's default image and avatar to
+// published images.
+func (b *builder) siteImages(s *Site, st siteSettings) {
+	if st.Image != nil {
+		s.Config.Image = b.imageURL(protocol.SettingsNoteName, protocol.SiteNotePath, *st.Image)
+	}
+	if st.Avatar != nil && s.Config.Profile != nil {
+		s.Config.Profile.Avatar = b.imageURL(protocol.SettingsNoteName, protocol.SiteNotePath, *st.Avatar)
 	}
 }
 

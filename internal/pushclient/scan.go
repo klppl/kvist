@@ -168,6 +168,7 @@ func ScanDir(dir string, rules protocol.Rules) (*Scan, error) {
 				include[target] = true
 			}
 		}
+		includeImages(include, ix, rules, p, m.Frontmatter, vault.NoteImageKeys)
 	}
 	if _, ok := all[protocol.SiteConfigPath]; ok {
 		include[protocol.SiteConfigPath] = true
@@ -175,6 +176,17 @@ func ScanDir(dir string, rules protocol.Rules) (*Scan, error) {
 	settings, err := findSettingsNote(paths)
 	if err != nil {
 		return nil, err
+	}
+	if settings != "" {
+		src, err := os.ReadFile(all[settings].abs)
+		if err != nil {
+			return nil, err
+		}
+		// The settings note's images resolve from the vault root, as on
+		// the server, which only sees it as .kvist/site.md.
+		fm := vault.ParseMeta(src).Frontmatter
+		includeImages(include, ix, rules, protocol.SettingsNoteName, fm, vault.SiteImageKeys)
+		includeImages(include, ix, rules, protocol.SettingsNoteName, fm, vault.SiteAvatarKeys)
 	}
 
 	for p := range include {
@@ -226,6 +238,19 @@ func ScanDir(dir string, rules protocol.Rules) (*Scan, error) {
 	}
 	sort.Slice(s.Files, func(i, j int) bool { return s.Files[i].Path < s.Files[j].Path })
 	return s, nil
+}
+
+// includeImages adds the vault image an image property points to (see
+// vault.NoteImageKeys), under the same rules as an embedded attachment.
+func includeImages(include map[string]bool, ix *resolve.Index, rules protocol.Rules, from string, fm map[string]any, keys []string) {
+	ref, ok := vault.ImageProperty(fm, keys)
+	if !ok || ref.URL != "" {
+		return
+	}
+	target, ok := ix.Resolve(from, ref.Link)
+	if ok && vault.IsImage(target) && protocol.AllowedPath(target, rules) && publish.AttachmentAllowed(rules, target) {
+		include[target] = true
+	}
 }
 
 func newestMTime(files []protocol.File) time.Time {

@@ -31,6 +31,7 @@ const (
 	WarnSiteConfig       = "site_config"
 	WarnPermalink        = "permalink"
 	WarnHome             = "home"
+	WarnImage            = "image"
 )
 
 // BuildError lists the problems that make a build fail.
@@ -141,6 +142,7 @@ func Build(site *config.Site, snap source.Snapshot) (*Site, error) {
 		return nil, &BuildError{Problems: b.problems}
 	}
 	b.render(s)
+	b.siteImages(s, settings)
 	b.makeFolders(s)
 	b.makeTags(s)
 	b.makeAssets(s)
@@ -235,6 +237,9 @@ func (b *builder) makeNotes(s *Site) {
 				}
 				n.Params[k] = v
 			}
+		}
+		if ref, ok := vault.ImageProperty(fm, vault.NoteImageKeys); ok {
+			n.Image = b.imageURL(p, p, ref)
 		}
 		ns.doc.RemoveLeadingTitle(n.Title)
 		n.TOC = toc(ns.doc.Headings)
@@ -584,6 +589,24 @@ func (r *noteResolver) TagURL(name string) string {
 func tagURL(name string) string { return "/tags/" + slug.Path(name) + "/" }
 
 // --- assets ---
+
+// imageURL resolves an image property (vault.ImageProperty) of the note
+// from to a URL, and publishes the image it points to as if the note
+// embedded it. An image that isn't a published attachment is left out
+// with a warning naming file.
+func (b *builder) imageURL(from, file string, ref vault.ImageRef) string {
+	if ref.URL != "" {
+		return ref.URL
+	}
+	target := b.lookup(from, markdown.Ref{Target: ref.Link.Target})
+	f, ok := b.assets[target]
+	if !ok || !vault.IsImage(target) {
+		b.warn(WarnImage, file, "image %q is not a published image; left out", ref.Link.Target)
+		return ""
+	}
+	b.used[target] = true
+	return b.assetURL(f)
+}
 
 // assetURL is content-addressed. For images whose metadata is stripped the
 // hash also covers that setting, so a file published unstripped is never

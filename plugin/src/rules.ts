@@ -107,3 +107,59 @@ export function allowedPath(rules: Rules, path: string): boolean {
   const ext = extension(path);
   return rules.attachment_extensions.some((a) => a.replace(/^\./, "").toLowerCase() === ext);
 }
+
+// Image properties name a picture in the frontmatter: a note's social
+// preview image, or the site's default image and avatar in the settings
+// note. The image they point to is published like an embedded one. Each
+// list is one purpose; the first key holding an image wins. Mirrors
+// internal/vault/image.go.
+export const NOTE_IMAGE_KEYS = ["image", "cover"];
+export const SITE_IMAGE_KEYS = ["image"];
+export const SITE_AVATAR_KEYS = ["avatar", "logo"];
+
+export type ImageRef = { target: string } | { url: string };
+
+/** Interprets one image property value: a link, a vault path or an http(s) URL. */
+export function parseImageValue(v: unknown): ImageRef | null {
+  if (Array.isArray(v)) {
+    if (v.length === 0) return null;
+    v = v[0];
+  }
+  if (typeof v !== "string") return null;
+  let s = v.trim();
+  if (s.startsWith("!")) s = s.slice(1);
+  if (s.startsWith("[[")) {
+    if (!s.endsWith("]]")) return null;
+    const target = s.slice(2, -2).split("|")[0].split("#")[0].trim();
+    return target ? { target } : null;
+  }
+  if (isExternal(s)) return /^https?:\/\//i.test(s) ? { url: s } : null;
+  if (s === "" || /[[\]\n]/.test(s)) return null;
+  return { target: s.split("#")[0].trim() };
+}
+
+function isExternal(dest: string): boolean {
+  if (dest.startsWith("//")) return true;
+  const colon = dest.indexOf(":");
+  return colon > 0 && /^[a-zA-Z0-9+.-]+$/.test(dest.slice(0, colon));
+}
+
+/** The first of keys (case-insensitive) whose value is an image. */
+export function imageProperty(frontmatter: Record<string, unknown> | undefined, keys: string[]): ImageRef | null {
+  if (!frontmatter) return null;
+  const names = Object.keys(frontmatter).sort();
+  for (const key of keys) {
+    for (const k of names) {
+      if (k.toLowerCase() !== key) continue;
+      const r = parseImageValue(frontmatter[k]);
+      if (r) return r;
+    }
+  }
+  return null;
+}
+
+const IMAGE_EXTENSIONS = new Set(["png", "jpg", "jpeg", "gif", "webp", "svg", "avif", "bmp"]);
+
+export function isImage(path: string): boolean {
+  return IMAGE_EXTENSIONS.has(extension(path));
+}

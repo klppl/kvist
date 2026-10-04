@@ -93,6 +93,9 @@ func TestSiteOutput(t *testing.T) {
 		`🌿 budding`,
 		`<span class="link-unpublished">a private note</span>`,
 		`href="/garden/leaf/"`,
+		// the settings note's image, as the default social preview image
+		`<meta property="og:image" content="https://garden.example.com/_assets/`,
+		`<meta name="twitter:card" content="summary_large_image">`,
 	} {
 		if !strings.Contains(string(hub), frag) {
 			t.Errorf("hub page lacks %q", frag)

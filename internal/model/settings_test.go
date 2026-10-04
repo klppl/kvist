@@ -186,3 +186,76 @@ func TestStrictLineBreaks(t *testing.T) {
 		t.Error("strict_line_breaks is a site setting, not a theme parameter")
 	}
 }
+
+func TestImagesAndProfile(t *testing.T) {
+	site := buildVault(t, map[string]string{
+		"Kvist/Note.md":      "---\nimage: \"[[cover.png]]\"\n---\nText without the picture.",
+		"Kvist/Web.md":       "---\ncover: https://example.com/c.png\n---\nText.",
+		"Kvist/Broken.md":    "---\nimage: \"[[missing.png]]\"\ncover: \"[[cover.png]]\"\n---\nText.",
+		"Kvist/cover.png":    "png",
+		"Kvist/me.jpg":       "jpg",
+		"Private/hidden.png": "png",
+		"Kvist/_site.md": `---
+image: "[[hidden.png]]"
+avatar: "[[me.jpg]]"
+bio: Gardener.
+profile_links:
+  - https://github.com/ada
+  - "[Toots](https://mastodon.social/@ada)"
+  - Blog: https://ada.example.com
+  - mailto:ada@example.com
+  - javascript:alert(1)
+---
+`,
+	})
+	byPath := map[string]*Note{}
+	for _, n := range site.Notes {
+		byPath[n.Path] = n
+	}
+	var cover string
+	for _, a := range site.Assets {
+		if a.Path == "Kvist/cover.png" {
+			cover = a.URL
+		}
+		if a.Path == "Private/hidden.png" {
+			t.Error("an image in an excluded folder was published")
+		}
+	}
+	if cover == "" || byPath["Kvist/Note.md"].Image != cover {
+		t.Errorf("note image = %q, cover asset = %q", byPath["Kvist/Note.md"].Image, cover)
+	}
+	if got := byPath["Kvist/Web.md"].Image; got != "https://example.com/c.png" {
+		t.Errorf("web image = %q", got)
+	}
+	if got := byPath["Kvist/Broken.md"].Image; got != "" {
+		t.Errorf("an unresolved image should be left out, not fall back: %q", got)
+	}
+	if site.Config.Image != "" {
+		t.Errorf("site image from an excluded folder: %q", site.Config.Image)
+	}
+	p := site.Config.Profile
+	if p == nil || !strings.HasPrefix(p.Avatar, "/_assets/") || p.Bio != "Gardener." {
+		t.Fatalf("profile = %+v", p)
+	}
+	want := []ProfileLink{
+		{"GitHub", "https://github.com/ada", "github"},
+		{"Toots", "https://mastodon.social/@ada", "mastodon"},
+		{"Blog", "https://ada.example.com", "website"},
+		{"Email", "mailto:ada@example.com", "email"},
+	}
+	if !reflect.DeepEqual(p.Links, want) {
+		t.Errorf("links = %+v", p.Links)
+	}
+	for _, k := range []string{"image", "avatar", "bio", "profile_links"} {
+		if _, ok := site.Config.Params[k]; ok {
+			t.Errorf("%s should not be a theme parameter", k)
+		}
+	}
+	var warned bool
+	for _, w := range site.Warnings {
+		warned = warned || strings.Contains(w.Message, "javascript:")
+	}
+	if !warned {
+		t.Error("no warning for the javascript: profile link")
+	}
+}
