@@ -281,6 +281,15 @@ func (r *nodeRenderer) image(w util.BufWriter, src []byte, node ast.Node, enteri
 	if gmhtml.IsDangerousURL(n.Destination) {
 		return ast.WalkSkipChildren, nil
 	}
+	if player, ok := videoPlayer(dest); ok {
+		title := alt
+		if title == "" {
+			title = "Video"
+		}
+		fmt.Fprintf(w, `<iframe class="embed-video" src="%s" title="%s" loading="lazy" allow="encrypted-media; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>`,
+			esc(player), esc(title))
+		return ast.WalkSkipChildren, nil
+	}
 	fmt.Fprintf(w, `<img src="%s" alt="%s" loading="lazy">`, esc(dest), esc(alt))
 	return ast.WalkSkipChildren, nil
 }

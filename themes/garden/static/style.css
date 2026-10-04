@@ -201,6 +201,7 @@ a.external-link::after { content: "↗"; font-size: .75em; margin-left: .1em; }
 .embed-title { font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; }
 .embed-title a { text-decoration: none; }
 .embed-content > :first-child { margin-top: .4rem; }
+iframe.embed-video { display: block; width: 100%; aspect-ratio: 16 / 9; height: auto; border: 0; border-radius: var(--radius); background: var(--code-bg); margin: 1rem 0; }
 iframe.embed-pdf { width: 100%; height: 70vh; border: 1px solid var(--border); border-radius: var(--radius); }
 
 /* callouts */

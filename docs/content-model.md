@@ -107,6 +107,9 @@ or a note would take a reserved URL (`/tags/…`, `/_assets/…`,
 - Images and other attachments: `/_assets/<hash8>/<name>`. The hash in the
   URL means CDNs may cache them as immutable. Size syntax: `![[a.png|300]]`,
   `![[a.png|300x200]]`.
+- YouTube and Vimeo links written as images (`![title](https://youtu.be/…)`):
+  `<iframe class="embed-video">` with the privacy-friendly player
+  (`youtube-nocookie.com`, Vimeo with `dnt=1`) and `loading="lazy"`.
 - Callouts: `<div class="callout" data-callout="type">` with `callout-title`
   and `callout-content`; foldable ones (`[!tip]-`, `[!tip]+`) use
   `<details>`/`<summary>`.

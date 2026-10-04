@@ -187,3 +187,35 @@ func TestPlainTextLeavesOutEmbeds(t *testing.T) {
 		t.Errorf("plain text = %q", got)
 	}
 }
+
+func TestVideoEmbeds(t *testing.T) {
+	cases := map[string]string{
+		"https://www.youtube.com/watch?v=dQw4w9WgXcQ":      "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ",
+		"https://youtu.be/dQw4w9WgXcQ?t=1m30s":             "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?start=90",
+		"https://m.youtube.com/watch?v=dQw4w9WgXcQ&t=42":   "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?start=42",
+		"https://youtube.com/shorts/dQw4w9WgXcQ":           "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ",
+		"https://vimeo.com/76979871":                       "https://player.vimeo.com/video/76979871?dnt=1",
+		"https://vimeo.com/76979871/abc123":                "https://player.vimeo.com/video/76979871?dnt=1&amp;h=abc123",
+		"https://player.vimeo.com/video/76979871?h=abc123": "https://player.vimeo.com/video/76979871?dnt=1&amp;h=abc123",
+	}
+	for in, want := range cases {
+		out, _ := render(t, "![A talk]("+in+")")
+		contains(t, out, `<iframe class="embed-video" src="`+want+`" title="A talk" loading="lazy"`)
+	}
+	for _, in := range []string{
+		"https://www.youtube.com/watch?v=short",
+		"https://www.youtube.com/channel/UC123",
+		"https://vimeo.com/channels/staffpicks",
+		"https://example.com/watch?v=dQw4w9WgXcQ",
+	} {
+		out, _ := render(t, "![x]("+in+")")
+		if strings.Contains(out, "<iframe") {
+			t.Errorf("%s should stay an image: %s", in, out)
+		}
+	}
+	// A link (not an image) to a video stays a link.
+	out, _ := render(t, "[talk](https://youtu.be/dQw4w9WgXcQ)")
+	if strings.Contains(out, "<iframe") {
+		t.Errorf("a plain link became a player: %s", out)
+	}
+}
