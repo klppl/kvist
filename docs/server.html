@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Running the server · kvist docs</title>
+<meta name="description" content="Update, back up and look after your kvist server: tokens, rollbacks, Cloudflare and the command line.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<script>try{var t=localStorage.getItem("kvist-docs-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="stylesheet" href="assets/docs.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="shell">
+  <aside class="side">
+    <div class="brand">
+      <a href="index.html"><img src="assets/icon.svg" width="22" height="22" alt="">kvist <small>docs</small></a>
+      <button class="icon-button theme-toggle" type="button" aria-label="Switch color theme" hidden><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
+      <button class="icon-button menu-toggle" type="button" aria-label="Menu" aria-expanded="false" hidden><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    </div>
+    <nav aria-label="Documentation">
+      <h2>Start</h2>
+      <ul>
+        <li><a href="index.html">Overview</a></li>
+        <li><a href="getting-started.html">Getting started</a></li>
+      </ul>
+      <h2>Guides</h2>
+      <ul>
+        <li><a href="publishing.html">Publishing notes</a></li>
+        <li><a href="writing.html">Writing notes</a></li>
+        <li><a href="customizing.html">Customizing the site</a></li>
+        <li><a href="server.html" aria-current="page">Running the server</a></li>
+      </ul>
+      <h2>Reference</h2>
+      <ul>
+        <li><a href="configuration.html">Configuration</a></li>
+        <li><a href="troubleshooting.html">Troubleshooting</a></li>
+      </ul>
+      <h2>More</h2>
+      <ul>
+        <li><a href="https://github.com/klppl/kvist" class="ext">GitHub</a></li>
+        <li><a href="https://github.com/klppl/kvist/blob/main/docs/themes.md" class="ext">Writing a theme</a></li>
+        <li><a href="https://github.com/klppl/kvist/blob/main/docs/content-model.md" class="ext">Content model</a></li>
+        <li><a href="https://github.com/klppl/kvist/blob/main/docs/design.md" class="ext">Design notes</a></li>
+      </ul>
+    </nav>
+    <p class="side-foot">kvist is open source (MIT). <a href="https://github.com/klppl/kvist/issues">Report a problem</a></p>
+  </aside>
+  <main id="main">
+    <div class="page">
+      <article>
+<p class="eyebrow">Guides</p>
+<h1>Running the server</h1>
+<p class="lead">Once it's set up, the server mostly looks after itself. This page covers the things you'll do now and then: updating, backups, tokens, undoing a publish and putting Cloudflare in front.</p>
+<p>All commands below are run on the server, in the folder with <code>docker-compose.yml</code> (<code>~/kvist</code> in <a href="getting-started.html">Getting started</a>).</p>
+
+<h2 id="update">Updating</h2>
+<pre><code>docker compose pull
+docker compose up -d</code></pre>
+<p>This fetches the newest kvist and Caddy images and restarts what changed. Your published site and settings are kept. The plugin and the server check each other's protocol version and tell you if one needs updating.</p>
+<p>Every build of kvist is also published with its own tag, <code>ghcr.io/klppl/kvist:sha-&lt;commit&gt;</code>. To stay on a known version, put that tag in <code>docker-compose.yml</code> instead of <code>latest</code>; to go back after a bad update, put the previous one there and run <code>docker compose up -d</code>.</p>
+
+<h2 id="config-changes">Changing the settings</h2>
+<p>kvist reads <code>kvist.toml</code> when it starts. After editing it:</p>
+<pre><code>docker compose restart kvist</code></pre>
+<p>Then publish from Obsidian, so the site is rebuilt with the new settings. If the file has a mistake, kvist doesn't start; <code>docker compose logs kvist</code> says what's wrong.</p>
+
+<h2 id="tokens">Tokens</h2>
+<pre><code>docker compose exec kvist kvist token create --site garden --name phone
+docker compose exec kvist kvist token list
+docker compose exec kvist kvist token revoke 3f9a1c2e</code></pre>
+<p>Use one token per device. If a device is lost, revoke its token (by the id from <code>token list</code>); the others keep working. Changes take effect immediately, without a restart. Anyone with a token can replace your site, so treat it like a password.</p>
+
+<h2 id="rollback">Undoing a publish</h2>
+<p>The server keeps the last 10 versions (<em>revisions</em>) of each site. The log names the revision each publish created:</p>
+<pre><code>docker compose logs kvist | grep commit</code></pre>
+<p>Make an earlier one live again:</p>
+<pre><code>docker compose exec kvist kvist rollback garden r000041</code></pre>
+<p>If you give an id that's no longer kept, kvist lists the ones that are. A rollback is undone by the next publish from your vault, so fix the vault first (or turn off automatic publishing for a while).</p>
+
+<h2 id="backups">Backups</h2>
+<p>Everything kvist stores is in the <code>kvist-data</code> Docker volume: what you published, the built site and the token fingerprints. Your vault is the real original, so losing the server only means setting it up again and publishing. To keep a copy anyway:</p>
+<pre><code>docker run --rm -v kvist_kvist-data:/data -v "$PWD":/backup alpine \
+  tar czf /backup/kvist-data.tar.gz -C /data .</code></pre>
+<p>The volume's name starts with the folder name; check it with <code>docker volume ls</code>.</p>
+
+<h2 id="disk">Disk use and history</h2>
+<p>Unpublished notes vanish from the site immediately, but stay on the server's disk inside older revisions until they age out. That's what makes rollbacks possible. Change how much history is kept in <code>kvist.toml</code>:</p>
+<pre data-label="kvist.toml"><code>[site.retention]
+revisions = 10   <span class="c"># versions of your notes kept for rollback</span>
+builds    = 3    <span class="c"># built copies of the site</span></code></pre>
+<p>Set both to <code>1</code> to keep as little as possible. Unchanged files are shared between builds, so history costs little space. Old uploads are cleaned up automatically.</p>
+
+<h2 id="logs">Logs</h2>
+<pre><code>docker compose logs -f kvist</code></pre>
+<p>Every publish (<code>commit</code>), build and error is logged, with the device name that published.</p>
+
+<h2 id="cloudflare">Cloudflare</h2>
+<p>kvist works behind Cloudflare's proxy (the orange cloud). Set it up like this:</p>
+<ul>
+  <li><strong>SSL/TLS mode:</strong> <em>Full (strict)</em>. Caddy already has a valid certificate.</li>
+  <li><strong>Caching:</strong> leave Cloudflare's cache on “respect existing headers”. kvist tells it to keep pages for 60 seconds and images and styles for a year (their addresses change when they change). Don't add a “cache everything” rule with a long edge lifetime, or unpublished pages stay visible until it expires.</li>
+  <li><strong>The API:</strong> add a Cache Rule: <em>URI Path starts with <code>/api/</code></em> → <em>Bypass cache</em>.</li>
+  <li><strong>Upload size:</strong> Cloudflare's free plan accepts up to 100 MB per request. kvist's default file limit, 50 MiB, fits.</li>
+</ul>
+<h3 id="purge">Clearing Cloudflare's cache on every publish</h3>
+<p>So that an unpublished page disappears from Cloudflare right away instead of within a minute:</p>
+<ol>
+  <li>In Cloudflare, create an API token with only the permission <em>Zone → Cache Purge</em>, for your domain's zone.</li>
+  <li>Add it to the server, next to <code>docker-compose.yml</code>, in a file called <code>.env</code>:
+<pre data-label=".env"><code>CF_API_TOKEN=your-token</code></pre></li>
+  <li>Add the zone to <code>kvist.toml</code> (the Zone ID is on your domain's overview page in Cloudflare):
+<pre data-label="kvist.toml"><code>[site.cloudflare]
+zone_id       = "your-zone-id"
+api_token_env = "CF_API_TOKEN"</code></pre></li>
+  <li>Run <code>docker compose up -d</code> so kvist picks up both.</li>
+</ol>
+<p>If a purge fails, the publish still succeeds, and the warning shows in the plugin's report.</p>
+
+<h2 id="cli">The command line</h2>
+<p>The same <code>kvist</code> program is the server and a set of tools. On the server, run them with <code>docker compose exec kvist kvist …</code>. To use them on your own computer (for example <code>kvist dev</code> to preview your vault), build it from the repository with Go installed: <code>make build</code> puts it in <code>bin/kvist</code>.</p>
+<table>
+  <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>kvist serve</code></td><td>Runs the server (what the Docker container does).</td></tr>
+    <tr><td><code>kvist token create|list|revoke</code></td><td>Manages tokens.</td></tr>
+    <tr><td><code>kvist rollback SITE REVISION</code></td><td>Makes an earlier revision live again.</td></tr>
+    <tr><td><code>kvist gc</code></td><td>Cleans up unused uploads now (the server also does it by itself).</td></tr>
+    <tr><td><code>kvist dev --dir VAULT --config kvist.toml</code></td><td>Previews a vault at <code>http://127.0.0.1:1313</code>, reloading on every change.</td></tr>
+    <tr><td><code>kvist build --dir VAULT --out DIR</code></td><td>Builds the site into a folder, without a server.</td></tr>
+    <tr><td><code>kvist push --server URL --site ID --dir VAULT</code></td><td>Publishes a folder from the terminal, like the plugin does. The token goes in <code>KVIST_TOKEN</code>; <code>-v</code> shows the decision for every note.</td></tr>
+    <tr><td><code>kvist version</code></td><td>Prints the version.</td></tr>
+  </tbody>
+</table>
+<p>Commands that need the config look for <code>kvist.toml</code> in the current folder, or the path in <code>KVIST_CONFIG</code>, or <code>--config</code>.</p>
+
+<h2 id="without-docker">Without Docker</h2>
+<p>kvist is a single program, so it also runs directly under systemd, behind Caddy or nginx. The <a href="https://github.com/klppl/kvist/blob/main/docs/deploy.md">deployment notes</a> have a ready-made systemd unit and an nginx example that serves the built files directly.</p>
+<nav class="next" aria-label="Pages"><a href="customizing.html"><small>Previous</small>Customizing the site</a><a class="fwd" href="configuration.html"><small>Next</small>Configuration</a></nav>
+      </article>
+      <aside class="toc"></aside>
+    </div>
+  </main>
+</div>
+<script src="assets/docs.js" defer></script>
+</body>
+</html>

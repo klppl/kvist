@@ -12,6 +12,10 @@ the built-in garden theme, publishes it atomically and can serve it. The
 
 **Status:** feature-complete, but not yet run in production.
 
+**[Read the documentation →](https://klppl.github.io/kvist/)** It walks you
+through setting up a server, connecting Obsidian and publishing your first
+notes.
+
 ## Run on a server
 
 Every push to `main` publishes a Docker image, `ghcr.io/klppl/kvist`
@@ -80,6 +84,9 @@ The client applies the rules before uploading anything, and the server
 applies them again on its own.
 
 ## Docs
+
+The user guide is at **https://klppl.github.io/kvist/** (source: `docs/*.html`).
+Reference notes for developers:
 
 - [Design](docs/design.md): architecture, decisions, threat model
 - [Sync protocol v1](docs/protocol.md): the client–server contract

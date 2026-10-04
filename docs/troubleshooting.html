@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Troubleshooting · kvist docs</title>
+<meta name="description" content="Fixes for common problems when setting up kvist and publishing notes.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<script>try{var t=localStorage.getItem("kvist-docs-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="stylesheet" href="assets/docs.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="shell">
+  <aside class="side">
+    <div class="brand">
+      <a href="index.html"><img src="assets/icon.svg" width="22" height="22" alt="">kvist <small>docs</small></a>
+      <button class="icon-button theme-toggle" type="button" aria-label="Switch color theme" hidden><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
+      <button class="icon-button menu-toggle" type="button" aria-label="Menu" aria-expanded="false" hidden><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    </div>
+    <nav aria-label="Documentation">
+      <h2>Start</h2>
+      <ul>
+        <li><a href="index.html">Overview</a></li>
+        <li><a href="getting-started.html">Getting started</a></li>
+      </ul>
+      <h2>Guides</h2>
+      <ul>
+        <li><a href="publishing.html">Publishing notes</a></li>
+        <li><a href="writing.html">Writing notes</a></li>
+        <li><a href="customizing.html">Customizing the site</a></li>
+        <li><a href="server.html">Running the server</a></li>
+      </ul>
+      <h2>Reference</h2>
+      <ul>
+        <li><a href="configuration.html">Configuration</a></li>
+        <li><a href="troubleshooting.html" aria-current="page">Troubleshooting</a></li>
+      </ul>
+      <h2>More</h2>
+      <ul>
+        <li><a href="https://github.com/klppl/kvist" class="ext">GitHub</a></li>
+        <li><a href="https://github.com/klppl/kvist/blob/main/docs/themes.md" class="ext">Writing a theme</a></li>
+        <li><a href="https://github.com/klppl/kvist/blob/main/docs/content-model.md" class="ext">Content model</a></li>
+        <li><a href="https://github.com/klppl/kvist/blob/main/docs/design.md" class="ext">Design notes</a></li>
+      </ul>
+    </nav>
+    <p class="side-foot">kvist is open source (MIT). <a href="https://github.com/klppl/kvist/issues">Report a problem</a></p>
+  </aside>
+  <main id="main">
+    <div class="page">
+      <article>
+<p class="eyebrow">Reference</p>
+<h1>Troubleshooting</h1>
+<p class="lead">Fixes for the problems people run into most. When in doubt, two places tell you more: the plugin's publish report, and the server's log (<code>docker compose logs kvist</code>).</p>
+
+<h2 id="setup">Setting up</h2>
+
+<h3 id="pull-denied"><code>docker compose pull</code> says “denied” or “unauthorized”</h3>
+<p>The kvist image is in GitHub's container registry. If it says access is denied, the image isn't public. If you run your own fork, open your GitHub profile → <strong>Packages</strong> → <strong>kvist</strong> → <strong>Package settings</strong> → <strong>Change visibility</strong> → <strong>Public</strong>. Or log in on the server with <code>docker login ghcr.io</code>, using a GitHub token with the <code>read:packages</code> permission.</p>
+
+<h3 id="no-https">The site doesn't load, or the browser warns about the certificate</h3>
+<ul>
+  <li>Check that your domain points at the server: <code>dig +short garden.example.com</code> should print its IP address.</li>
+  <li>Ports 80 and 443 must be open. Caddy needs port 80 to get a certificate.</li>
+  <li>Look at Caddy's log: <code>docker compose logs caddy</code>.</li>
+  <li>With Cloudflare's proxy on, set SSL/TLS to <em>Full (strict)</em>. If Caddy can't get a certificate, switch the DNS record to <em>DNS only</em> (grey cloud) until it has one, then turn the proxy back on.</li>
+</ul>
+
+<h3 id="site-404">The site says “404 not found”</h3>
+<p>Nothing has been published yet. Publish from Obsidian, and the site appears. If you have published, check that <code>serve = true</code> is set for the site in <code>kvist.toml</code>.</p>
+
+<h3 id="plugin-missing">The plugin doesn't show up in Obsidian</h3>
+<ul>
+  <li>The three files must be directly in <code>&lt;vault&gt;/.obsidian/plugins/kvist/</code>: <code>main.js</code>, <code>manifest.json</code> and <code>styles.css</code>.</li>
+  <li><code>main.js</code> only exists after <code>npm run build</code>.</li>
+  <li>Turn off <em>Restricted mode</em> under <strong>Settings → Community plugins</strong>, then press the reload button next to <em>Installed plugins</em>.</li>
+</ul>
+
+<h3 id="test-fails">“Test” in the plugin fails</h3>
+<table>
+  <thead><tr><th>Message</th><th>What to check</th></tr></thead>
+  <tbody>
+    <tr><td><em>invalid token</em></td><td>The token is mistyped or revoked, or the <strong>Site</strong> doesn't match the site the token was made for. Tokens belong to one site. Create a new one if unsure.</td></tr>
+    <tr><td><em>must use https://</em></td><td>Enter the address with <code>https://</code>. Plain <code>http://</code> only works for <code>localhost</code>.</td></tr>
+    <tr><td><em>could not reach the server</em> or a network error</td><td>The address is wrong or the site isn't up yet. Open <code>https://your-domain/api/v1/info</code> in a browser; it should show a short JSON text.</td></tr>
+    <tr><td>Something about the protocol version</td><td>The plugin and server are too far apart. Update both: <code>docker compose pull &amp;&amp; docker compose up -d</code>, and rebuild the plugin.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="publishing">Publishing</h2>
+
+<h3 id="note-missing">A note isn't on the site</h3>
+<ul>
+  <li>Open the note and run <strong>kvist: Toggle publish for current note</strong>. If a rule keeps it private (an excluded folder, the <code>#private</code> tag), the message says which. Run the command again if you didn't mean to change it.</li>
+  <li>Check the folder name's letter case: <code>always_public_folders = ["Garden"]</code> doesn't match a folder called <code>garden</code>.</li>
+  <li>Pages can be cached for up to a minute; reload after that.</li>
+</ul>
+
+<h3 id="plain-links">Some links are plain text on the site</h3>
+<p>The note they point to isn't published, or doesn't exist. That's by design: it keeps private notes hidden. The publish report lists them. Also make sure links between notes are <code>[[wikilinks]]</code>; Markdown-style links to <code>.md</code> files don't work on the site (see <a href="writing.html#supported">Writing notes</a>).</p>
+
+<h3 id="images-missing">An image or file is missing</h3>
+<ul>
+  <li>It sits in an excluded folder (the report lists these under <em>Attachments in excluded folders</em>). Move it, or set an attachment folder outside the excluded ones in Obsidian's <strong>Files and links</strong> settings.</li>
+  <li>Its file type isn't allowed, or it is over 50 MiB. See <a href="configuration.html#server-publish">attachment_extensions</a> and <a href="configuration.html#server-limits">limits</a>.</li>
+</ul>
+
+<h3 id="build-failed">“The site build failed”</h3>
+<p>The live site keeps showing the last good version. The message says what's wrong. The most common causes:</p>
+<ul>
+  <li><strong>Two notes would get the same address</strong>, for example <code>My note.md</code> and <code>My Note!.md</code>, or a note's <code>permalink</code> clashes with another. The message names both; rename one.</li>
+  <li><strong>A link or embed to a private note</strong>, when <code>unpublished_links</code> or <code>unpublished_embeds</code> is set to <code>"error"</code>.</li>
+</ul>
+
+<h3 id="newer-content">“The server has newer content than this device” (◆)</h3>
+<p>Another device published changes this device hasn't received yet, and publishing now would put older notes back. Let your vault finish syncing, then run <strong>Publish now</strong>. It shows which notes are affected and asks before going ahead. See <a href="publishing.html#devices">More than one device</a>.</p>
+
+<h3 id="still-visible">A page is still visible after I unpublished it</h3>
+<p>Browsers and CDNs may keep a page for up to 60 seconds. With Cloudflare, set up the <a href="server.html#purge">cache purge</a> so it disappears immediately. If a search engine already indexed it, it can take that search engine some time to notice.</p>
+
+<h2 id="settings">Settings</h2>
+
+<h3 id="toml-ignored">My changes to <code>kvist.toml</code> did nothing</h3>
+<p>Restart kvist (<code>docker compose restart kvist</code>), then publish again. If kvist doesn't come back up, the file has a mistake; <code>docker compose logs kvist</code> says where.</p>
+
+<h3 id="site-toml-ignored">My changes to <code>.kvist/site.toml</code> did nothing</h3>
+<ul>
+  <li>The file must be at <code>&lt;vault&gt;/.kvist/site.toml</code>, exactly, at the top of the vault.</li>
+  <li>Publish after saving it: the file goes up with your notes.</li>
+  <li>Open the publish report. A mistake in the file, or a key that isn't allowed there (publish rules belong on the server), shows up as a warning.</li>
+  <li>For <code>nav_tags</code>, at least one published note must carry each tag.</li>
+</ul>
+
+<h2 id="help">Still stuck?</h2>
+<p><a href="https://github.com/klppl/kvist/issues">Open an issue on GitHub</a> with what you did, what you expected and the error message. Remove tokens and private note names before posting logs.</p>
+<nav class="next" aria-label="Pages"><a href="configuration.html"><small>Previous</small>Configuration</a></nav>
+      </article>
+      <aside class="toc"></aside>
+    </div>
+  </main>
+</div>
+<script src="assets/docs.js" defer></script>
+</body>
+</html>

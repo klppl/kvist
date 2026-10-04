@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Publishing notes · kvist docs</title>
+<meta name="description" content="Decide which notes are public, keep the rest private, and keep your site up to date.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<script>try{var t=localStorage.getItem("kvist-docs-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="stylesheet" href="assets/docs.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="shell">
+  <aside class="side">
+    <div class="brand">
+      <a href="index.html"><img src="assets/icon.svg" width="22" height="22" alt="">kvist <small>docs</small></a>
+      <button class="icon-button theme-toggle" type="button" aria-label="Switch color theme" hidden><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
+      <button class="icon-button menu-toggle" type="button" aria-label="Menu" aria-expanded="false" hidden><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    </div>
+    <nav aria-label="Documentation">
+      <h2>Start</h2>
+      <ul>
+        <li><a href="index.html">Overview</a></li>
+        <li><a href="getting-started.html">Getting started</a></li>
+      </ul>
+      <h2>Guides</h2>
+      <ul>
+        <li><a href="publishing.html" aria-current="page">Publishing notes</a></li>
+        <li><a href="writing.html">Writing notes</a></li>
+        <li><a href="customizing.html">Customizing the site</a></li>
+        <li><a href="server.html">Running the server</a></li>
+      </ul>
+      <h2>Reference</h2>
+      <ul>
+        <li><a href="configuration.html">Configuration</a></li>
+        <li><a href="troubleshooting.html">Troubleshooting</a></li>
+      </ul>
+      <h2>More</h2>
+      <ul>
+        <li><a href="https://github.com/klppl/kvist" class="ext">GitHub</a></li>
+        <li><a href="https://github.com/klppl/kvist/blob/main/docs/themes.md" class="ext">Writing a theme</a></li>
+        <li><a href="https://github.com/klppl/kvist/blob/main/docs/content-model.md" class="ext">Content model</a></li>
+        <li><a href="https://github.com/klppl/kvist/blob/main/docs/design.md" class="ext">Design notes</a></li>
+      </ul>
+    </nav>
+    <p class="side-foot">kvist is open source (MIT). <a href="https://github.com/klppl/kvist/issues">Report a problem</a></p>
+  </aside>
+  <main id="main">
+    <div class="page">
+      <article>
+<p class="eyebrow">Guides</p>
+<h1>Publishing notes</h1>
+<p class="lead">Every note is private unless a rule makes it public. The rules are set on the server, and both the plugin and the server check them, so a mistake on one device can't leak a note.</p>
+
+<h2 id="rules">The rules</h2>
+<p>For each note, kvist goes through these rules in order. <strong>The first one that matches decides.</strong></p>
+<ol class="steps">
+  <li><h3 id="rule-excluded">Excluded folders are always private</h3>
+    <p>A note in a folder listed in <code>exclude_folders</code> (or any of its subfolders) is never published, whatever its tags or properties say. Use this for journals, templates and anything sensitive.</p></li>
+  <li><h3 id="rule-private">Explicitly private notes stay private</h3>
+    <p>A note with <code>publish: false</code> in its properties, or with the <code>#private</code> tag, stays private, even inside a public folder.</p></li>
+  <li><h3 id="rule-public">Public folders, tags and properties publish</h3>
+    <p>A note is published if it is in a folder listed in <code>always_public_folders</code>, has the <code>#public</code> tag, or has <code>publish: true</code> in its properties.</p></li>
+  <li><h3 id="rule-default">Everything else stays private</h3>
+    <p>If nothing above matched, the note is not published.</p></li>
+</ol>
+<p>The rules live in <code>kvist.toml</code> on the server <span class="where server">server</span>:</p>
+<pre data-label="kvist.toml"><code>[site.publish]
+always_public_folders = ["Garden"]
+exclude_folders       = ["Templates", "Private", "Journal"]
+public_tag            = "public"    <span class="c"># the tag that publishes a note</span>
+private_tag           = "private"   <span class="c"># the tag that keeps a note private</span>
+frontmatter_key       = "publish"   <span class="c"># the property: publish: true / false</span></code></pre>
+<p>After changing them, restart kvist (<code>docker compose restart kvist</code>) and publish again. The plugin fetches the new rules from the server each time it publishes.</p>
+<div class="callout tip">
+  <p class="callout-title">Details that matter</p>
+  <ul>
+    <li>Folders include their subfolders. <code>"Garden"</code> covers <code>Garden/Ideas/Note.md</code> too.</li>
+    <li>Excluded folders match regardless of letter case (<code>private</code> also excludes <code>Private</code>). Public folders must match exactly.</li>
+    <li>Use <code>"/"</code> in <code>always_public_folders</code> to make the whole vault public except the excluded folders and private notes.</li>
+    <li>The <code>#public</code> and <code>#private</code> tags are hidden on the published page.</li>
+  </ul>
+</div>
+
+<h2 id="ways">Three ways to publish a note</h2>
+<table>
+  <thead><tr><th>Way</th><th>Good for</th><th>How</th></tr></thead>
+  <tbody>
+    <tr><td>A public folder</td><td>A garden where everything in one place is public</td><td>Move the note into <code>Garden/</code> (or whatever you listed).</td></tr>
+    <tr><td>A tag</td><td>Single notes elsewhere in the vault</td><td>Add <code>#public</code> anywhere in the note, or in its <code>tags</code> property.</td></tr>
+    <tr><td>A property</td><td>Explicit, per-note control</td><td>Add <code>publish: true</code> to the note's properties.</td></tr>
+  </tbody>
+</table>
+<p>The command <strong>kvist: Toggle publish for current note</strong> (also in a note's file menu) sets <code>publish: true</code> or <code>publish: false</code> for you. If a stronger rule wins anyway, for example the note is in an excluded folder, it tells you why.</p>
+
+<h2 id="links">Links to private notes</h2>
+<p>Public notes often link to notes that stay private. On the site, those links turn into <strong>plain text</strong>, looking exactly like a link to a note that doesn't exist. A visitor can't tell whether a private note is behind it.</p>
+<ul>
+  <li><strong>Links</strong> keep their text (or the alias, for <code>[[Note|alias]]</code>), but don't link anywhere.</li>
+  <li><strong>Embeds</strong> of private notes (<code>![[Private note]]</code>) are left out completely.</li>
+  <li><strong>Backlinks, the graph, search, tags, RSS and the sitemap</strong> only ever contain published notes.</li>
+</ul>
+<p>The publish report lists every such link and embed, so you can decide whether to publish the target too. To be stricter, make the build fail instead: set <code>unpublished_links = "error"</code> or <code>unpublished_embeds = "error"</code> in <code>[site.publish]</code> (the default is <code>"warn"</code>).</p>
+
+<h2 id="attachments">Images and attachments</h2>
+<p>An image, PDF or other file is published only if a published note links to or embeds it, and never if the file itself sits in an excluded folder. You don't need to make attachments public separately.</p>
+<p>Before publishing, kvist removes metadata from <strong>JPEG, PNG and WebP</strong> images: GPS location, camera details, author and comments. The image itself isn't re-compressed. <strong>SVG, GIF, AVIF and PDF files are published as they are</strong>, so check those for anything personal.</p>
+<p>The allowed file types are png, jpg, jpeg, gif, webp, svg, avif, pdf, mp3, m4a, ogg, wav, mp4 and webm. Files can be up to 50 MiB each. Both can be changed in the <a href="configuration.html#server-publish">configuration</a>.</p>
+
+<h2 id="report">The publish report</h2>
+<p>Run <strong>kvist: Open publish report</strong>, or click the kvist status in the status bar. After a publish it shows:</p>
+<ul>
+  <li>how many notes and files are public;</li>
+  <li>links and embeds that point to private notes;</li>
+  <li>attachments that are used by public notes but sit in excluded folders;</li>
+  <li>warnings from the server's build, each linked to the note it's about.</li>
+</ul>
+<p>The status bar shows where things stand at a glance:</p>
+<table>
+  <thead><tr><th>Icon</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td>○</td><td>Not published yet</td></tr>
+    <tr><td>◔ / ◑</td><td>Waiting to publish / publishing</td></tr>
+    <tr><td>●</td><td>Published, no warnings</td></tr>
+    <tr><td>▲</td><td>Published, with warnings in the report</td></tr>
+    <tr><td>◆</td><td>The server has newer content than this device (see <a href="#devices">below</a>)</td></tr>
+    <tr><td>✕</td><td>Publishing failed; the message tells you why</td></tr>
+  </tbody>
+</table>
+
+<h2 id="automatic">Publishing automatically</h2>
+<p>Turn on <strong>Publish automatically</strong> in the plugin settings, and kvist publishes by itself once you stop editing for a while (30 seconds by default, at least 5).</p>
+<div class="callout warn">
+  <p class="callout-title">Use it on one device only</p>
+  <p>A device that hasn't finished syncing your vault has older notes. If it published automatically, it could replace newer versions on your site. Pick your main computer for automatic publishing, and use <strong>Publish now</strong> elsewhere.</p>
+</div>
+
+<h2 id="devices">More than one device</h2>
+<p>Each device needs its own token. The server keeps track of what was published last. When a device would put an <em>older</em> version of a note back on the site, or remove a note another device just published, kvist stops:</p>
+<ul>
+  <li>An automatic publish stops, and the status bar shows <strong>◆</strong>.</li>
+  <li><strong>Publish now</strong> shows the affected notes and asks before going ahead.</li>
+</ul>
+<p>Usually the fix is to let your vault finish syncing, then publish again.</p>
+
+<h2 id="unpublish">Unpublishing and mistakes</h2>
+<p>To take a note down, make it private (move it, tag it <code>#private</code> or set <code>publish: false</code>) and publish. It disappears from the site, search, feeds and the graph with that build.</p>
+<ul>
+  <li><strong>Caches.</strong> Pages are cached by browsers and CDNs for up to 60 seconds. With Cloudflare, set up the <a href="server.html#cloudflare">cache purge</a> so pages vanish from its cache right away.</li>
+  <li><strong>The wider internet.</strong> Search engines and archives may already have copied a page. kvist can't undo that, so think before publishing something sensitive.</li>
+  <li><strong>Undo a bad publish.</strong> The server keeps the last 10 versions of your site. <a href="server.html#rollback">Roll back</a> to an earlier one, then fix the vault before publishing again.</li>
+</ul>
+<nav class="next" aria-label="Pages"><a href="getting-started.html"><small>Previous</small>Getting started</a><a class="fwd" href="writing.html"><small>Next</small>Writing notes</a></nav>
+      </article>
+      <aside class="toc"></aside>
+    </div>
+  </main>
+</div>
+<script src="assets/docs.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Getting started · kvist docs</title>
+<meta name="description" content="Set up a kvist server and the Obsidian plugin, then publish your first notes.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<script>try{var t=localStorage.getItem("kvist-docs-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="stylesheet" href="assets/docs.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="shell">
+  <aside class="side">
+    <div class="brand">
+      <a href="index.html"><img src="assets/icon.svg" width="22" height="22" alt="">kvist <small>docs</small></a>
+      <button class="icon-button theme-toggle" type="button" aria-label="Switch color theme" hidden><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
+      <button class="icon-button menu-toggle" type="button" aria-label="Menu" aria-expanded="false" hidden><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    </div>
+    <nav aria-label="Documentation">
+      <h2>Start</h2>
+      <ul>
+        <li><a href="index.html">Overview</a></li>
+        <li><a href="getting-started.html" aria-current="page">Getting started</a></li>
+      </ul>
+      <h2>Guides</h2>
+      <ul>
+        <li><a href="publishing.html">Publishing notes</a></li>
+        <li><a href="writing.html">Writing notes</a></li>
+        <li><a href="customizing.html">Customizing the site</a></li>
+        <li><a href="server.html">Running the server</a></li>
+      </ul>
+      <h2>Reference</h2>
+      <ul>
+        <li><a href="configuration.html">Configuration</a></li>
+        <li><a href="troubleshooting.html">Troubleshooting</a></li>
+      </ul>
+      <h2>More</h2>
+      <ul>
+        <li><a href="https://github.com/klppl/kvist" class="ext">GitHub</a></li>
+        <li><a href="https://github.com/klppl/kvist/blob/main/docs/themes.md" class="ext">Writing a theme</a></li>
+        <li><a href="https://github.com/klppl/kvist/blob/main/docs/content-model.md" class="ext">Content model</a></li>
+        <li><a href="https://github.com/klppl/kvist/blob/main/docs/design.md" class="ext">Design notes</a></li>
+      </ul>
+    </nav>
+    <p class="side-foot">kvist is open source (MIT). <a href="https://github.com/klppl/kvist/issues">Report a problem</a></p>
+  </aside>
+  <main id="main">
+    <div class="page">
+      <article>
+<p class="eyebrow">Start</p>
+<h1>Getting started</h1>
+<p class="lead">This guide takes you from an empty server to your first published notes. You set up the server once, connect Obsidian, and choose what is public.</p>
+
+<div class="callout">
+  <p class="callout-title">Before you begin</p>
+  <p>You need a Linux server with <a href="https://docs.docker.com/engine/install/">Docker</a> installed, a domain name you can point at it, and Obsidian on your computer. In the examples, the site lives at <code>garden.example.com</code>; replace that with your own address everywhere.</p>
+</div>
+
+<h2 id="server">Part 1: the server</h2>
+<ol class="steps">
+  <li>
+    <h3 id="dns">Point your domain at the server</h3>
+    <p>At your DNS provider, add an <strong>A record</strong> for your site's name (for example <code>garden</code>) with your server's IP address. Add an <strong>AAAA record</strong> too if the server has an IPv6 address. Make sure ports 80 and 443 are open in the server's firewall.</p>
+    <p>DNS changes can take a few minutes to arrive. The next steps need them, because the server asks Let's Encrypt for an HTTPS certificate for that name.</p>
+  </li>
+  <li>
+    <h3 id="download">Download the three server files</h3>
+    <p>Log in to the server with SSH and run:</p>
+<pre><code>mkdir -p ~/kvist &amp;&amp; cd ~/kvist
+base=https://raw.githubusercontent.com/klppl/kvist/main/deploy
+curl -fsSLO $base/docker-compose.yml -O $base/Caddyfile -O $base/kvist.toml</code></pre>
+    <p>You now have:</p>
+    <table>
+      <thead><tr><th>File</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code>docker-compose.yml</code></td><td>Runs two containers: kvist, and <a href="https://caddyserver.com">Caddy</a>, which handles HTTPS.</td></tr>
+        <tr><td><code>Caddyfile</code></td><td>Tells Caddy your domain name.</td></tr>
+        <tr><td><code>kvist.toml</code></td><td>The kvist server settings: your site's address, title and publish rules.</td></tr>
+      </tbody>
+    </table>
+  </li>
+  <li>
+    <h3 id="edit">Put in your domain and rules</h3>
+    <p>In <code>Caddyfile</code>, replace <code>garden.example.com</code> with your domain. In <code>kvist.toml</code>, set <code>base_url</code> and <code>title</code>, and look at the publish rules:</p>
+<pre data-label="kvist.toml"><code>data_dir = "/data"
+listen   = "0.0.0.0:8080"
+
+[[site]]
+id       = "garden"                       <span class="c"># the name you use in the plugin</span>
+base_url = "https://garden.example.com"   <span class="c"># your address</span>
+title    = "My garden"
+theme    = "garden"
+serve    = true
+
+  [site.publish]
+  always_public_folders = ["Garden"]              <span class="c"># everything in here is public</span>
+  exclude_folders       = ["Templates", "Private"] <span class="c"># never public</span>
+  expose_frontmatter    = ["stage"]</code></pre>
+    <p>These defaults mean: notes in a <code>Garden</code> folder are published, notes with a <code>#public</code> tag are published from anywhere, and <code>Templates</code> and <code>Private</code> never are. Everything else stays private. You can change this any time; <a href="publishing.html">Publishing notes</a> explains the options.</p>
+    <p>Leave <code>data_dir</code> and <code>listen</code> as they are. They refer to paths inside the container.</p>
+  </li>
+  <li>
+    <h3 id="start">Start it</h3>
+<pre><code>docker compose up -d</code></pre>
+    <p>Docker downloads kvist and Caddy and starts both. Caddy gets an HTTPS certificate on its own. Check that kvist answers:</p>
+<pre><code>curl https://garden.example.com/api/v1/info</code></pre>
+    <p>You should see something like <code>{"protocol":{"min":1,"max":1},"server":"…"}</code>. The site itself shows “404 not found” until you publish for the first time. That's expected.</p>
+  </li>
+  <li>
+    <h3 id="token">Create a token for your computer</h3>
+    <p>A token is the password the plugin uses to publish. Create one per device, so you can revoke a lost phone without touching the others:</p>
+<pre><code>docker compose exec kvist kvist token create --site garden --name laptop</code></pre>
+    <p>It prints a token that starts with <code>kvist_</code>. <strong>Copy it now:</strong> it is shown only once, and the server only keeps a fingerprint of it.</p>
+  </li>
+</ol>
+
+<h2 id="plugin">Part 2: the Obsidian plugin</h2>
+<ol class="steps" style="counter-reset: step 5">
+  <li>
+    <h3 id="build-plugin">Build the plugin</h3>
+    <p>kvist isn't in Obsidian's community plugin list yet, so you build it once on your computer. You need <a href="https://nodejs.org">Node.js</a> and Git:</p>
+<pre><code>git clone https://github.com/klppl/kvist
+cd kvist/plugin
+npm ci
+npm run build</code></pre>
+    <p>This creates <code>main.js</code>. Together with <code>manifest.json</code> and <code>styles.css</code> in the same folder, that is the whole plugin.</p>
+  </li>
+  <li>
+    <h3 id="install-plugin">Copy it into your vault</h3>
+    <p>Copy the three files into your vault's plugin folder (replace the path with your vault's):</p>
+<pre><code>VAULT=~/Documents/MyVault
+mkdir -p "$VAULT/.obsidian/plugins/kvist"
+cp main.js manifest.json styles.css "$VAULT/.obsidian/plugins/kvist/"</code></pre>
+    <p>In Obsidian, open <strong>Settings → Community plugins</strong>. If <em>Restricted mode</em> is on, turn it off. Click the reload button next to <em>Installed plugins</em> and switch <strong>kvist</strong> on.</p>
+  </li>
+  <li>
+    <h3 id="connect">Connect it to your server</h3>
+    <p>Open <strong>Settings → kvist</strong> and fill in:</p>
+    <table>
+      <thead><tr><th>Setting</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>Server URL</td><td><code>https://garden.example.com</code></td></tr>
+        <tr><td>Site</td><td><code>garden</code> (the <code>id</code> from <code>kvist.toml</code>)</td></tr>
+        <tr><td>Token</td><td>The token from step 5</td></tr>
+      </tbody>
+    </table>
+    <p>Press <strong>Test</strong>. You should see <em>connected to “garden”</em>. If not, see <a href="troubleshooting.html#test-fails">Troubleshooting</a>.</p>
+  </li>
+</ol>
+
+<h2 id="first-publish">Part 3: your first publish</h2>
+<ol class="steps" style="counter-reset: step 8">
+  <li>
+    <h3 id="choose">Choose a few public notes</h3>
+    <p>With the default rules, the easiest start is to create a folder called <code>Garden</code> in your vault and put a note or two in it. To publish a note that lives elsewhere, add the <code>#public</code> tag to it, or run the command <strong>kvist: Toggle publish for current note</strong>, which sets <code>publish: true</code> in its properties.</p>
+  </li>
+  <li>
+    <h3 id="publish">Publish</h3>
+    <p>Open the command palette (<kbd>Cmd</kbd>+<kbd>P</kbd> or <kbd>Ctrl</kbd>+<kbd>P</kbd>) and run <strong>kvist: Publish now</strong>. After a few seconds you see <em>published 2 notes</em>, and the kvist icon in the status bar turns into <strong>●</strong>.</p>
+    <p>Open your address in a browser. Your notes are there.</p>
+  </li>
+  <li>
+    <h3 id="report">Check the report</h3>
+    <p>Click the kvist status in the status bar, or run <strong>kvist: Open publish report</strong>. It lists what is public, and anything worth a look: links from public notes to private ones (shown as plain text on the site), embeds that were left out, and warnings from the server.</p>
+  </li>
+</ol>
+
+<h2 id="make-it-yours">Part 4: make it yours</h2>
+<p>The site's title, description, home page and menu come from a small settings file <strong>in your vault</strong>, so you can change them from Obsidian and they go live with your next publish. The file is <code>.kvist/site.toml</code> at the top of your vault.</p>
+<div class="callout warn">
+  <p class="callout-title">The folder is hidden</p>
+  <p>Folders whose names start with a dot are hidden in Obsidian and in Finder, so create the file from a terminal:</p>
+<pre><code>mkdir -p "$VAULT/.kvist"
+open -e "$VAULT/.kvist/site.toml"    <span class="c"># macOS: opens TextEdit; elsewhere use any text editor</span></code></pre>
+  <p>On macOS, if TextEdit says the file doesn't exist, run <code>touch "$VAULT/.kvist/site.toml"</code> first.</p>
+</div>
+<p>A good start:</p>
+<pre data-label=".kvist/site.toml (in your vault)"><code>title       = "Ada's garden"
+description = "Notes on what I'm learning and building"
+
+<span class="c"># Use one of your notes as the home page (optional):</span>
+<span class="c"># home = "Garden/Welcome.md"</span>
+
+[theme_params]
+<span class="c"># Group the menu by tags instead of folders (optional):</span>
+nav_tags = ["articles", "projects", "books"]</code></pre>
+<p>Run <strong>Publish now</strong> again to apply it. <a href="customizing.html">Customizing the site</a> lists everything you can change, including how menu groups work.</p>
+
+<h2 id="more-devices">Publishing from more devices</h2>
+<p>For each extra device (another computer, your phone):</p>
+<ol>
+  <li>Create a new token on the server with a new <code>--name</code>.</li>
+  <li>Make sure the plugin files are in that device's copy of the vault. If you sync your vault with Obsidian Sync or iCloud, including the <code>.obsidian</code> folder, they usually arrive by themselves.</li>
+  <li>Enable the plugin and paste the new token. The server URL and site sync with your vault; the token never does.</li>
+</ol>
+<p>If you turn on <strong>Publish automatically</strong>, do it on <strong>one</strong> device only. <a href="publishing.html#automatic">Here's why</a>.</p>
+
+<h2 id="next">What next</h2>
+<ul>
+  <li><a href="publishing.html">Publishing notes</a>: every way to make a note public or private.</li>
+  <li><a href="writing.html">Writing notes</a>: what works on the site, from callouts to math.</li>
+  <li><a href="server.html">Running the server</a>: updates, backups and Cloudflare.</li>
+</ul>
+<nav class="next" aria-label="Pages"><a href="index.html"><small>Previous</small>Overview</a><a class="fwd" href="publishing.html"><small>Next</small>Publishing notes</a></nav>
+      </article>
+      <aside class="toc"></aside>
+    </div>
+  </main>
+</div>
+<script src="assets/docs.js" defer></script>
+</body>
+</html>

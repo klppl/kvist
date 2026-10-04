@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Writing notes · kvist docs</title>
+<meta name="description" content="The Markdown and Obsidian features kvist supports, note properties, and how pages get their addresses.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<script>try{var t=localStorage.getItem("kvist-docs-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="stylesheet" href="assets/docs.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="shell">
+  <aside class="side">
+    <div class="brand">
+      <a href="index.html"><img src="assets/icon.svg" width="22" height="22" alt="">kvist <small>docs</small></a>
+      <button class="icon-button theme-toggle" type="button" aria-label="Switch color theme" hidden><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
+      <button class="icon-button menu-toggle" type="button" aria-label="Menu" aria-expanded="false" hidden><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    </div>
+    <nav aria-label="Documentation">
+      <h2>Start</h2>
+      <ul>
+        <li><a href="index.html">Overview</a></li>
+        <li><a href="getting-started.html">Getting started</a></li>
+      </ul>
+      <h2>Guides</h2>
+      <ul>
+        <li><a href="publishing.html">Publishing notes</a></li>
+        <li><a href="writing.html" aria-current="page">Writing notes</a></li>
+        <li><a href="customizing.html">Customizing the site</a></li>
+        <li><a href="server.html">Running the server</a></li>
+      </ul>
+      <h2>Reference</h2>
+      <ul>
+        <li><a href="configuration.html">Configuration</a></li>
+        <li><a href="troubleshooting.html">Troubleshooting</a></li>
+      </ul>
+      <h2>More</h2>
+      <ul>
+        <li><a href="https://github.com/klppl/kvist" class="ext">GitHub</a></li>
+        <li><a href="https://github.com/klppl/kvist/blob/main/docs/themes.md" class="ext">Writing a theme</a></li>
+        <li><a href="https://github.com/klppl/kvist/blob/main/docs/content-model.md" class="ext">Content model</a></li>
+        <li><a href="https://github.com/klppl/kvist/blob/main/docs/design.md" class="ext">Design notes</a></li>
+      </ul>
+    </nav>
+    <p class="side-foot">kvist is open source (MIT). <a href="https://github.com/klppl/kvist/issues">Report a problem</a></p>
+  </aside>
+  <main id="main">
+    <div class="page">
+      <article>
+<p class="eyebrow">Guides</p>
+<h1>Writing notes</h1>
+<p class="lead">Write the way you already do in Obsidian. Most of what you use renders on the site the same way, and a few note properties let you fine-tune titles, dates and addresses.</p>
+
+<h2 id="supported">What works</h2>
+<table>
+  <thead><tr><th>Feature</th><th>Write</th><th>On the site</th></tr></thead>
+  <tbody>
+    <tr><td>Links</td><td><code>[[Note]]</code>, <code>[[Note|text]]</code></td><td>A link to the note, or plain text if it isn't published</td></tr>
+    <tr><td>Heading links</td><td><code>[[Note#Heading]]</code></td><td>Jumps to the heading</td></tr>
+    <tr><td>Block links</td><td><code>[[Note#^id]]</code></td><td>Jumps to the block marked <code>^id</code></td></tr>
+    <tr><td>Embeds</td><td><code>![[Note]]</code>, <code>![[Note#Heading]]</code></td><td>The note or section shown inline, in a box</td></tr>
+    <tr><td>Images</td><td><code>![[photo.jpg]]</code>, <code>![[photo.jpg|300]]</code>, <code>![[photo.jpg|300x200]]</code></td><td>The image, optionally resized</td></tr>
+    <tr><td>PDF, audio, video</td><td><code>![[paper.pdf]]</code>, <code>![[talk.mp3]]</code>, <code>![[demo.mp4]]</code></td><td>An inline viewer or player</td></tr>
+    <tr><td>Tags</td><td><code>#idea</code>, <code>#projects/kvist</code></td><td>A link to the tag's page; nested tags have their own pages</td></tr>
+    <tr><td>Callouts</td><td><code>&gt; [!tip] Title</code>, foldable with <code>[!tip]-</code> or <code>[!tip]+</code></td><td>Colored boxes; foldable ones open on click</td></tr>
+    <tr><td>Highlights</td><td><code>==text==</code></td><td>Highlighted text</td></tr>
+    <tr><td>Footnotes</td><td><code>text[^1]</code> and <code>[^1]: note</code></td><td>Numbered notes at the bottom</td></tr>
+    <tr><td>Tasks</td><td><code>- [ ]</code>, <code>- [x]</code></td><td>Checkboxes</td></tr>
+    <tr><td>Tables, strikethrough</td><td>Standard Markdown</td><td>As in Obsidian</td></tr>
+    <tr><td>Code</td><td>Fenced code with a language, e.g. <code>```python</code></td><td>Syntax highlighting, light and dark</td></tr>
+    <tr><td>Math</td><td><code>$e^{i\pi}+1=0$</code>, <code>$$ … $$</code></td><td>Typeset with KaTeX</td></tr>
+    <tr><td>Diagrams</td><td>A <code>```mermaid</code> code block</td><td>A Mermaid diagram</td></tr>
+    <tr><td>Comments</td><td><code>%% hidden %%</code>, <code>&lt;!-- hidden --&gt;</code></td><td>Removed before publishing</td></tr>
+  </tbody>
+</table>
+<p>Single line breaks are kept as line breaks, as in Obsidian's reading view.</p>
+
+<div class="callout warn">
+  <p class="callout-title">Use wikilinks between notes</p>
+  <p>kvist resolves <code>[[wikilinks]]</code>. Markdown-style links to other notes, like <code>[text](Other%20note.md)</code>, are not converted and won't work on the site. Links to websites (<code>[text](https://…)</code>) work normally. Obsidian uses wikilinks by default; check <strong>Settings → Files and links → Use [[Wikilinks]]</strong>.</p>
+</div>
+
+<h2 id="properties">Note properties</h2>
+<p>Properties (frontmatter) at the top of a note control how it appears. All are optional.</p>
+<pre data-label="A note"><code>---
+title: A better title than the file name
+description: One sentence for search results and link previews.
+created: 2026-09-01
+updated: 2026-10-02
+tags: [articles, writing]
+aliases: [Another name]
+permalink: /about/
+publish: true
+stage: budding
+---</code></pre>
+<table>
+  <thead><tr><th>Property</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td><code>title</code></td><td>The page title. Without it, kvist uses the first <code># Heading</code>, then the file name.</td></tr>
+    <tr><td><code>description</code> or <code>summary</code></td><td>Shown in lists, search results and link previews. Without it, kvist uses the first paragraph.</td></tr>
+    <tr><td><code>created</code> or <code>date</code></td><td>The “Planted” date. Without it, the file's modification time.</td></tr>
+    <tr><td><code>updated</code>, <code>modified</code> or <code>lastmod</code></td><td>The “Tended” date, and the order of “Recently tended”.</td></tr>
+    <tr><td><code>tags</code></td><td>Tags, in addition to the ones written in the text.</td></tr>
+    <tr><td><code>aliases</code></td><td>Other names for the note. Search finds the note by them. (Links still need the note’s file name: <code>[[Real name|alias]]</code>.)</td></tr>
+    <tr><td><code>permalink</code></td><td>A custom address, such as <code>/about/</code>.</td></tr>
+    <tr><td><code>publish</code></td><td><code>true</code> or <code>false</code>; see <a href="publishing.html">Publishing notes</a>.</td></tr>
+    <tr><td><code>stage</code></td><td>Growth stage: <code>seedling</code> 🌱, <code>budding</code> 🌿 or <code>evergreen</code> 🌳, shown as a badge.</td></tr>
+  </tbody>
+</table>
+<p>Other properties stay private: they are never put on the site unless the server lists them in <code>expose_frontmatter</code> (which is how <code>stage</code> is enabled in the default config).</p>
+
+<h2 id="addresses">Page addresses</h2>
+<p>A note's address comes from its path: each part is lowercased, and spaces and punctuation become dashes.</p>
+<table>
+  <thead><tr><th>Note</th><th>Address</th></tr></thead>
+  <tbody>
+    <tr><td><code>Garden/My First Note.md</code></td><td><code>/garden/my-first-note/</code></td></tr>
+    <tr><td><code>Garden/Recipes/Recipes.md</code></td><td><code>/garden/recipes/</code> (a <em>folder note</em>, named like its folder)</td></tr>
+    <tr><td><code>Garden/Recipes/index.md</code></td><td><code>/garden/recipes/</code> (also a folder note)</td></tr>
+    <tr><td>A note with <code>permalink: /about/</code></td><td><code>/about/</code></td></tr>
+  </tbody>
+</table>
+<p>Renaming or moving a note changes its address, so old links to it stop working. If two notes would get the same address, the build stops and names both, and your site keeps showing the previous version until you fix it.</p>
+
+<h2 id="home">The home page</h2>
+<p>By default the home page shows your site's title and description, cards for your folders or <a href="customizing.html#groups">menu groups</a>, and a list of recently updated notes. To use one of your notes instead, either publish a note named <code>index.md</code> at the top of your vault, or set <code>home</code> in <code>.kvist/site.toml</code>:</p>
+<pre data-label=".kvist/site.toml"><code>home = "Garden/Welcome.md"</code></pre>
+
+<h2 id="tags">Tags</h2>
+<p>Every tag on a published note gets a page at <code>/tags/&lt;tag&gt;/</code>, and <code>/tags/</code> lists them all. Nested tags like <code>#projects/kvist</code> get their own page, and the parent tag's page includes them. Tags can also <a href="customizing.html#groups">group the menu</a>.</p>
+
+<h2 id="preview">Preview before publishing</h2>
+<p>To see your site on your computer before publishing, run kvist's preview server. It needs the <code>kvist</code> program (see <a href="server.html#cli">the command line</a>) and a copy of your server's <code>kvist.toml</code>, so it applies the same rules:</p>
+<pre><code>kvist dev --dir ~/Documents/MyVault --config kvist.toml</code></pre>
+<p>Open <code>http://127.0.0.1:1313</code>. The page reloads whenever you save a note.</p>
+<nav class="next" aria-label="Pages"><a href="publishing.html"><small>Previous</small>Publishing notes</a><a class="fwd" href="customizing.html"><small>Next</small>Customizing the site</a></nav>
+      </article>
+      <aside class="toc"></aside>
+    </div>
+  </main>
+</div>
+<script src="assets/docs.js" defer></script>
+</body>
+</html>

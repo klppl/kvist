@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Configuration · kvist docs</title>
+<meta name="description" content="Every kvist setting, with defaults, and which file it belongs in.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<script>try{var t=localStorage.getItem("kvist-docs-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="stylesheet" href="assets/docs.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="shell">
+  <aside class="side">
+    <div class="brand">
+      <a href="index.html"><img src="assets/icon.svg" width="22" height="22" alt="">kvist <small>docs</small></a>
+      <button class="icon-button theme-toggle" type="button" aria-label="Switch color theme" hidden><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
+      <button class="icon-button menu-toggle" type="button" aria-label="Menu" aria-expanded="false" hidden><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    </div>
+    <nav aria-label="Documentation">
+      <h2>Start</h2>
+      <ul>
+        <li><a href="index.html">Overview</a></li>
+        <li><a href="getting-started.html">Getting started</a></li>
+      </ul>
+      <h2>Guides</h2>
+      <ul>
+        <li><a href="publishing.html">Publishing notes</a></li>
+        <li><a href="writing.html">Writing notes</a></li>
+        <li><a href="customizing.html">Customizing the site</a></li>
+        <li><a href="server.html">Running the server</a></li>
+      </ul>
+      <h2>Reference</h2>
+      <ul>
+        <li><a href="configuration.html" aria-current="page">Configuration</a></li>
+        <li><a href="troubleshooting.html">Troubleshooting</a></li>
+      </ul>
+      <h2>More</h2>
+      <ul>
+        <li><a href="https://github.com/klppl/kvist" class="ext">GitHub</a></li>
+        <li><a href="https://github.com/klppl/kvist/blob/main/docs/themes.md" class="ext">Writing a theme</a></li>
+        <li><a href="https://github.com/klppl/kvist/blob/main/docs/content-model.md" class="ext">Content model</a></li>
+        <li><a href="https://github.com/klppl/kvist/blob/main/docs/design.md" class="ext">Design notes</a></li>
+      </ul>
+    </nav>
+    <p class="side-foot">kvist is open source (MIT). <a href="https://github.com/klppl/kvist/issues">Report a problem</a></p>
+  </aside>
+  <main id="main">
+    <div class="page">
+      <article>
+<p class="eyebrow">Reference</p>
+<h1>Configuration</h1>
+<p class="lead">kvist has two settings files. The server's file decides what may be published and where; the vault's file decides how the site looks.</p>
+
+<h2 id="which-file">Which file?</h2>
+<table>
+  <thead><tr><th></th><th><code>kvist.toml</code> <span class="where server">server</span></th><th><code>.kvist/site.toml</code> <span class="where vault">vault</span></th></tr></thead>
+  <tbody>
+    <tr><td>Where</td><td>On the server, next to <code>docker-compose.yml</code></td><td>At the top of your Obsidian vault (a hidden folder)</td></tr>
+    <tr><td>Holds</td><td>Publish rules, the site's address, limits, Cloudflare, the theme</td><td>Title, description, home page, menu links, theme settings</td></tr>
+    <tr><td>Takes effect</td><td>After <code>docker compose restart kvist</code>, on the next publish</td><td>On the next publish</td></tr>
+    <tr><td>Why there</td><td>A device or synced vault can't loosen the rules</td><td>You can change the look from Obsidian, on any device</td></tr>
+  </tbody>
+</table>
+<p>The plugin's own settings (server URL, site, token) are in Obsidian under <strong>Settings → kvist</strong>; see <a href="#plugin">below</a>.</p>
+<p>Both files use <a href="https://toml.io">TOML</a>: <code>key = "text"</code>, <code>key = true</code>, <code>key = 10</code>, lists like <code>["a", "b"]</code>, and <code>[sections]</code>. Lines starting with <code>#</code> are comments.</p>
+
+<h2 id="server">Server: kvist.toml</h2>
+<pre data-label="kvist.toml"><code>data_dir = "/data"
+listen   = "0.0.0.0:8080"
+
+[[site]]
+id       = "garden"
+base_url = "https://garden.example.com"
+title    = "My garden"
+serve    = true
+
+  [site.publish]
+  always_public_folders = ["Garden"]
+  exclude_folders       = ["Templates", "Private"]
+  expose_frontmatter    = ["stage"]</code></pre>
+
+<h3 id="server-top">Top level</h3>
+<table>
+  <thead><tr><th>Key</th><th>Default</th><th></th></tr></thead>
+  <tbody>
+    <tr><td><code>data_dir</code></td><td>required</td><td>Where kvist stores everything. <code>/data</code> in Docker.</td></tr>
+    <tr><td><code>listen</code></td><td><code>"127.0.0.1:8080"</code></td><td>Address and port to listen on. <code>"0.0.0.0:8080"</code> in Docker, so Caddy can reach it.</td></tr>
+    <tr><td><code>sync_ttl</code></td><td><code>"1h"</code></td><td>How long an unfinished upload may take.</td></tr>
+    <tr><td><code>themes_dir</code></td><td><code>"themes"</code></td><td>Folder with extra themes, searched before the built-in ones.</td></tr>
+    <tr><td><code>tls_cert</code>, <code>tls_key</code></td><td>none</td><td>Serve HTTPS directly. Not needed behind Caddy.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="server-site">[[site]]</h3>
+<p>One block per site. A server can host several sites, each with its own <code>[[site]]</code> block, domain and tokens.</p>
+<table>
+  <thead><tr><th>Key</th><th>Default</th><th></th></tr></thead>
+  <tbody>
+    <tr><td><code>id</code></td><td>required</td><td>Short name used by the plugin and the commands: lowercase letters, digits and dashes.</td></tr>
+    <tr><td><code>base_url</code></td><td>required</td><td>The site's address, e.g. <code>https://garden.example.com</code>. Must be the root of a domain (sub-paths aren't supported yet).</td></tr>
+    <tr><td><code>title</code>, <code>description</code>, <code>author</code></td><td>empty</td><td>Defaults; the vault's <code>site.toml</code> can override them.</td></tr>
+    <tr><td><code>language</code></td><td><code>"en"</code></td><td>Language code for pages and feeds.</td></tr>
+    <tr><td><code>serve</code></td><td><code>false</code></td><td>Let kvist serve the site itself. Keep <code>true</code> with the Docker setup.</td></tr>
+    <tr><td><code>theme</code></td><td><code>"garden"</code></td><td>The theme: a built-in name, a folder in <code>themes_dir</code>, or a path.</td></tr>
+    <tr><td><code>theme_overrides</code></td><td>none</td><td>Folder whose files replace the theme's files with the same path.</td></tr>
+    <tr><td><code>[site.theme_params]</code></td><td></td><td><a href="customizing.html#theme">Theme settings</a>; the vault's values win.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="server-publish">[site.publish]</h3>
+<p>See <a href="publishing.html#rules">Publishing notes</a> for how the rules combine.</p>
+<table>
+  <thead><tr><th>Key</th><th>Default</th><th></th></tr></thead>
+  <tbody>
+    <tr><td><code>always_public_folders</code></td><td><code>[]</code></td><td>Folders whose notes are public. <code>"/"</code> means the whole vault.</td></tr>
+    <tr><td><code>exclude_folders</code></td><td><code>[]</code></td><td>Folders that are never published, whatever their notes say.</td></tr>
+    <tr><td><code>public_tag</code></td><td><code>"public"</code></td><td>Tag that publishes a note.</td></tr>
+    <tr><td><code>private_tag</code></td><td><code>"private"</code></td><td>Tag that keeps a note private.</td></tr>
+    <tr><td><code>frontmatter_key</code></td><td><code>"publish"</code></td><td>Property that publishes (<code>true</code>) or hides (<code>false</code>) a note.</td></tr>
+    <tr><td><code>expose_frontmatter</code></td><td><code>[]</code></td><td>Note properties the theme may show. The garden theme uses <code>stage</code>.</td></tr>
+    <tr><td><code>attachment_extensions</code></td><td>png, jpg, jpeg, gif, webp, svg, avif, pdf, mp3, m4a, ogg, wav, mp4, webm</td><td>File types that may be published.</td></tr>
+    <tr><td><code>strip_image_metadata</code></td><td><code>true</code></td><td>Remove location, camera and author data from JPEG, PNG and WebP images.</td></tr>
+    <tr><td><code>unpublished_links</code></td><td><code>"warn"</code></td><td>Links to private notes: <code>"ignore"</code>, <code>"warn"</code>, or <code>"error"</code> to stop the build.</td></tr>
+    <tr><td><code>unpublished_embeds</code></td><td><code>"warn"</code></td><td>The same for embeds.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="server-limits">[site.limits]</h3>
+<table>
+  <thead><tr><th>Key</th><th>Default</th><th></th></tr></thead>
+  <tbody>
+    <tr><td><code>max_file_size</code></td><td><code>52428800</code> (50 MiB)</td><td>Largest file, in bytes.</td></tr>
+    <tr><td><code>max_files</code></td><td><code>20000</code></td><td>Most notes and files in one site.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="server-retention">[site.retention]</h3>
+<table>
+  <thead><tr><th>Key</th><th>Default</th><th></th></tr></thead>
+  <tbody>
+    <tr><td><code>revisions</code></td><td><code>10</code></td><td>Published versions kept for <a href="server.html#rollback">rollback</a>.</td></tr>
+    <tr><td><code>builds</code></td><td><code>3</code></td><td>Built copies of the site kept on disk.</td></tr>
+  </tbody>
+</table>
+
+<h3 id="server-cloudflare">[site.cloudflare]</h3>
+<p>Clears Cloudflare's cache after every publish. See <a href="server.html#purge">Running the server</a>.</p>
+<table>
+  <thead><tr><th>Key</th><th></th></tr></thead>
+  <tbody>
+    <tr><td><code>zone_id</code></td><td>The zone's ID. Purging is off without it.</td></tr>
+    <tr><td><code>api_token_env</code></td><td>Name of the environment variable with the API token, e.g. <code>"CF_API_TOKEN"</code>.</td></tr>
+    <tr><td><code>api_token_file</code></td><td>Or: a file containing the token.</td></tr>
+  </tbody>
+</table>
+
+<h2 id="vault">Vault: .kvist/site.toml</h2>
+<pre data-label=".kvist/site.toml"><code>title       = "Ada's garden"
+description = "Notes on what I'm learning"
+author      = "Ada"
+language    = "en"
+home        = "Garden/Welcome.md"
+
+[[nav]]
+title = "About"
+url   = "/about/"
+
+[theme_params]
+nav_tags = ["articles", "projects"]</code></pre>
+<table>
+  <thead><tr><th>Key</th><th></th></tr></thead>
+  <tbody>
+    <tr><td><code>title</code>, <code>description</code>, <code>author</code>, <code>language</code></td><td>Override the server's values.</td></tr>
+    <tr><td><code>home</code></td><td>Vault path of a published note to use as the home page.</td></tr>
+    <tr><td><code>[[nav]]</code></td><td>Menu links, each with <code>title</code> and <code>url</code>, shown under <em>Links</em>.</td></tr>
+    <tr><td><code>[theme_params]</code></td><td><a href="customizing.html#theme">Theme settings</a>.</td></tr>
+  </tbody>
+</table>
+<p>Any other key is ignored, and the publish report says so.</p>
+
+<h2 id="plugin">Plugin settings</h2>
+<table>
+  <thead><tr><th>Setting</th><th>Synced with the vault?</th><th></th></tr></thead>
+  <tbody>
+    <tr><td>Server URL</td><td>yes</td><td>Your site's address, e.g. <code>https://garden.example.com</code>.</td></tr>
+    <tr><td>Site</td><td>yes</td><td>The <code>id</code> from <code>kvist.toml</code>.</td></tr>
+    <tr><td>Token</td><td><strong>no</strong></td><td>This device's token. Never synced.</td></tr>
+    <tr><td>Device name</td><td>no</td><td>Shown in the server's log and in warnings.</td></tr>
+    <tr><td>Publish automatically</td><td>no</td><td>Publish after edits settle. <a href="publishing.html#automatic">One device only.</a></td></tr>
+    <tr><td>Wait before publishing</td><td>no</td><td>Seconds of quiet before an automatic publish (default 30, at least 5).</td></tr>
+  </tbody>
+</table>
+<p>Commands: <strong>Publish now</strong>, <strong>Toggle publish for current note</strong>, <strong>Open published page</strong> and <strong>Open publish report</strong>.</p>
+<nav class="next" aria-label="Pages"><a href="server.html"><small>Previous</small>Running the server</a><a class="fwd" href="troubleshooting.html"><small>Next</small>Troubleshooting</a></nav>
+      </article>
+      <aside class="toc"></aside>
+    </div>
+  </main>
+</div>
+<script src="assets/docs.js" defer></script>
+</body>
+</html>

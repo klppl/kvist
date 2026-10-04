@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>kvist: publish your Obsidian notes as a digital garden</title>
+<meta name="description" content="kvist publishes selected notes from an Obsidian vault as a website you host yourself.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<script>try{var t=localStorage.getItem("kvist-docs-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="stylesheet" href="assets/docs.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="shell">
+  <aside class="side">
+    <div class="brand">
+      <a href="index.html"><img src="assets/icon.svg" width="22" height="22" alt="">kvist <small>docs</small></a>
+      <button class="icon-button theme-toggle" type="button" aria-label="Switch color theme" hidden><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
+      <button class="icon-button menu-toggle" type="button" aria-label="Menu" aria-expanded="false" hidden><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    </div>
+    <nav aria-label="Documentation">
+      <h2>Start</h2>
+      <ul>
+        <li><a href="index.html" aria-current="page">Overview</a></li>
+        <li><a href="getting-started.html">Getting started</a></li>
+      </ul>
+      <h2>Guides</h2>
+      <ul>
+        <li><a href="publishing.html">Publishing notes</a></li>
+        <li><a href="writing.html">Writing notes</a></li>
+        <li><a href="customizing.html">Customizing the site</a></li>
+        <li><a href="server.html">Running the server</a></li>
+      </ul>
+      <h2>Reference</h2>
+      <ul>
+        <li><a href="configuration.html">Configuration</a></li>
+        <li><a href="troubleshooting.html">Troubleshooting</a></li>
+      </ul>
+      <h2>More</h2>
+      <ul>
+        <li><a href="https://github.com/klppl/kvist" class="ext">GitHub</a></li>
+        <li><a href="https://github.com/klppl/kvist/blob/main/docs/themes.md" class="ext">Writing a theme</a></li>
+        <li><a href="https://github.com/klppl/kvist/blob/main/docs/content-model.md" class="ext">Content model</a></li>
+        <li><a href="https://github.com/klppl/kvist/blob/main/docs/design.md" class="ext">Design notes</a></li>
+      </ul>
+    </nav>
+    <p class="side-foot">kvist is open source (MIT). <a href="https://github.com/klppl/kvist/issues">Report a problem</a></p>
+  </aside>
+  <main id="main">
+    <div class="page">
+      <article>
+<section class="hero">
+  <p class="eyebrow">Documentation</p>
+  <h1>Publish your Obsidian notes as a website you own</h1>
+  <p class="lead">kvist (Swedish for “twig”) turns the notes you choose into a fast, searchable digital garden on your own server. You write in Obsidian, press <strong>Publish</strong>, and your site updates. Private notes never leave your device.</p>
+  <div class="actions">
+    <a class="button primary" href="getting-started.html">Get started →</a>
+    <a class="button" href="publishing.html">How publishing works</a>
+    <a class="button" href="https://github.com/klppl/kvist">GitHub</a>
+  </div>
+</section>
+
+<h2 id="how-it-works">How it works</h2>
+<div class="flow" role="img" aria-label="Obsidian vault, then the kvist plugin, then your kvist server, then your website">
+  <div class="flow-box"><b>Your vault</b><span>Write notes in Obsidian as usual, on desktop or mobile.</span></div>
+  <div class="flow-arrow" aria-hidden="true">→</div>
+  <div class="flow-box"><b>kvist plugin</b><span>Picks the public notes and uploads only those and the files they use.</span></div>
+  <div class="flow-arrow" aria-hidden="true">→</div>
+  <div class="flow-box"><b>kvist server</b><span>Checks every note against your rules again, then builds the site.</span></div>
+  <div class="flow-arrow" aria-hidden="true">→</div>
+  <div class="flow-box"><b>Your website</b><span>Served over HTTPS from your domain, with search and a graph.</span></div>
+</div>
+<p>There are two parts you install once:</p>
+<ul>
+  <li><strong>The server</strong> runs on a small Linux machine (a VPS) with Docker. It stores what you publish, builds the website and serves it. It is a single program, and it needs very little memory.</li>
+  <li><strong>The Obsidian plugin</strong> connects your vault to the server. It works on desktop and mobile.</li>
+</ul>
+<p>The <strong>publish rules</strong> (which folders and tags are public) live on the server, so a device with an old setting can't publish something by mistake. The plugin applies the same rules before uploading, so private notes are never sent.</p>
+
+<h2 id="features">What you get</h2>
+<ul class="cards">
+  <li><div class="card"><b>Obsidian syntax</b><span>Wikilinks, embeds, callouts, tags, highlights, footnotes, math and Mermaid diagrams.</span></div></li>
+  <li><div class="card"><b>Private stays private</b><span>Links to private notes become plain text, with no hint that the note exists.</span></div></li>
+  <li><div class="card"><b>Search and graph</b><span>Full-text search (press <kbd>/</kbd>), backlinks and a graph of how notes connect.</span></div></li>
+  <li><div class="card"><b>Three-pane theme</b><span>Navigation, a list of related notes and the note itself, in light and dark.</span></div></li>
+  <li><div class="card"><b>Feeds and SEO</b><span>RSS, a sitemap and page metadata are generated for you.</span></div></li>
+  <li><div class="card"><b>Safe images</b><span>Location and camera data are removed from photos before they are published.</span></div></li>
+</ul>
+
+<h2 id="what-you-need">What you need</h2>
+<ul>
+  <li>A Linux server you can reach with SSH, with Docker installed. The smallest plan at most hosts (for example a Hetzner CX22) is plenty.</li>
+  <li>A domain or subdomain, such as <code>garden.example.com</code>, that you can point at the server.</li>
+  <li>Obsidian on your computer, and Node.js to build the plugin (until it is in Obsidian's plugin list).</li>
+  <li>About 30 minutes for the first setup.</li>
+</ul>
+<p>Ready? Follow <a href="getting-started.html">Getting started</a>. It goes from an empty server to your first published note.</p>
+
+<h2 id="find-your-way">Find your way</h2>
+<ul class="cards">
+  <li><a href="getting-started.html"><b>Getting started</b><span>Set up the server and the plugin, then publish your first notes.</span></a></li>
+  <li><a href="publishing.html"><b>Publishing notes</b><span>Decide what is public, keep things private and update your site.</span></a></li>
+  <li><a href="writing.html"><b>Writing notes</b><span>The Markdown and Obsidian features that work on your site.</span></a></li>
+  <li><a href="customizing.html"><b>Customizing the site</b><span>Title, home page, menu groups, colors and more.</span></a></li>
+  <li><a href="server.html"><b>Running the server</b><span>Updates, backups, Cloudflare and the command line.</span></a></li>
+  <li><a href="configuration.html"><b>Configuration</b><span>Every setting, and which file it goes in.</span></a></li>
+</ul>
+<nav class="next" aria-label="Pages"><a class="fwd" href="getting-started.html"><small>Next</small>Getting started</a></nav>
+      </article>
+      <aside class="toc"></aside>
+    </div>
+  </main>
+</div>
+<script src="assets/docs.js" defer></script>
+</body>
+</html>
