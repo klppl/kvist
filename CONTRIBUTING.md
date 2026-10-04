@@ -21,7 +21,7 @@ docs/               design, protocol, content model, themes, deployment
 ```sh
 make test                 # gofmt check is in CI: run `make fmt` first
 make plugin-test          # plugin type check, unit and end-to-end tests
-go run ./cmd/kvist dev --dir example-vault --public Garden
+go run ./cmd/kvist dev --dir example-vault --public Kvist
 ```
 
 You don't need Obsidian to work on the server: `kvist push --dir` is a

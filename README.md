@@ -60,7 +60,7 @@ works, so `http://127.0.0.1:8080/` shows it.
 
 ```sh
 ./kvist dev --dir ~/Vault --config kvist.toml   # same rules and theme as the server
-./kvist dev --dir ~/Vault --public Garden       # without a config
+./kvist dev --dir ~/Vault --public Kvist       # without a config
 ./kvist dev --dir example-vault --config kvist.example.toml   # the demo vault
 ```
 

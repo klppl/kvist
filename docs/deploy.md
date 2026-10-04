@@ -95,7 +95,7 @@ theme    = "garden"
 serve    = true
 
   [site.publish]
-  always_public_folders = ["Garden"]
+  always_public_folders = ["Kvist"]
   exclude_folders       = ["Templates", "Private"]
   expose_frontmatter    = ["stage"]
 ```

@@ -99,7 +99,7 @@ They are written to `syntax.css` (`{{asset "syntax.css"}}`).
 
 | Path | Cache-Control (built-in server) |
 |---|---|
-| pages (`/garden/note/index.html`, …) | `public, max-age=60` |
+| pages (`/kvist/note/index.html`, …) | `public, max-age=60` |
 | `/_assets/<hash>/…` (attachments) | `public, max-age=31536000, immutable` |
 | `/_kvist/<hash>/…` (theme files) | `public, max-age=31536000, immutable` |
 

@@ -39,7 +39,7 @@ the theme and the base URL stay on the server.
 ```toml
 # .kvist/site.toml
 title = "Alex's garden"
-home  = "Garden/Welcome.md"
+home  = "Kvist/Welcome.md"
 
 [[nav]]
 title = "About"
@@ -54,8 +54,8 @@ accent = "#3f7d4e"
 | Field | Type | |
 |---|---|---|
 | `ID` | string | URL without slashes (`garden/my-note`); `index` for `/`. |
-| `Path` | string | Vault path (`Garden/My Note.md`). |
-| `URL` | string | `/garden/my-note/`. |
+| `Path` | string | Vault path (`Kvist/My Note.md`). |
+| `URL` | string | `/kvist/my-note/`. |
 | `Slug` | string | URL without surrounding slashes. |
 | `Title` | string | Frontmatter `title`, else the first `# Heading`, else the file name. |
 | `Aliases` | []string | Frontmatter `aliases`. |
@@ -73,7 +73,7 @@ accent = "#3f7d4e"
 
 ### URLs
 
-`Garden/My Note.md` becomes `/garden/my-note/`. Each path segment is
+`Kvist/My Note.md` becomes `/kvist/my-note/`. Each path segment is
 lowercased and runs of characters other than letters and digits become `-`.
 Unicode letters are kept. Frontmatter `permalink: /about/` overrides the URL.
 `index.md`, or a note named like its folder (`Recipes/Recipes.md`), is the

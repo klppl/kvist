@@ -135,7 +135,7 @@ plugin                                            server
      "rules_hash": "sha256:…",
      "client": {"id": "a1b2…", "name": "Alex's iPhone", "platform": "ios", "version": "0.1.0"},
      "files": [
-       {"path": "Garden/Welcome.md", "hash": "sha256:…", "size": 812, "mtime": "2026-10-02T19:12:00Z"},
+       {"path": "Kvist/Welcome.md", "hash": "sha256:…", "size": 812, "mtime": "2026-10-02T19:12:00Z"},
        {"path": "attachments/map.png", "hash": "sha256:…", "size": 40211, "mtime": "…"}
      ]
    }
@@ -231,7 +231,7 @@ one — a wrong link. To make both agree, the plugin may include a hints file in
 the manifest at the reserved path `.kvist/links.json`:
 
 ```json
-{"version": 1, "notes": {"Garden/Welcome.md": {"Note": "Public/Note.md", "Secret": null}}}
+{"version": 1, "notes": {"Kvist/Welcome.md": {"Note": "Public/Note.md", "Secret": null}}}
 ```
 
 The plugin writes `null` for any target that is not published, so **private
@@ -411,7 +411,7 @@ Tag     Name, Slug, URL, Notes, Children, Parent
 Folder  Name, Path, URL, Notes, Children, Index *Note (folder note, if any)
 ```
 
-URLs: `Garden/My Note.md` → `/garden/my-note/` (slugified, configurable;
+URLs: `Kvist/My Note.md` → `/kvist/my-note/` (slugified, configurable;
 frontmatter `permalink` overrides). Slug collisions are a build error naming
 both notes (both are published, so naming them is safe). Attachments:
 `/_assets/<hash8>/<file-name>` — content-hashed, so CDN caching can be
@@ -506,7 +506,7 @@ theme    = "garden"             # name in themes dir, or a path
 serve    = true                 # serve public/ from this binary on host match
 
   [site.publish]
-  always_public_folders = ["Garden"]
+  always_public_folders = ["Kvist"]
   exclude_folders       = ["Templates", "Private"]
   public_tag  = "public"
   private_tag = "private"

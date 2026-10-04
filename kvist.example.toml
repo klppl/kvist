@@ -11,7 +11,7 @@ theme    = "garden"
 serve    = true              # serve the built site from this binary (or point Caddy/nginx at <data_dir>/sites/garden/public)
 
   [site.publish]
-  always_public_folders = ["Garden"]
+  always_public_folders = ["Kvist"]
   exclude_folders       = ["Templates", "Private"]
   public_tag            = "public"
   private_tag           = "private"

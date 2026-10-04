@@ -60,7 +60,7 @@ Clients must stop if their version is outside `[min, max]`.
   "site": "garden",
   "base_url": "https://garden.example.com",
   "rules": {
-    "always_public_folders": ["Garden"],
+    "always_public_folders": ["Kvist"],
     "exclude_folders": ["Templates", "Private"],
     "public_tag": "public",
     "private_tag": "private",
@@ -87,7 +87,7 @@ Request (the manifest is the **complete** desired state):
   "rules_hash": "sha256:…",
   "client": {"id": "a1b2…", "name": "Alex's iPhone", "platform": "ios", "version": "0.1.0"},
   "files": [
-    {"path": "Garden/Welcome.md", "hash": "sha256:…", "size": 812, "mtime": "2026-10-02T19:12:00Z"}
+    {"path": "Kvist/Welcome.md", "hash": "sha256:…", "size": 812, "mtime": "2026-10-02T19:12:00Z"}
   ]
 }
 ```
@@ -189,7 +189,7 @@ Runs only when `base_revision` ≠ HEAD, comparing the manifest with HEAD.
   server hasn't seen).
 
 ```json
-{"path": "Garden/x.md", "kind": "older", "stored_mtime": "…", "incoming_mtime": "…"}
+{"path": "Kvist/x.md", "kind": "older", "stored_mtime": "…", "incoming_mtime": "…"}
 ```
 
 No regressions → the commit goes through with a `stale_base` warning.
@@ -228,7 +228,7 @@ commit with a `gate_disagreement` warning).
 Optional. Tells the server how the client resolved wikilinks:
 
 ```json
-{"version": 1, "notes": {"Garden/Welcome.md": {"Note": "Garden/Note.md", "Diary": null}}}
+{"version": 1, "notes": {"Kvist/Welcome.md": {"Note": "Kvist/Note.md", "Diary": null}}}
 ```
 
 Keys are link targets as written (without `#heading` and `|alias`). The value

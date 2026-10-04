@@ -68,7 +68,7 @@
 </ol>
 <p>The rules live in <code>kvist.toml</code> on the server <span class="where server">server</span>:</p>
 <pre data-label="kvist.toml"><code>[site.publish]
-always_public_folders = ["Garden"]
+always_public_folders = ["Kvist"]
 exclude_folders       = ["Templates", "Private", "Journal"]
 public_tag            = "public"    <span class="c"># the tag that publishes a note</span>
 private_tag           = "private"   <span class="c"># the tag that keeps a note private</span>
@@ -77,7 +77,7 @@ frontmatter_key       = "publish"   <span class="c"># the property: publish: tru
 <div class="callout tip">
   <p class="callout-title">Details that matter</p>
   <ul>
-    <li>Folders include their subfolders. <code>"Garden"</code> covers <code>Garden/Ideas/Note.md</code> too.</li>
+    <li>Folders include their subfolders. <code>"Kvist"</code> covers <code>Kvist/Ideas/Note.md</code> too.</li>
     <li>Excluded folders match regardless of letter case (<code>private</code> also excludes <code>Private</code>). Public folders must match exactly.</li>
     <li>Use <code>"/"</code> in <code>always_public_folders</code> to make the whole vault public except the excluded folders and private notes.</li>
     <li>The <code>#public</code> and <code>#private</code> tags are hidden on the published page.</li>
@@ -88,7 +88,7 @@ frontmatter_key       = "publish"   <span class="c"># the property: publish: tru
 <table>
   <thead><tr><th>Way</th><th>Good for</th><th>How</th></tr></thead>
   <tbody>
-    <tr><td>A public folder</td><td>A garden where everything in one place is public</td><td>Move the note into <code>Garden/</code> (or whatever you listed).</td></tr>
+    <tr><td>A public folder</td><td>A garden where everything in one place is public</td><td>Move the note into <code>Kvist/</code> (or whatever you listed).</td></tr>
     <tr><td>A tag</td><td>Single notes elsewhere in the vault</td><td>Add <code>#public</code> anywhere in the note, or in its <code>tags</code> property.</td></tr>
     <tr><td>A property</td><td>Explicit, per-note control</td><td>Add <code>publish: true</code> to the note's properties.</td></tr>
   </tbody>

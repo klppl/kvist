@@ -96,10 +96,10 @@ theme    = "garden"
 serve    = true
 
   [site.publish]
-  always_public_folders = ["Garden"]              <span class="c"># everything in here is public</span>
+  always_public_folders = ["Kvist"]              <span class="c"># everything in here is public</span>
   exclude_folders       = ["Templates", "Private"] <span class="c"># never public</span>
   expose_frontmatter    = ["stage"]</code></pre>
-    <p>These defaults mean: notes in a <code>Garden</code> folder are published, notes with a <code>#public</code> tag are published from anywhere, and <code>Templates</code> and <code>Private</code> never are. Everything else stays private. You can change this any time; <a href="publishing.html">Publishing notes</a> explains the options.</p>
+    <p>These defaults mean: notes in a <code>Kvist</code> folder are published, notes with a <code>#public</code> tag are published from anywhere, and <code>Templates</code> and <code>Private</code> never are. Everything else stays private. You can change this any time; <a href="publishing.html">Publishing notes</a> explains the options.</p>
     <p>Leave <code>data_dir</code> and <code>listen</code> as they are. They refer to paths inside the container.</p>
   </li>
   <li>
@@ -155,7 +155,7 @@ cp main.js manifest.json styles.css "$VAULT/.obsidian/plugins/kvist/"</code></pr
 <ol class="steps" style="counter-reset: step 8">
   <li>
     <h3 id="choose">Choose a few public notes</h3>
-    <p>With the default rules, the easiest start is to create a folder called <code>Garden</code> in your vault and put a note or two in it. To publish a note that lives elsewhere, add the <code>#public</code> tag to it, or run the command <strong>kvist: Toggle publish for current note</strong>, which sets <code>publish: true</code> in its properties.</p>
+    <p>With the default rules, the easiest start is to create a folder called <code>Kvist</code> in your vault and put a note or two in it. (The name is just the default. Use any folder you like by changing <code>always_public_folders</code> in <code>kvist.toml</code>.) To publish a note that lives elsewhere, add the <code>#public</code> tag to it, or run the command <strong>kvist: Toggle publish for current note</strong>, which sets <code>publish: true</code> in its properties.</p>
   </li>
   <li>
     <h3 id="publish">Publish</h3>
@@ -183,7 +183,7 @@ open -e "$VAULT/.kvist/site.toml"    <span class="c"># macOS: opens TextEdit; el
 description = "Notes on what I'm learning and building"
 
 <span class="c"># Use one of your notes as the home page (optional):</span>
-<span class="c"># home = "Garden/Welcome.md"</span>
+<span class="c"># home = "Kvist/Welcome.md"</span>
 
 [theme_params]
 <span class="c"># Group the menu by tags instead of folders (optional):</span>
