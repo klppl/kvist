@@ -2,3 +2,10 @@
 /kvist
 /kvist.toml
 /data/
+
+# OS and editor files
+.DS_Store
+.claude/
+.vscode/
+.idea/
+*.swp
