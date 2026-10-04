@@ -62,6 +62,10 @@ a { color: var(--accent); text-underline-offset: 0.18em; text-decoration-thickne
 a:hover { text-decoration-thickness: 2px; }
 img, video, iframe { max-width: 100%; }
 img { height: auto; border-radius: 6px; }
+img.align-center { display: block; margin: 1rem auto; }
+img.align-left { float: left; margin: .3rem 1.4rem .8rem 0; max-width: 50%; }
+img.align-right { float: right; margin: .3rem 0 .8rem 1.4rem; max-width: 50%; }
+.content::after { content: ""; display: block; clear: both; }
 .muted { color: var(--muted); }
 .skip { position: absolute; left: -9999px; }
 .skip:focus { left: 1rem; top: 1rem; z-index: 10; background: var(--bg); padding: .5rem 1rem; }
@@ -366,4 +370,5 @@ pre.mermaid { background: none; text-align: center; }
   main { order: 1; }
   .page { padding: 2rem 1rem 3rem; }
   .note-header h1, .intro h1, .listing h1 { font-size: 2rem; }
+  img.align-left, img.align-right { float: none; display: block; max-width: 100%; margin: 1rem auto; }
 }

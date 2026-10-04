@@ -219,3 +219,19 @@ func TestVideoEmbeds(t *testing.T) {
 		t.Errorf("a plain link became a player: %s", out)
 	}
 }
+
+func TestImageOptions(t *testing.T) {
+	cases := map[string]string{
+		"![[pic.png|center]]":                          `<img src="/_assets/abc/pic.png" alt="" class="align-center" loading="lazy">`,
+		"![[pic.png|right|200]]":                       `<img src="/_assets/abc/pic.png" alt="" class="align-right" width="200" loading="lazy">`,
+		"![[pic.png|A map|100]]":                       `<img src="/_assets/abc/pic.png" alt="A map" width="100" loading="lazy">`,
+		"![[pic.png|A map|left|100x50]]":               `<img src="/_assets/abc/pic.png" alt="A map" class="align-left" width="100" height="50" loading="lazy">`,
+		"![A map|right|120](pic.png)":                  `<img src="/_assets/abc/pic.png" alt="A map" class="align-right" width="120" loading="lazy">`,
+		"| a |\n|---|\n| ![[pic.png\\|center\\|80]] |": `<img src="/_assets/abc/pic.png" alt="" class="align-center" width="80" loading="lazy">`,
+		"![[pic.png|Left of the river]]":               `alt="Left of the river" loading="lazy">`,
+	}
+	for in, want := range cases {
+		out, _ := render(t, in)
+		contains(t, out, want)
+	}
+}

@@ -106,7 +106,9 @@ or a note would take a reserved URL (`/tags/…`, `/_assets/…`,
   embeds nested deeper than 5 levels are omitted.
 - Images and other attachments: `/_assets/<hash8>/<name>`. The hash in the
   URL means CDNs may cache them as immutable. Size syntax: `![[a.png|300]]`,
-  `![[a.png|300x200]]`.
+  `![[a.png|300x200]]`. The part after `|` may also hold an alignment and
+  alt text, in any order (`![[a.png|A map|right|200]]`); an alignment adds
+  `class="align-left|center|right"` to the `<img>`.
 - YouTube and Vimeo links written as images (`![title](https://youtu.be/…)`):
   `<iframe class="embed-video">` with the privacy-friendly player
   (`youtube-nocookie.com`, Vimeo with `dnt=1`) and `loading="lazy"`.

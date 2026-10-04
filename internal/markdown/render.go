@@ -100,21 +100,32 @@ func writeLink(w util.BufWriter, t Target, innerHTML string) {
 	fmt.Fprintf(w, `<a class="internal-link" href="%s">%s</a>`, esc(t.URL), innerHTML)
 }
 
-// writeAsset embeds an attachment. For images the alias may be a size
-// ("300" or "300x200"), else it is the alt text.
+// writeAsset embeds an attachment. For images the alias is split at "|"
+// into a size ("300" or "300x200"), an alignment (left, center, right) and
+// the alt text, in any order: ![[a.png|Description|right|200]].
 func writeAsset(w util.BufWriter, t Target, alias, name string) {
 	switch t.Media {
 	case MediaImage:
-		alt := alias
-		var size string
-		if wd, ht, ok := parseSize(alias); ok {
-			alt = ""
-			size = fmt.Sprintf(` width="%d"`, wd)
-			if ht > 0 {
-				size += fmt.Sprintf(` height="%d"`, ht)
+		var alt []string
+		var size, align string
+		for _, part := range strings.Split(alias, "|") {
+			part = strings.TrimSpace(strings.TrimSuffix(part, `\`)) // a\|b inside tables
+			if wd, ht, ok := parseSize(part); ok && size == "" {
+				size = fmt.Sprintf(` width="%d"`, wd)
+				if ht > 0 {
+					size += fmt.Sprintf(` height="%d"`, ht)
+				}
+				continue
+			}
+			if a := strings.ToLower(part); align == "" && (a == "left" || a == "center" || a == "right") {
+				align = fmt.Sprintf(` class="align-%s"`, a)
+				continue
+			}
+			if part != "" {
+				alt = append(alt, part)
 			}
 		}
-		fmt.Fprintf(w, `<img src="%s" alt="%s"%s loading="lazy">`, esc(t.URL), esc(alt), size)
+		fmt.Fprintf(w, `<img src="%s" alt="%s"%s%s loading="lazy">`, esc(t.URL), esc(strings.Join(alt, "|")), align, size)
 	case MediaAudio:
 		fmt.Fprintf(w, `<audio controls preload="metadata" src="%s"></audio>`, esc(t.URL))
 	case MediaVideo:
