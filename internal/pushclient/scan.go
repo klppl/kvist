@@ -58,8 +58,9 @@ type hints struct {
 }
 
 // ScanDir walks a vault folder and builds the manifest under rules: the
-// published notes, the attachments they reference, the optional
-// .kvist/site.toml, and a .kvist/links.json hints file.
+// published notes, the attachments they reference, the optional settings
+// note (_site.md, sent as .kvist/site.md) and .kvist/site.toml, and a
+// .kvist/links.json hints file.
 //
 // Dot folders (.obsidian, .git, .trash) and symlinks are skipped.
 func ScanDir(dir string, rules protocol.Rules) (*Scan, error) {
@@ -90,7 +91,7 @@ func ScanDir(dir string, rules protocol.Rules) (*Scan, error) {
 		if strings.HasPrefix(p, ".kvist/") && !protocol.IsReservedPath(p) {
 			return nil
 		}
-		if p == protocol.HintsPath {
+		if p == protocol.HintsPath || p == protocol.SiteNotePath {
 			return nil // generated below
 		}
 		if other, dup := folded[strings.ToLower(p)]; dup {
@@ -171,6 +172,10 @@ func ScanDir(dir string, rules protocol.Rules) (*Scan, error) {
 	if _, ok := all[protocol.SiteConfigPath]; ok {
 		include[protocol.SiteConfigPath] = true
 	}
+	settings, err := findSettingsNote(paths)
+	if err != nil {
+		return nil, err
+	}
 
 	for p := range include {
 		e := all[p]
@@ -182,6 +187,22 @@ func ScanDir(dir string, rules protocol.Rules) (*Scan, error) {
 		s.open[p] = func() (io.ReadCloser, error) { return os.Open(abs) }
 		s.Files = append(s.Files, protocol.File{
 			Path:  p,
+			Hash:  hash,
+			Size:  e.info.Size(),
+			MTime: e.info.ModTime().UTC().Truncate(time.Millisecond),
+		})
+	}
+	if settings != "" {
+		// The settings note goes up under a fixed name, wherever it lives.
+		e := all[settings]
+		hash, err := hashFile(e.abs)
+		if err != nil {
+			return nil, err
+		}
+		abs := e.abs
+		s.open[protocol.SiteNotePath] = func() (io.ReadCloser, error) { return os.Open(abs) }
+		s.Files = append(s.Files, protocol.File{
+			Path:  protocol.SiteNotePath,
 			Hash:  hash,
 			Size:  e.info.Size(),
 			MTime: e.info.ModTime().UTC().Truncate(time.Millisecond),
@@ -228,4 +249,22 @@ func hashFile(p string) (string, error) {
 		return "", err
 	}
 	return protocol.HashPrefix + hex.EncodeToString(h.Sum(nil)), nil
+}
+
+// findSettingsNote returns the vault's settings note (_site.md in any
+// folder), "" if there is none, or an error if there are several.
+func findSettingsNote(paths []string) (string, error) {
+	var found []string
+	for _, p := range paths {
+		if protocol.IsSettingsNote(p) {
+			found = append(found, p)
+		}
+	}
+	switch len(found) {
+	case 0:
+		return "", nil
+	case 1:
+		return found[0], nil
+	}
+	return "", fmt.Errorf("found %d settings notes (%s); keep one", len(found), strings.Join(found, ", "))
 }

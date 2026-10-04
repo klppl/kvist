@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Configuration · kvist docs</title>
-<meta name="description" content="Every kvist setting, with defaults, and which file it belongs in.">
+<meta name="description" content="Every kvist setting, with defaults, and where it belongs.">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
 <script>try{var t=localStorage.getItem("kvist-docs-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
@@ -50,20 +50,20 @@
       <article>
 <p class="eyebrow">Reference</p>
 <h1>Configuration</h1>
-<p class="lead">kvist has two settings files. The server's file decides what may be published and where; the vault's file decides how the site looks.</p>
+<p class="lead">kvist has two places for settings. The server's file decides what may be published and where; a settings note in your vault decides how the site looks.</p>
 
-<h2 id="which-file">Which file?</h2>
+<h2 id="which-file">Which place?</h2>
 <table>
-  <thead><tr><th></th><th><code>kvist.toml</code> <span class="where server">server</span></th><th><code>.kvist/site.toml</code> <span class="where vault">vault</span></th></tr></thead>
+  <thead><tr><th></th><th><code>kvist.toml</code> <span class="where server">server</span></th><th><code>_site.md</code> <span class="where vault">vault</span></th></tr></thead>
   <tbody>
-    <tr><td>Where</td><td>On the server, next to <code>docker-compose.yml</code></td><td>At the top of your Obsidian vault (a hidden folder)</td></tr>
+    <tr><td>Where</td><td>On the server, next to <code>docker-compose.yml</code></td><td>A note in your vault, usually <code>Kvist/_site.md</code></td></tr>
     <tr><td>Holds</td><td>Publish rules, the site's address, limits, Cloudflare, the theme</td><td>Title, description, home page, menu links, theme settings</td></tr>
     <tr><td>Takes effect</td><td>After <code>docker compose restart kvist</code>, on the next publish</td><td>On the next publish</td></tr>
     <tr><td>Why there</td><td>A device or synced vault can't loosen the rules</td><td>You can change the look from Obsidian, on any device</td></tr>
   </tbody>
 </table>
 <p>The plugin's own settings (server URL, site, token) are in Obsidian under <strong>Settings → kvist</strong>; see <a href="#plugin">below</a>.</p>
-<p>Both files use <a href="https://toml.io">TOML</a>: <code>key = "text"</code>, <code>key = true</code>, <code>key = 10</code>, lists like <code>["a", "b"]</code>, and <code>[sections]</code>. Lines starting with <code>#</code> are comments.</p>
+<p><code>kvist.toml</code> uses <a href="https://toml.io">TOML</a>: <code>key = "text"</code>, <code>key = true</code>, <code>key = 10</code>, lists like <code>["a", "b"]</code>, and <code>[sections]</code>. Lines starting with <code>#</code> are comments. The settings note uses ordinary Obsidian properties.</p>
 
 <h2 id="server">Server: kvist.toml</h2>
 <pre data-label="kvist.toml"><code>data_dir = "/data"
@@ -99,12 +99,12 @@ serve    = true
   <tbody>
     <tr><td><code>id</code></td><td>required</td><td>Short name used by the plugin and the commands: lowercase letters, digits and dashes.</td></tr>
     <tr><td><code>base_url</code></td><td>required</td><td>The site's address, e.g. <code>https://garden.example.com</code>. Must be the root of a domain (sub-paths aren't supported yet).</td></tr>
-    <tr><td><code>title</code>, <code>description</code>, <code>author</code></td><td>empty</td><td>Defaults; the vault's <code>site.toml</code> can override them.</td></tr>
+    <tr><td><code>title</code>, <code>description</code>, <code>author</code></td><td>empty</td><td>Defaults; the settings note can override them.</td></tr>
     <tr><td><code>language</code></td><td><code>"en"</code></td><td>Language code for pages and feeds.</td></tr>
     <tr><td><code>serve</code></td><td><code>false</code></td><td>Let kvist serve the site itself. Keep <code>true</code> with the Docker setup.</td></tr>
     <tr><td><code>theme</code></td><td><code>"garden"</code></td><td>The theme: a built-in name, a folder in <code>themes_dir</code>, or a path.</td></tr>
     <tr><td><code>theme_overrides</code></td><td>none</td><td>Folder whose files replace the theme's files with the same path.</td></tr>
-    <tr><td><code>[site.theme_params]</code></td><td></td><td><a href="customizing.html#theme">Theme settings</a>; the vault's values win.</td></tr>
+    <tr><td><code>[site.theme_params]</code></td><td></td><td><a href="customizing.html#theme">Theme settings</a>; the settings note's values win.</td></tr>
   </tbody>
 </table>
 
@@ -155,29 +155,34 @@ serve    = true
   </tbody>
 </table>
 
-<h2 id="vault">Vault: .kvist/site.toml</h2>
-<pre data-label=".kvist/site.toml"><code>title       = "Ada's garden"
-description = "Notes on what I'm learning"
-author      = "Ada"
-language    = "en"
-home        = "Kvist/Welcome.md"
-
-[[nav]]
-title = "About"
-url   = "/about/"
-
-[theme_params]
-nav_tags = ["articles", "projects"]</code></pre>
+<h2 id="vault">Vault: the settings note</h2>
+<p>A note called <code>_site.md</code>, in any folder. It's never published as a page. Create or open it with <strong>kvist: Open site settings note</strong>.</p>
+<pre data-label="Kvist/_site.md"><code>---
+title: Ada's garden
+description: Notes on what I'm learning
+author: Ada
+language: en
+home: "[[Welcome]]"
+groups: [articles, projects]
+accent: "#8a4f9e"
+---
+## Links
+- [About](/about/)
+- [[Reading list]]</code></pre>
 <table>
-  <thead><tr><th>Key</th><th></th></tr></thead>
+  <thead><tr><th>Property</th><th></th></tr></thead>
   <tbody>
     <tr><td><code>title</code>, <code>description</code>, <code>author</code>, <code>language</code></td><td>Override the server's values.</td></tr>
-    <tr><td><code>home</code></td><td>Vault path of a published note to use as the home page.</td></tr>
-    <tr><td><code>[[nav]]</code></td><td>Menu links, each with <code>title</code> and <code>url</code>, shown under <em>Links</em>.</td></tr>
-    <tr><td><code>[theme_params]</code></td><td><a href="customizing.html#theme">Theme settings</a>.</td></tr>
+    <tr><td><code>home</code></td><td>A published note to use as the home page: <code>"[[Welcome]]"</code> or a vault path.</td></tr>
+    <tr><td><code>groups</code></td><td>Tags that group the menu.</td></tr>
+    <tr><td>Anything else</td><td>A <a href="customizing.html#theme">theme setting</a>.</td></tr>
   </tbody>
 </table>
-<p>Any other key is ignored, and the publish report says so.</p>
+<p>Empty properties keep their default. Obsidian's own properties (<code>tags</code>, <code>aliases</code>, <code>cssclasses</code>) are ignored. Server-only keys such as <code>base_url</code> or <code>exclude_folders</code> are ignored with a warning in the publish report.</p>
+<p><strong>Menu links</strong> are the list items in the note's text that are a single link: <code>[Text](https://…)</code>, <code>[Text](/path/)</code>, <code>[[Note]]</code> or <code>[[Note|Text]]</code>. Links to notes that aren't published are left out with a warning. Links inside <code>%% comments %%</code> and code blocks don't count, so you can keep examples there.</p>
+
+<h3 id="site-toml">The older .kvist/site.toml</h3>
+<p>Before the settings note, these settings lived in a hidden file, <code>.kvist/site.toml</code>. It still works; where both set something, the settings note wins. The keys are the same, with menu links as <code>[[nav]]</code> tables (<code>title</code>, <code>url</code>) and theme settings under <code>[theme_params]</code>.</p>
 
 <h2 id="plugin">Plugin settings</h2>
 <table>
@@ -191,7 +196,7 @@ nav_tags = ["articles", "projects"]</code></pre>
     <tr><td>Wait before publishing</td><td>no</td><td>Seconds of quiet before an automatic publish (default 30, at least 5).</td></tr>
   </tbody>
 </table>
-<p>Commands: <strong>Publish now</strong>, <strong>Toggle publish for current note</strong>, <strong>Open published page</strong> and <strong>Open publish report</strong>.</p>
+<p>Commands: <strong>Publish now</strong>, <strong>Toggle publish for current note</strong>, <strong>Open published page</strong>, <strong>Open publish report</strong> and <strong>Open site settings note</strong>.</p>
 <nav class="next" aria-label="Pages"><a href="server.html"><small>Previous</small>Running the server</a><a class="fwd" href="troubleshooting.html"><small>Next</small>Troubleshooting</a></nav>
       </article>
       <aside class="toc"></aside>

@@ -1,14 +1,13 @@
 # kvist
 
 kvist (Swedish for "twig") publishes selected notes from an Obsidian vault as
-a themeable static website: a digital garden. An Obsidian plugin decides what
-is public and pushes it. A self-hosted Go server checks it again, stores it,
-builds the site and serves it.
-
-The server accepts pushes, enforces the publish rules, builds the site with
-the built-in garden theme, publishes it atomically and can serve it. The
-[Obsidian plugin](plugin/README.md) publishes from desktop and mobile;
-`kvist push` does the same from a terminal.
+a themeable static website: a digital garden. The
+[Obsidian plugin](plugin/README.md) decides what is public and pushes it,
+from desktop or mobile (`kvist push` does the same from a terminal). A
+self-hosted Go server checks the publish rules again, builds the site with
+the built-in garden theme, publishes it atomically and serves it. The site's
+title, menu and look are set in a note in your vault, `_site.md`, so you can
+change them from Obsidian.
 
 **Status:** feature-complete, but not yet run in production.
 
@@ -29,8 +28,9 @@ docker compose up -d
 docker compose exec kvist kvist token create --site garden --name laptop
 ```
 
-Caddy handles HTTPS. [Deploying](docs/deploy.md) has the full walkthrough,
-a systemd setup without Docker, and Cloudflare settings.
+Caddy handles HTTPS. [Getting started](https://klppl.github.io/kvist/getting-started.html)
+walks through it, including the Obsidian plugin. [Deploying](docs/deploy.md)
+also covers systemd without Docker, nginx and Cloudflare.
 
 ## Try it
 
@@ -72,6 +72,7 @@ the bottom of the page while the last good build stays up.
 
 The server config defines the rules. Per note, the first match wins:
 
+0. The settings note, `_site.md`, is never a page.
 1. Notes in an `exclude_folders` folder stay private.
 2. `publish: false` in the frontmatter, or a `#private` tag, keeps a note private.
 3. Notes in an `always_public_folders` folder, with a `#public` tag, or with
@@ -85,7 +86,8 @@ applies them again on its own.
 
 ## Docs
 
-The user guide is at **https://klppl.github.io/kvist/** (source: `docs/*.html`).
+The user guide is at **https://klppl.github.io/kvist/** (source: `docs/*.html`,
+served by GitHub Pages).
 Reference notes for developers:
 
 - [Design](docs/design.md): architecture, decisions, threat model
@@ -102,4 +104,4 @@ Reference notes for developers:
 make test     # go vet + go test -race ./...
 ```
 
-Requires Go 1.24 (and Node 20+ for the plugin). MIT licensed.
+Requires Go 1.26 or later (and Node 20+ for the plugin). MIT licensed.

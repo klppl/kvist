@@ -226,10 +226,12 @@ func TestPushPublishesOnlyPublicContent(t *testing.T) {
 	d.write(".obsidian/app.json", "{}", time.Time{})
 	d.write(".kvist/site.toml", "title = 'x'", time.Time{})
 	d.write(".kvist/secret.txt", "no", time.Time{})
+	d.write("Garden/_site.md", "---\ntitle: Note title\n---\n- [About](/about/)\n", time.Time{})
 
 	res := d.mustPush()
+	// The settings note travels as .kvist/site.md and is never a page.
 	eq(t, "published", e.headPaths(), []string{
-		".kvist/links.json", ".kvist/site.toml", "Garden/Note.md", "Garden/Welcome.md", "Tagged.md", "att/doc.pdf", "map.png",
+		".kvist/links.json", ".kvist/site.md", ".kvist/site.toml", "Garden/Note.md", "Garden/Welcome.md", "Tagged.md", "att/doc.pdf", "map.png",
 	})
 	if res.Revision != "r000001" || res.Build == nil || res.Build.State != protocol.BuildSucceeded {
 		t.Fatalf("result = %+v build=%+v", res, res.Build)

@@ -24,30 +24,41 @@ folder, note ↔ tag, backlinks) are written as note ids.
 | `AllTags` | []*Tag | Every tag, sorted by name (templates only). |
 | `Root` | *Folder | Folder tree of published notes. |
 | `Graph` | Graph | Nodes and edges between published notes. |
-| `Home` | *Note | The root `index.md`, or `home` from `.kvist/site.toml`; nil means the theme generates an index. |
+| `Home` | *Note | The root `index.md`, or `home` from the settings note; nil means the theme generates an index. |
 
 ## SiteConfig
 
 `Title`, `Description`, `BaseURL` (no trailing slash), `Language`, `Author`,
 `Nav` (list of `{Title, URL}`) and `Params` (theme parameters).
 
-The server config sets these. An optional `.kvist/site.toml` in the vault
-may override `title`, `description`, `author`, `language`, `home`, `nav`
-and `theme_params`. Any other key is ignored with a warning: publish rules,
-the theme and the base URL stay on the server.
+The server config sets these. The vault may override `title`,
+`description`, `author`, `language`, `home`, the menu (`Nav`) and theme
+parameters with a **settings note**: a note named `_site.md` in any folder,
+never published as a page. Clients push its content as `.kvist/site.md`.
 
-```toml
-# .kvist/site.toml
-title = "Alex's garden"
-home  = "Kvist/Welcome.md"
-
-[[nav]]
-title = "About"
-url   = "/about/"
-
-[theme_params]
-accent = "#3f7d4e"
+```markdown
+---
+title: Alex's garden
+home: "[[Welcome]]"
+groups: [articles, projects]
+accent: "#3f7d4e"
+---
+- [About](/about/)
+- [[Reading list]]
 ```
+
+Properties other than the site fields become theme parameters; empty ones
+are ignored. Obsidian's own properties (`tags`, `aliases`, `cssclasses`,
+`publish`) are skipped, and server-only keys (`base_url`, publish rules, …)
+are ignored with a warning. `Nav` comes from the list items in the body that
+are a single link: URLs are kept, `[[wikilinks]]` resolve to published notes
+(links to anything else are dropped with a warning). Links in comments and
+code blocks don't count.
+
+The older `.kvist/site.toml` is still read (`title`, `description`,
+`author`, `language`, `home`, `[[nav]]`, `[theme_params]`); the settings
+note wins where both set a value. The theme parameter `nav_tags` is read as
+`groups`.
 
 ## Note
 

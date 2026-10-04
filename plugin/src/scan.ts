@@ -1,11 +1,12 @@
 // Builds the manifest from a vault: gate 1 (the publish rules on Obsidian's
-// metadata), the attachments that published notes reference, the optional
-// .kvist/site.toml and the hints file. Obsidian-independent so it can be
+// metadata), the attachments that published notes reference, the settings
+// note (_site.md, sent as .kvist/site.md), the optional .kvist/site.toml and
+// the hints file. Obsidian-independent so it can be
 // tested; main.ts adapts the real vault to VaultLike.
 
 import { HashCache, sha256 } from "./hash";
-import { HINTS_PATH, ManifestFile, Rules, SITE_CONFIG_PATH } from "./protocol";
-import { Decision, allowedPath, attachmentAllowed, evaluate, isNote } from "./rules";
+import { HINTS_PATH, ManifestFile, Rules, SITE_CONFIG_PATH, SITE_NOTE_PATH } from "./protocol";
+import { Decision, allowedPath, attachmentAllowed, evaluate, isNote, isSettingsNote } from "./rules";
 
 export interface VaultFile {
   path: string;
@@ -49,6 +50,15 @@ export interface ScanResult {
   decisions: Map<string, Decision>;
   leaks: LeakItem[];
   content: Map<string, () => Promise<ArrayBuffer>>;
+  /** Vault path of the settings note (_site.md), if there is one. */
+  settingsNote?: string;
+}
+
+/** Finds the settings note; throws if there are several. */
+export function findSettingsNote(paths: Iterable<string>): string | undefined {
+  const found = [...paths].filter(isSettingsNote).sort();
+  if (found.length > 1) throw new Error(`found ${found.length} settings notes (${found.join(", ")}); keep one`);
+  return found[0];
 }
 
 /** Splits "Note#Heading" into the target part, as the server keys hints. */
@@ -129,6 +139,19 @@ export async function scan(vault: VaultLike, rules: Rules, cache: HashCache): Pr
   }
   cache.prune(new Set(all.keys()));
 
+  const settingsNote = findSettingsNote(all.keys());
+  if (settingsNote) {
+    // Pushed under a fixed name, so the server needn't know where it lives.
+    const f = all.get(settingsNote)!;
+    let hash = cache.get(settingsNote, f.mtime, f.size);
+    if (!hash) {
+      hash = await sha256(await vault.read(settingsNote));
+      cache.set(settingsNote, f.mtime, f.size, hash);
+    }
+    files.push({ path: SITE_NOTE_PATH, hash, size: f.size, mtime: iso(f.mtime) });
+    content.set(SITE_NOTE_PATH, () => vault.read(settingsNote));
+  }
+
   const siteToml = await vault.readHidden(SITE_CONFIG_PATH);
   if (siteToml) {
     files.push({ path: SITE_CONFIG_PATH, hash: await sha256(siteToml.data), size: siteToml.data.byteLength, mtime: iso(siteToml.mtime) });
@@ -142,7 +165,7 @@ export async function scan(vault: VaultLike, rules: Rules, cache: HashCache): Pr
   }
 
   files.sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
-  return { files, decisions, leaks, content };
+  return { files, decisions, leaks, content, settingsNote };
 }
 
 /** JSON with sorted object keys, so equal hints hash equally. */

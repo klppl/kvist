@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Customizing the site · kvist docs</title>
-<meta name="description" content="Change your site&#x27;s title, home page, menu, colors and layout from your vault.">
+<meta name="description" content="Change your site&#x27;s title, home page, menu, colors and layout from a settings note in your vault.">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
 <script>try{var t=localStorage.getItem("kvist-docs-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
@@ -50,45 +50,51 @@
       <article>
 <p class="eyebrow">Guides</p>
 <h1>Customizing the site</h1>
-<p class="lead">Most of how your site looks is set from your vault, in <code>.kvist/site.toml</code>. Change it, publish, and the site follows.</p>
+<p class="lead">How your site looks is set in one note in your vault, <code>_site.md</code>. Edit it in Obsidian on any device, publish, and the site follows.</p>
 
-<h2 id="site-toml">The site settings file</h2>
-<p><code>.kvist/site.toml</code> sits at the top of your vault <span class="where vault">vault</span>. The plugin uploads it with every publish. It's hidden in Obsidian and Finder because the folder name starts with a dot; <a href="getting-started.html#make-it-yours">Getting started</a> shows how to create it.</p>
-<pre data-label=".kvist/site.toml"><code>title       = "Ada's garden"
-description = "Notes on what I'm learning and building"
-author      = "Ada"
-language    = "en"
-home        = "Kvist/Welcome.md"
+<h2 id="settings-note">The settings note</h2>
+<p>The settings note is a note called <code>_site.md</code> <span class="where vault">vault</span>. It can be in any folder; the plugin creates it next to your public notes, as <code>Kvist/_site.md</code>. It is never published as a page, even inside a public folder. Open it, or create it, with <strong>kvist: Open site settings note</strong>.</p>
+<pre data-label="Kvist/_site.md"><code>---
+title: Ada's garden
+description: Notes on what I'm learning and building
+author: Ada
+language: en
+home: "[[Welcome]]"
+groups: [articles, projects, books]
+accent: "#8a4f9e"
+footer: © 2026 Ada · [Contact](mailto:ada@example.com)
+---
+Settings for my website.
 
-[[nav]]
-title = "About"
-url   = "/about/"
-
-[[nav]]
-title = "Mastodon"
-url   = "https://mastodon.social/@ada"
-
-[theme_params]
-accent   = "#8a4f9e"
-nav_tags = ["articles", "projects", "books"]
-footer   = "© 2026 Ada · [Contact](mailto:ada@example.com)"</code></pre>
-<p>Only presentation settings are allowed here. Publish rules, the theme and the site address can only be set on the server, so a synced vault can't change what's public. Other keys are ignored, and the publish report shows a warning.</p>
+## Links
+- [About](/about/)
+- [[Reading list]]
+- [Mastodon](https://mastodon.social/@ada)</code></pre>
+<p>Settings are the note's properties, so you can edit them in Obsidian's property editor. <strong>Leave a property empty to keep its default.</strong></p>
 <table>
-  <thead><tr><th>Key</th><th>What it does</th></tr></thead>
+  <thead><tr><th>Property</th><th>What it does</th></tr></thead>
   <tbody>
     <tr><td><code>title</code></td><td>Site name, shown top left and in browser tabs.</td></tr>
     <tr><td><code>description</code></td><td>Shown under the title on the home page and in link previews.</td></tr>
     <tr><td><code>author</code>, <code>language</code></td><td>Used in page metadata and feeds. <code>language</code> is a code like <code>en</code> or <code>sv</code>.</td></tr>
-    <tr><td><code>home</code></td><td>A published note to use as the home page (path in the vault).</td></tr>
-    <tr><td><code>[[nav]]</code></td><td>Extra links in the menu, under <em>Links</em>. Links to other websites get an arrow.</td></tr>
-    <tr><td><code>[theme_params]</code></td><td>Theme settings, listed <a href="#theme">below</a>.</td></tr>
+    <tr><td><code>home</code></td><td>A published note to use as the home page, as a link: <code>"[[Welcome]]"</code>. Obsidian keeps it up to date if you rename the note.</td></tr>
+    <tr><td><code>groups</code></td><td>Tags that group the menu (<a href="#groups">below</a>).</td></tr>
+    <tr><td>Anything else</td><td>A theme setting, such as <code>accent</code> or <code>footer</code>. See <a href="#theme">Theme settings</a>.</td></tr>
   </tbody>
 </table>
+<p><strong>Menu links</strong> come from the note's text: each list item that is a single link becomes a link under <em>Links</em> in the menu, in order. Links can go to other websites (they get an arrow), to addresses on your site like <code>/about/</code>, or to published notes with <code>[[wikilinks]]</code>. A link to a note that isn't published is left out, with a warning in the publish report. Other text in the note is ignored, so you can keep notes to yourself there.</p>
+<p>Publish rules, the theme and the site's address can only be set on the server, so a synced vault can't change what's public. If the settings note tries, the publish report shows a warning.</p>
+<div class="callout">
+  <p class="callout-title">Only one settings note</p>
+  <p>If the vault has two notes called <code>_site.md</code>, publishing stops and names both, so you can delete one.</p>
+</div>
+<p>Older sites may use a hidden <code>.kvist/site.toml</code> file instead. It still works, and the settings note wins where both set something. See <a href="configuration.html#site-toml">Configuration</a>.</p>
 
 <h2 id="groups">Grouping the menu by tags</h2>
 <p>The menu's <em>Content</em> section lists your top-level folders. If you keep all public notes in one folder, that shows a single “Kvist” entry, which doesn't help visitors. Group notes by tags instead:</p>
-<pre data-label=".kvist/site.toml"><code>[theme_params]
-nav_tags = ["articles", "projects", "books"]</code></pre>
+<pre data-label="Kvist/_site.md"><code>---
+groups: [articles, projects, books]
+---</code></pre>
 <figure class="shot narrow"><img src="assets/screens/groups.webp" width="1200" height="1040" alt="The menu shows tag groups Kvist, Ideas and Meta with note counts; Kvist is highlighted and the middle column lists its notes." loading="lazy"><figcaption>Groups in the menu. The note's group is highlighted, and the middle column lists the group.</figcaption></figure>
 <p>Then tag each note, either in the text (<code>#articles</code>) or in its properties (<code>tags: [articles]</code>). Now:</p>
 <ul>
@@ -100,7 +106,7 @@ nav_tags = ["articles", "projects", "books"]</code></pre>
 <p>Some details:</p>
 <ul>
   <li>Child tags count: a note tagged <code>#projects/kvist</code> belongs to Projects.</li>
-  <li>A note with two group tags appears in both groups. On its own page it uses the one listed first in <code>nav_tags</code>.</li>
+  <li>A note with two group tags appears in both groups. On its own page it uses the one listed first in <code>groups</code>.</li>
   <li>Notes without a group tag are still published. Their page shows their folder in the middle column instead.</li>
   <li>A group with no published notes yet is left out of the menu.</li>
   <li>The label is the tag with a capital first letter: <code>articles</code> becomes “Articles”.</li>
@@ -121,12 +127,12 @@ nav_tags = ["articles", "projects", "books"]</code></pre>
 </div>
 
 <h2 id="theme">Theme settings</h2>
-<p>Put these under <code>[theme_params]</code> in <code>.kvist/site.toml</code> <span class="where vault">vault</span>, or in the site's <code>[site.theme_params]</code> in <code>kvist.toml</code> <span class="where server">server</span>. The vault wins if both set one.</p>
+<p>Add these as properties of the settings note <span class="where vault">vault</span>, or under the site's <code>[site.theme_params]</code> in <code>kvist.toml</code> <span class="where server">server</span>. The note wins if both set one. Colors start with <code>#</code>, so write them in quotes in the properties: <code>accent: "#8a4f9e"</code>.</p>
 <table>
   <thead><tr><th>Setting</th><th>Default</th><th>What it does</th></tr></thead>
   <tbody>
     <tr><td><code>accent</code></td><td><code>"#3f7d4e"</code></td><td>Color of links and highlights.</td></tr>
-    <tr><td><code>nav_tags</code></td><td><code>[]</code></td><td>Tags that group the menu (<a href="#groups">above</a>). Empty: folders.</td></tr>
+    <tr><td><code>groups</code></td><td><code>[]</code></td><td>Tags that group the menu (<a href="#groups">above</a>). Empty: folders. Older configs call it <code>nav_tags</code>, which still works.</td></tr>
     <tr><td><code>show_list</code></td><td><code>true</code></td><td>Show the middle list column.</td></tr>
     <tr><td><code>list_max</code></td><td><code>100</code></td><td>Notes in the list before a “more…” link.</td></tr>
     <tr><td><code>home_recent</code></td><td><code>12</code></td><td>Notes in the home page's “Recently tended” list.</td></tr>

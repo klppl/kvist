@@ -12,8 +12,6 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/BurntSushi/toml"
-
 	"github.com/klppl/kvist/internal/config"
 	"github.com/klppl/kvist/internal/imagemeta"
 	"github.com/klppl/kvist/internal/markdown"
@@ -91,7 +89,7 @@ func Build(site *config.Site, snap source.Snapshot) (*Site, error) {
 		used:    map[string]bool{},
 		aliases: map[string][]string{},
 	}
-	var siteToml []byte
+	var siteToml, siteNote []byte
 	for _, f := range snap.Files() {
 		switch {
 		case f.Path == protocol.SiteConfigPath:
@@ -100,6 +98,12 @@ func Build(site *config.Site, snap source.Snapshot) (*Site, error) {
 				return nil, err
 			}
 			siteToml = src
+		case f.Path == protocol.SiteNotePath:
+			src, err := b.read(f)
+			if err != nil {
+				return nil, err
+			}
+			siteNote = src
 		case protocol.IsReservedPath(f.Path):
 		case protocol.IsNote(f.Path):
 			src, err := b.read(f)
@@ -126,7 +130,8 @@ func Build(site *config.Site, snap source.Snapshot) (*Site, error) {
 	b.ix = resolve.NewIndex(paths)
 
 	s := &Site{ModelVersion: Version, Revision: snap.Revision(), BuiltAt: snap.Time().UTC(), notesBy: map[string]*Note{}}
-	s.Config = b.siteConfig(siteToml)
+	settings := b.readSettings(siteToml, siteNote)
+	s.Config = b.siteConfig(settings)
 
 	b.makeNotes(s)
 	b.checkURLs(s)
@@ -138,7 +143,7 @@ func Build(site *config.Site, snap source.Snapshot) (*Site, error) {
 	b.makeTags(s)
 	b.makeAssets(s)
 	b.makeGraph(s)
-	b.pickHome(s, siteToml)
+	b.finishSettings(s, settings)
 	s.Warnings = b.warnings
 	if len(b.problems) > 0 {
 		return nil, &BuildError{Problems: b.problems}
@@ -168,19 +173,9 @@ func (b *builder) warn(code, p, format string, args ...any) {
 
 // --- site config ---
 
-// siteOverrides are the presentation settings a vault may set in
-// .kvist/site.toml. Everything else stays server-side.
-type siteOverrides struct {
-	Title       *string        `toml:"title"`
-	Description *string        `toml:"description"`
-	Author      *string        `toml:"author"`
-	Language    *string        `toml:"language"`
-	Home        *string        `toml:"home"`
-	Nav         []NavItem      `toml:"nav"`
-	ThemeParams map[string]any `toml:"theme_params"`
-}
-
-func (b *builder) siteConfig(siteToml []byte) SiteConfig {
+// siteConfig starts from the server's settings and applies the vault's
+// (see settings.go).
+func (b *builder) siteConfig(st siteSettings) SiteConfig {
 	c := SiteConfig{
 		Title:       b.cfg.Title,
 		Description: b.cfg.Description,
@@ -192,33 +187,8 @@ func (b *builder) siteConfig(siteToml []byte) SiteConfig {
 	for k, v := range b.cfg.ThemeParams {
 		c.Params[k] = v
 	}
-	if siteToml == nil {
-		return c
-	}
-	var o siteOverrides
-	md, err := toml.Decode(string(siteToml), &o)
-	if err != nil {
-		b.warn(WarnSiteConfig, protocol.SiteConfigPath, "ignored: %v", err)
-		return c
-	}
-	for _, k := range md.Undecoded() {
-		b.warn(WarnSiteConfig, protocol.SiteConfigPath, "key %q is not allowed in the vault and was ignored (it can only be set in the server config)", k.String())
-	}
-	set := func(dst *string, v *string) {
-		if v != nil {
-			*dst = *v
-		}
-	}
-	set(&c.Title, o.Title)
-	set(&c.Description, o.Description)
-	set(&c.Author, o.Author)
-	set(&c.Language, o.Language)
-	if o.Nav != nil {
-		c.Nav = o.Nav
-	}
-	for k, v := range o.ThemeParams {
-		c.Params[k] = v
-	}
+	renameGroups(c.Params)
+	applySettings(&c, st)
 	return c
 }
 
@@ -755,23 +725,4 @@ func (b *builder) makeGraph(s *Site) {
 			s.Graph.Edges = append(s.Graph.Edges, GraphEdge{Source: n.ID, Target: l.TargetID})
 		}
 	}
-}
-
-func (b *builder) pickHome(s *Site, siteToml []byte) {
-	if root := s.Root; root != nil && root.Index != nil {
-		s.Home, s.HomeID = root.Index, root.Index.ID
-	}
-	var o siteOverrides
-	if siteToml != nil {
-		_, _ = toml.Decode(string(siteToml), &o)
-	}
-	if o.Home == nil || *o.Home == "" {
-		return
-	}
-	n := s.notesBy[protocol.NormalizePath(strings.TrimPrefix(*o.Home, "/"))]
-	if n == nil {
-		b.warn(WarnHome, protocol.SiteConfigPath, "home note %q is not published", *o.Home)
-		return
-	}
-	s.Home, s.HomeID = n, n.ID
 }

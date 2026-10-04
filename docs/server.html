@@ -56,11 +56,12 @@
 <h2 id="update">Updating</h2>
 <pre><code>docker compose pull
 docker compose up -d</code></pre>
-<p>This fetches the newest kvist and Caddy images and restarts what changed. Your published site and settings are kept. The plugin and the server check each other's protocol version and tell you if one needs updating.</p>
+<p>This fetches the newest kvist and Caddy images and restarts what changed. Your published site and settings are kept.</p>
+<p><strong>Update the server first, then the plugin.</strong> A newer plugin may send things an older server doesn't understand yet, and publishing fails until the server catches up. The plugin and the server also check each other's protocol version and tell you if one is too old.</p>
 <p>Every build of kvist is also published with its own tag, <code>ghcr.io/klppl/kvist:sha-&lt;commit&gt;</code>. To stay on a known version, put that tag in <code>docker-compose.yml</code> instead of <code>latest</code>; to go back after a bad update, put the previous one there and run <code>docker compose up -d</code>.</p>
 
 <h2 id="config-changes">Changing the settings</h2>
-<p>kvist reads <code>kvist.toml</code> when it starts. After editing it:</p>
+<p>The site's title, menu and look are set in the <a href="customizing.html#settings-note">settings note</a> in your vault, which needs no restart. <code>kvist.toml</code> holds the rest, and kvist reads it when it starts. After editing it:</p>
 <pre><code>docker compose restart kvist</code></pre>
 <p>Then publish from Obsidian, so the site is rebuilt with the new settings. If the file has a mistake, kvist doesn't start; <code>docker compose logs kvist</code> says what's wrong.</p>
 

@@ -8,13 +8,41 @@ import {
 } from "obsidian";
 import { Client, Transport } from "./client";
 import { HashCache, HashEntry } from "./hash";
-import { ProtocolError, Regression, Rules, Warning } from "./protocol";
+import { ProtocolError, Regression, Rules, SETTINGS_NOTE_NAME, SITE_NOTE_PATH, Warning } from "./protocol";
 import { DeviceState, PublishResult, Publisher, StaleCancelled } from "./publisher";
-import { evaluate, isNote } from "./rules";
-import { LeakItem, NoteMeta, VaultFile, VaultLike } from "./scan";
+import { evaluate, isNote, isSettingsNote } from "./rules";
+import { LeakItem, NoteMeta, VaultFile, VaultLike, findSettingsNote } from "./scan";
 import { noteURL } from "./slug";
 
 const VIEW_REPORT = "kvist-report";
+
+/** The settings note a new site starts with. Empty properties are ignored. */
+const SETTINGS_TEMPLATE = `---
+title:
+description:
+author:
+home:
+groups: []
+accent:
+footer:
+---
+Settings for your kvist website. This note is never published as a page. Fill in the properties above, then publish. Empty ones keep their default.
+
+- **title** and **description**: the site's name and tagline.
+- **home**: a note to use as the home page, written as a link: \`[[Welcome]]\`. Empty: a generated home page.
+- **groups**: tags that group the menu, such as \`articles\` and \`projects\`. Empty: your folders.
+- **accent**: the color of links, such as \`#3f7d4e\`.
+- **footer**: text at the bottom of the menu. Markdown works.
+
+## Links
+
+Each list item that is a single link becomes a menu link, in order. Links can point to websites, to addresses like /about/, or to published notes with \`[[wikilinks]]\`. For example:
+
+%%
+- [About](/about/)
+- [Mastodon](https://mastodon.social/@you)
+%%
+`;
 
 /** Shared settings (data.json; may sync between devices). */
 interface SharedSettings {
@@ -76,6 +104,7 @@ export default class KvistPlugin extends Plugin {
       },
     });
     this.addCommand({ id: "open-report", name: "Open publish report", callback: () => this.openReport() });
+    this.addCommand({ id: "settings-note", name: "Open site settings note", callback: () => this.openSettingsNote() });
     this.addCommand({
       id: "open-published",
       name: "Open published page",
@@ -89,7 +118,7 @@ export default class KvistPlugin extends Plugin {
 
     this.registerEvent(
       this.app.workspace.on("file-menu", (menu: Menu, file: TAbstractFile) => {
-        if (!(file instanceof TFile) || file.extension !== "md") return;
+        if (!(file instanceof TFile) || file.extension !== "md" || isSettingsNote(file.path)) return;
         const published = this.decide(file)?.published;
         menu.addItem((item) =>
           item.setTitle(published ? "Unpublish (kvist)" : "Publish (kvist)").setIcon("globe").onClick(() => this.togglePublish(file)),
@@ -241,6 +270,10 @@ export default class KvistPlugin extends Plugin {
   }
 
   async togglePublish(file: TFile) {
+    if (isSettingsNote(file.path)) {
+      new Notice("kvist: this is the site's settings note. It is never published as a page.");
+      return;
+    }
     const rules = await this.ensureRules();
     if (!rules) return;
     const before = this.decide(file)!;
@@ -261,6 +294,28 @@ export default class KvistPlugin extends Plugin {
     } else {
       new Notice(`kvist: “${file.basename}” will be ${after.published ? "published" : "unpublished"} on the next publish.`);
     }
+  }
+
+  /** Opens the settings note (_site.md), creating it from a template if there is none. */
+  async openSettingsNote() {
+    let path: string | undefined;
+    try {
+      path = findSettingsNote(this.app.vault.getMarkdownFiles().map((f) => f.path));
+    } catch (e) {
+      new Notice("kvist: " + (e instanceof Error ? e.message : e));
+      return;
+    }
+    if (!path) {
+      // Next to the public notes if the rules name a folder, else at the top.
+      const rules = await this.ensureRules();
+      const folder = (rules?.always_public_folders ?? []).map((f) => f.replace(/^\/+|\/+$/g, "")).find((f) => f !== "") ?? "";
+      if (folder && !this.app.vault.getAbstractFileByPath(folder)) await this.app.vault.createFolder(folder);
+      path = normalizePath(folder ? `${folder}/${SETTINGS_NOTE_NAME}` : SETTINGS_NOTE_NAME);
+      await this.app.vault.create(path, SETTINGS_TEMPLATE);
+      new Notice("kvist: created the site settings note. Fill it in, then publish.");
+    }
+    const file = this.app.vault.getAbstractFileByPath(path);
+    if (file instanceof TFile) await this.app.workspace.getLeaf(false).openFile(file);
   }
 
   openPublished(file: TFile) {
@@ -418,7 +473,7 @@ class ReportView extends ItemView {
     this.section(el, "Attachments in excluded folders", "Published notes reference these, but they stay private.",
       this.plugin.lastLeaks.filter((l) => l.kind === "excluded_attachment"), (l) => [l.from, `→ ${l.target}`]);
     this.section(el, "From the server", "Warnings from the last publish and build.",
-      this.plugin.lastWarnings, (w) => [w.path ?? "", w.message]);
+      this.plugin.lastWarnings, (w) => [w.path === SITE_NOTE_PATH ? res.scan.settingsNote ?? "" : w.path ?? "", w.message]);
   }
 
   private section<T>(el: HTMLElement, title: string, desc: string, items: T[], row: (t: T) => [string, string]) {
@@ -467,6 +522,10 @@ class KvistSettingTab extends PluginSettingTab {
         p.rules = undefined;
         await p.saveShared();
       }));
+
+    new Setting(containerEl).setName("Site settings")
+      .setDesc(`Title, home page, menu and colors live in a note called ${SETTINGS_NOTE_NAME}, so you can change them from any device.`)
+      .addButton((b) => b.setButtonText("Open settings note").onClick(() => p.openSettingsNote()));
 
     containerEl.createEl("h3", { text: "This device" });
     containerEl.createEl("p", {

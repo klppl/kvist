@@ -125,8 +125,10 @@ stage: budding
 <p>Renaming or moving a note changes its address, so old links to it stop working. If two notes would get the same address, the build stops and names both, and your site keeps showing the previous version until you fix it.</p>
 
 <h2 id="home">The home page</h2>
-<p>By default the home page shows your site's title and description, cards for your folders or <a href="customizing.html#groups">menu groups</a>, and a list of recently updated notes. To use one of your notes instead, either publish a note named <code>index.md</code> at the top of your vault, or set <code>home</code> in <code>.kvist/site.toml</code>:</p>
-<pre data-label=".kvist/site.toml"><code>home = "Kvist/Welcome.md"</code></pre>
+<p>By default the home page shows your site's title and description, cards for your folders or <a href="customizing.html#groups">menu groups</a>, and a list of recently updated notes. To use one of your notes instead, either publish a note named <code>index.md</code> at the top of your vault, or set <code>home</code> in the <a href="customizing.html#settings-note">settings note</a>:</p>
+<pre data-label="Kvist/_site.md"><code>---
+home: "[[Welcome]]"
+---</code></pre>
 
 <h2 id="tags">Tags</h2>
 <p>Every tag on a published note gets a page at <code>/tags/&lt;tag&gt;/</code>, and <code>/tags/</code> lists them all. Nested tags like <code>#projects/kvist</code> get their own page, and the parent tag's page includes them. Tags can also <a href="customizing.html#groups">group the menu</a>.</p>

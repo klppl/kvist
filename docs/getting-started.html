@@ -168,25 +168,20 @@ cp main.js manifest.json styles.css "$VAULT/.obsidian/plugins/kvist/"</code></pr
 </ol>
 
 <h2 id="make-it-yours">Part 4: make it yours</h2>
-<p>The site's title, description, home page and menu come from a small settings file <strong>in your vault</strong>, so you can change them from Obsidian and they go live with your next publish. The file is <code>.kvist/site.toml</code> at the top of your vault.</p>
-<div class="callout warn">
-  <p class="callout-title">The folder is hidden</p>
-  <p>Folders whose names start with a dot are hidden in Obsidian and in Finder, so create the file from a terminal:</p>
-<pre><code>mkdir -p "$VAULT/.kvist"
-open -e "$VAULT/.kvist/site.toml"    <span class="c"># macOS: opens TextEdit; elsewhere use any text editor</span></code></pre>
-  <p>On macOS, if TextEdit says the file doesn't exist, run <code>touch "$VAULT/.kvist/site.toml"</code> first.</p>
-</div>
-<p>A good start:</p>
-<pre data-label=".kvist/site.toml (in your vault)"><code>title       = "Ada's garden"
-description = "Notes on what I'm learning and building"
+<p>The site's title, home page, menu and colors are set in a note in your vault called <code>_site.md</code>, the <strong>settings note</strong>. You edit it in Obsidian like any other note, on any device, and changes go live with your next publish. It's never published as a page.</p>
+<p>Run <strong>kvist: Open site settings note</strong> from the command palette (or press <strong>Open settings note</strong> in the plugin's settings). The first time, it creates <code>Kvist/_site.md</code> with every setting ready to fill in:</p>
+<pre data-label="Kvist/_site.md"><code>---
+title: Ada's garden
+description: Notes on what I'm learning and building
+home: "[[Welcome]]"
+groups: [articles, projects, books]
+---
+Settings for your kvist website. …
 
-<span class="c"># Use one of your notes as the home page (optional):</span>
-<span class="c"># home = "Kvist/Welcome.md"</span>
-
-[theme_params]
-<span class="c"># Group the menu by tags instead of folders (optional):</span>
-nav_tags = ["articles", "projects", "books"]</code></pre>
-<p>Run <strong>Publish now</strong> again to apply it. <a href="customizing.html">Customizing the site</a> lists everything you can change, including how menu groups work.</p>
+## Links
+- [About](/about/)
+- [Mastodon](https://mastodon.social/@ada)</code></pre>
+<p>Fill in the properties you want and leave the rest empty; empty ones keep their default. Then run <strong>Publish now</strong>. <a href="customizing.html#settings-note">Customizing the site</a> explains every setting, including how menu groups work.</p>
 
 <h2 id="more-devices">Publishing from more devices</h2>
 <p>For each extra device (another computer, your phone):</p>

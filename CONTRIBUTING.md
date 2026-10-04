@@ -13,7 +13,8 @@ themes/garden/      the built-in theme (embedded in the binary)
 plugin/             the Obsidian plugin (TypeScript)
 testdata/leaks/     leak-prevention fixtures
 testdata/parity/    fixtures shared by the Go and plugin tests
-docs/               design, protocol, content model, themes, deployment
+docs/               the user guide (*.html, GitHub Pages) and the developer
+                    notes: design, protocol, content model, themes, deployment
 ```
 
 ## Develop
@@ -21,7 +22,7 @@ docs/               design, protocol, content model, themes, deployment
 ```sh
 make test                 # gofmt check is in CI: run `make fmt` first
 make plugin-test          # plugin type check, unit and end-to-end tests
-go run ./cmd/kvist dev --dir example-vault --public Kvist
+go run ./cmd/kvist dev --dir example-vault --config kvist.example.toml
 ```
 
 You don't need Obsidian to work on the server: `kvist push --dir` is a

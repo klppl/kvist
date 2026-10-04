@@ -35,7 +35,9 @@ own), a script or meta tags without copying any other file:
 
 with `static/custom.css` in the same overrides folder.
 
-`theme_params` can also be set from the vault in `.kvist/site.toml`.
+Theme parameters can also be set from the vault, as properties of the
+settings note (`_site.md`); see the [content model](content-model.md#siteconfig).
+The vault's values win.
 
 ## Layout
 
@@ -128,14 +130,15 @@ Params (set them in `theme_params`):
 | `home_recent` | `12` | notes in the home page's list |
 | `show_list` | `true` | the list pane (below) |
 | `list_max` | `100` | notes in the list pane before a "more…" link |
-| `nav_tags` | `[]` | tags that group the sidebar instead of folders (below) |
+| `groups` | `[]` | tags that group the sidebar instead of folders (below); `nav_tags` is an older name for it |
 | `show_toc`, `show_backlinks`, `show_graph` | `true` | note page parts |
 | `code_style_light`, `code_style_dark` | `github`, `github-dark` | highlighting |
-| `footer` | `""` | Markdown at the bottom of every page |
+| `footer` | `""` | Markdown at the bottom of the menu |
 | `mermaid_url`, `mermaid_integrity` | jsDelivr, pinned with an SRI hash | see below |
 
-Pages have three panes: the nav pane (main links, top-level folders and
-the site's `nav` links), the list pane, and the page. The list pane shows
+Pages have three panes: the nav pane (main links, the top-level folders or
+`groups`, and the menu links from the settings note), the list pane, and
+the page. The list pane shows
 the notes around the page: a note's folder, a folder's notes, a tag's notes,
 or the most recent notes on the home page. It has a filter box, and on
 small screens it moves below the page. Neither pane lists the whole vault,
@@ -146,23 +149,25 @@ graph sit to the right of a note; otherwise they follow it.
 **Grouping by tags.** By default the sidebar lists your top-level folders.
 If everything you publish lives in one folder, group it by tags instead:
 
-```toml
-# .kvist/site.toml in your vault
-[theme_params]
-nav_tags = ["articles", "projects", "books"]
+```markdown
+---
+groups: [articles, projects, books]
+---
 ```
+
+(in the settings note, `_site.md`)
 
 Each tag becomes a sidebar entry, in this order, labeled with a capital
 first letter ("Articles") and linked to its tag page; notes with a child
 tag (`#projects/kvist`) count too. On a note page, the list pane shows the
-note's group, the first `nav_tags` tag it carries, and falls back to its
+note's group, the first `groups` tag it carries, and falls back to its
 folder for notes without one. Tags with no published notes are left out.
 
 It shows the growth stage from the frontmatter `stage` (`seedling`,
 `budding`, `evergreen`) when `stage` is listed in `expose_frontmatter`.
 
 Search (press <kbd>/</kbd>) loads MiniSearch and `/search-index.json` the first time
-it opens. The graph (header button, and the "Connections" box on note pages)
+it opens. The graph (the Graph item in the menu, and the "Connections" box on note pages)
 reads `/graph.json` and draws on a canvas. KaTeX is vendored and loads only
 on pages with math.
 

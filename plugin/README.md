@@ -22,6 +22,8 @@ Copy `main.js`, `manifest.json` and `styles.css` to
    `kvist token create --site garden --name "My phone"`.
 2. In the plugin settings, enter the **server URL** (https) and the **site**.
 3. Under *This device*, paste the **token**, then press **Test**.
+4. Run **Open site settings note** to create `_site.md`, where you set the
+   site's title, home page, menu and colors.
 
 The server URL and site are stored in the plugin's `data.json`, so they sync
 with your vault. The token, the device name and the auto-publish switch are
@@ -35,6 +37,9 @@ them. Use one token per device, so you can revoke one without the others.
   `publish: true` or `publish: false` to the note's frontmatter. If a rule
   wins anyway (an excluded folder, a `#private` tag), it tells you.
 - **Open published page** opens the note on your site.
+- **Open site settings note** opens `_site.md`, the note with the site's
+  title, home page, menu and theme settings, and creates it from a template
+  the first time. It's never published as a page.
 - **Open publish report**, or click the status bar: links and embeds to
   notes that stay private, attachments in excluded folders, and the server's
   warnings, each with a link to the note.
@@ -49,8 +54,8 @@ them. Use one token per device, so you can revoke one without the others.
 The server decides the rules (see the main README). The plugin fetches them
 and applies them before uploading anything; the server checks every note
 again. Only published notes, the attachments they reference, a hints file
-that names published notes only, and `.kvist/site.toml` (if present) leave
-your device.
+that names published notes only, the settings note `_site.md` and
+`.kvist/site.toml` (if present) leave your device.
 
 ## Development
 

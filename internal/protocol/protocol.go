@@ -32,7 +32,15 @@ const (
 const (
 	HintsPath      = ".kvist/links.json"
 	SiteConfigPath = ".kvist/site.toml"
+	// SiteNotePath carries the vault's settings note. Clients find the note
+	// by name (SettingsNoteName) anywhere in the vault and push its content
+	// under this path, so the server never depends on where it lives.
+	SiteNotePath = ".kvist/site.md"
 )
+
+// SettingsNoteName is the file name of the settings note. A note with this
+// name is never published as a page, wherever it is.
+const SettingsNoteName = "_site.md"
 
 // HashPrefix prefixes every content hash on the wire.
 const HashPrefix = "sha256:"

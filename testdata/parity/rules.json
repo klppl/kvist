@@ -9,6 +9,10 @@
   },
   "cases": [
     {"path": "Garden/a.md", "published": true, "reason": "public_folder"},
+    {"path": "Garden/_site.md", "tags": ["public"], "frontmatter": {"publish": true}, "published": false, "reason": "settings_note"},
+    {"path": "_site.md", "published": false, "reason": "settings_note"},
+    {"path": "Docs/Public/_SITE.md", "published": false, "reason": "settings_note"},
+    {"path": "Garden/site.md", "published": true, "reason": "public_folder"},
     {"path": "Docs/Public/x.md", "published": true, "reason": "public_folder"},
     {"path": "Docs/x.md", "published": false, "reason": "no_rule"},
     {"path": "garden/a.md", "published": false, "reason": "no_rule"},

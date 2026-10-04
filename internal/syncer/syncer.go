@@ -436,8 +436,15 @@ func (s *Service) gate2(ss *store.Site, rules protocol.Rules, files []protocol.F
 	var keep []protocol.File
 	var warnings []protocol.Warning
 	for _, f := range files {
+		if protocol.IsReservedPath(f.Path) {
+			// .kvist/ files are settings and hints, never pages; the build
+			// reads them separately (.kvist/site.md ends in .md, so check
+			// this before treating anything as a note).
+			keep = append(keep, f)
+			continue
+		}
 		if !protocol.IsNote(f.Path) {
-			if !protocol.IsReservedPath(f.Path) && !publish.AttachmentAllowed(rules, f.Path) {
+			if !publish.AttachmentAllowed(rules, f.Path) {
 				warnings = append(warnings, protocol.Warning{Code: protocol.WarnGateDisagreement, Path: f.Path,
 					Message: "attachment in an excluded folder; not published"})
 				continue

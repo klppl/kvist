@@ -21,6 +21,7 @@ const (
 	ReasonFrontmatterTrue    = "frontmatter_true"
 	ReasonNoRule             = "no_rule"
 	ReasonNotANote           = "not_a_note"
+	ReasonSettingsNote       = "settings_note"
 )
 
 // Decision is the outcome of evaluating the rules for one note.
@@ -32,6 +33,8 @@ type Decision struct {
 // Evaluate applies the rules to a note at vault path p with metadata m.
 // Order (first match wins):
 //
+//  0. excluded if it is the settings note (_site.md): it configures the
+//     site and is never a page;
 //  1. excluded if inside an exclude_folders entry;
 //  2. excluded if frontmatter <key>: false, or tagged with the private tag,
 //     or the frontmatter cannot be read (fail closed);
@@ -41,6 +44,9 @@ type Decision struct {
 func Evaluate(r protocol.Rules, p string, m *vault.Meta) Decision {
 	if !protocol.IsNote(p) {
 		return Decision{false, ReasonNotANote}
+	}
+	if protocol.IsSettingsNote(p) {
+		return Decision{false, ReasonSettingsNote}
 	}
 	for _, f := range r.ExcludeFolders {
 		if inFolder(p, f, true) {

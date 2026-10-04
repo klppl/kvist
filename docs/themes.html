@@ -132,7 +132,7 @@ version = "1.0.0"
 license = "MIT"
 model   = [1]              <span class="c"># content model versions this theme understands</span>
 
-[params]                   <span class="c"># defaults; sites change them with theme_params</span>
+[params]                   <span class="c"># defaults; sites change them in the settings note</span>
 accent = "#3f7d4e"</code></pre>
 <p>Put the folder in <code>themes_dir</code> (default: <code>themes</code>, next to where kvist runs) and set <code>theme = "mytheme"</code>, or give a path: <code>theme = "/etc/kvist/mytheme"</code>. In Docker, mount the folder like the overrides above. A folder in <code>themes_dir</code> named <code>garden</code> replaces the built-in one.</p>
 <p>The quickest start is to copy <code>themes/garden</code> from the repository, rename it, and change it from there.</p>

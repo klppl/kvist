@@ -52,3 +52,22 @@ test("scan refuses paths that differ only by case", async () => {
   v.write("garden/a.md", "b");
   await assert.rejects(scan(v, rules, new HashCache()), /differ only by case/);
 });
+
+test("scan sends the settings note as .kvist/site.md and never as a page", async () => {
+  const v = new MemVault();
+  v.write("Garden/Welcome.md", "hi");
+  v.write("Garden/_site.md", "---\ntitle: Mine\n---\n- [About](/about/)");
+  const r = await scan(v, rules, new HashCache());
+  assert.deepEqual(r.files.map((f) => f.path), [".kvist/site.md", "Garden/Welcome.md"]);
+  assert.equal(r.settingsNote, "Garden/_site.md");
+  assert.equal(r.decisions.get("Garden/_site.md")?.reason, "settings_note");
+  const sent = new TextDecoder().decode(await r.content.get(".kvist/site.md")!());
+  assert.match(sent, /title: Mine/);
+});
+
+test("scan refuses two settings notes", async () => {
+  const v = new MemVault();
+  v.write("_site.md", "a");
+  v.write("Garden/_site.md", "b");
+  await assert.rejects(scan(v, rules, new HashCache()), /2 settings notes \(Garden\/_site.md, _site.md\); keep one/);
+});

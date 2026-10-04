@@ -4,6 +4,10 @@
 export const PROTOCOL_VERSION = 1;
 export const HINTS_PATH = ".kvist/links.json";
 export const SITE_CONFIG_PATH = ".kvist/site.toml";
+/** The settings note's content is pushed under this path, wherever the note lives. */
+export const SITE_NOTE_PATH = ".kvist/site.md";
+/** File name of the settings note; a note with this name is never a page. */
+export const SETTINGS_NOTE_NAME = "_site.md";
 
 export interface Info {
   protocol: { min: number; max: number };

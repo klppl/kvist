@@ -2,7 +2,7 @@
 // and applies them again on its own (internal/publish in the Go server);
 // this must decide the same way.
 
-import { Rules } from "./protocol";
+import { Rules, SETTINGS_NOTE_NAME } from "./protocol";
 
 export type Reason =
   | "excluded_folder"
@@ -12,7 +12,8 @@ export type Reason =
   | "public_tag"
   | "frontmatter_true"
   | "no_rule"
-  | "not_a_note";
+  | "not_a_note"
+  | "settings_note";
 
 export interface Decision {
   published: boolean;
@@ -28,6 +29,11 @@ export interface NoteFacts {
 
 export function isNote(path: string): boolean {
   return path.toLowerCase().endsWith(".md");
+}
+
+/** Reports whether path is a settings note (_site.md, any case, any folder). */
+export function isSettingsNote(path: string): boolean {
+  return path.slice(path.lastIndexOf("/") + 1).toLowerCase() === SETTINGS_NOTE_NAME;
 }
 
 export function extension(path: string): string {
@@ -74,6 +80,7 @@ function frontmatterFlag(fm: Record<string, unknown> | undefined, key: string): 
 /** Evaluate applies the rules to one note. First match wins. */
 export function evaluate(rules: Rules, path: string, facts: NoteFacts): Decision {
   if (!isNote(path)) return { published: false, reason: "not_a_note" };
+  if (isSettingsNote(path)) return { published: false, reason: "settings_note" };
   for (const f of rules.exclude_folders) {
     if (inFolder(path, f, true)) return { published: false, reason: "excluded_folder" };
   }

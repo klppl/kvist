@@ -1,7 +1,7 @@
 {{/*
   The nav pane: site title, the main links, the top-level folders (or the
-  nav_tags groups) and the site's nav links. It takes (dict "P" page "Group"
-  tag), where Group is the nav_tags group of the current note. It lists
+  groups) and the site's nav links. It takes (dict "P" page "Group"
+  tag), where Group is the group of the current note. It lists
   only the top of the garden, so every page stays small however big the
   garden is. The list pane shows the current folder or group.
 */}}
@@ -23,13 +23,13 @@
       {{- if param "show_graph"}}
       <li><button class="graph-toggle" type="button" hidden>{{template "icon" "graph"}}Graph</button></li>
       {{- end}}
-      <li><a href="/tags/"{{if or (eq $cur "/tags/") (and (hasPrefix $cur "/tags/") (not (param "nav_tags")))}} aria-current="page"{{end}}>{{template "icon" "tag"}}Tags</a></li>
+      <li><a href="/tags/"{{if or (eq $cur "/tags/") (and (hasPrefix $cur "/tags/") (not (param "groups")))}} aria-current="page"{{end}}>{{template "icon" "tag"}}Tags</a></li>
     </ul>
     {{- $root := .Site.Root}}
-    {{- if param "nav_tags"}}
+    {{- if param "groups"}}
     <h2 class="nav-section">Content</h2>
     <ul class="nav-list">
-      {{- range $name := param "nav_tags"}}{{range $p.Site.AllTags}}{{if eq (lower .Name) (lower (str $name))}}
+      {{- range $name := param "groups"}}{{range $p.Site.AllTags}}{{if eq (lower .Name) (lower (str $name))}}
       {{- $on := or (hasPrefix $cur .URL) (and $group (eq $group.URL .URL))}}
       <li><a href="{{.URL}}"{{if $on}} aria-current="{{if eq $cur .URL}}page{{else}}true{{end}}"{{end}}>{{template "icon" "tag"}}<span>{{title (str $name)}}</span><span class="count">{{len .Notes}}</span></a></li>
       {{- end}}{{end}}{{end}}

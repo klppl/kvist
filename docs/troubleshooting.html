@@ -122,13 +122,18 @@
 <h3 id="toml-ignored">My changes to <code>kvist.toml</code> did nothing</h3>
 <p>Restart kvist (<code>docker compose restart kvist</code>), then publish again. If kvist doesn't come back up, the file has a mistake; <code>docker compose logs kvist</code> says where.</p>
 
-<h3 id="site-toml-ignored">My changes to <code>.kvist/site.toml</code> did nothing</h3>
+<h3 id="settings-ignored">My changes to the settings note did nothing</h3>
 <ul>
-  <li>The file must be at <code>&lt;vault&gt;/.kvist/site.toml</code>, exactly, at the top of the vault.</li>
-  <li>Publish after saving it: the file goes up with your notes.</li>
-  <li>Open the publish report. A mistake in the file, or a key that isn't allowed there (publish rules belong on the server), shows up as a warning.</li>
-  <li>For <code>nav_tags</code>, at least one published note must carry each tag.</li>
+  <li>The note must be called exactly <code>_site.md</code>, with the underscore.</li>
+  <li>Publish after editing it: the settings go up with your notes.</li>
+  <li>An empty property keeps its default; write a value to change something.</li>
+  <li>Colors start with <code>#</code> and must be in quotes: <code>accent: "#8a4f9e"</code>. Without quotes, the rest of the line is read as a comment.</li>
+  <li>Open the publish report. A setting that can only be set on the server, a home note that isn't published, or a menu link to a private note shows up there as a warning.</li>
+  <li>For <code>groups</code>, at least one published note must carry each tag.</li>
 </ul>
+
+<h3 id="two-settings-notes">“found 2 settings notes”</h3>
+<p>Only one note may be called <code>_site.md</code>. The message names both; delete or rename one.</p>
 
 <h2 id="help">Still stuck?</h2>
 <p><a href="https://github.com/klppl/kvist/issues">Open an issue on GitHub</a> with what you did, what you expected and the error message. Remove tokens and private note names before posting logs.</p>

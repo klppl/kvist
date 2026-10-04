@@ -8,6 +8,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"io"
 	"io/fs"
 	"os"
@@ -60,8 +61,8 @@ func (s *Source) Snapshot(ctx context.Context) (source.Snapshot, error) {
 		if !d.Type().IsRegular() {
 			return nil
 		}
-		if strings.HasPrefix(vp, ".") && !protocol.IsReservedPath(vp) {
-			return nil
+		if strings.HasPrefix(vp, ".") && !protocol.IsReservedPath(vp) || vp == protocol.SiteNotePath {
+			return nil // .kvist/site.md is generated below from the settings note
 		}
 		info, err := d.Info()
 		if err != nil {
@@ -81,6 +82,28 @@ func (s *Source) Snapshot(ctx context.Context) (source.Snapshot, error) {
 	})
 	if err != nil {
 		return nil, err
+	}
+	// The settings note (_site.md, anywhere) is read as .kvist/site.md, as
+	// the plugin pushes it.
+	var settings []source.File
+	for _, f := range files {
+		if protocol.IsSettingsNote(f.Path) {
+			settings = append(settings, f)
+		}
+	}
+	if len(settings) > 1 {
+		names := make([]string, len(settings))
+		for i, f := range settings {
+			names[i] = f.Path
+		}
+		sort.Strings(names)
+		return nil, fmt.Errorf("found %d settings notes (%s); keep one", len(names), strings.Join(names, ", "))
+	}
+	if len(settings) == 1 {
+		f := settings[0]
+		abs[protocol.SiteNotePath] = abs[f.Path]
+		f.Path = protocol.SiteNotePath
+		files = append(files, f)
 	}
 	sort.Slice(files, func(i, j int) bool { return files[i].Path < files[j].Path })
 	sig := sha256.New()

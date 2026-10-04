@@ -153,6 +153,10 @@ Install the plugin (`plugin/README.md`), then enter the server URL
 then **Publish now**. Create one token per device; `kvist token list` and
 `kvist token revoke ID` manage them.
 
+The site's title, home page, menu and colors are set in the vault, in the
+settings note `_site.md`: run **kvist: Open site settings note** to create
+it. See [Customizing the site](https://klppl.github.io/kvist/customizing.html).
+
 ## 4. Cloudflare (optional)
 
 With the DNS record proxied (orange cloud):
@@ -196,7 +200,8 @@ With the DNS record proxied (orange cloud):
   builds cost little extra space.
 - **Upgrades:** `docker compose pull && docker compose up -d` (or replace
   the binary). To go back, pin the previous `sha-…` tag in
-  `docker-compose.yml`. The plugin and server check protocol versions and tell
-  you if one side needs an update.
+  `docker-compose.yml`. Update the server before the plugin: a newer plugin
+  may send files an older server doesn't accept yet. The plugin and server
+  also check protocol versions and tell you if one side is too old.
 - **Logs:** `journalctl -u kvist` or `docker compose logs kvist`. Every
   commit, build and failure is logged.

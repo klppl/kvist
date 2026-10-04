@@ -42,6 +42,7 @@ func TestPushBuildServe(t *testing.T) {
 	d.write("Garden/Second.md", "Second note ![[pic.png]]", time.Time{})
 	d.write("Garden/pic.png", tinyPNG, time.Time{})
 	d.write("Journal/Diary.md", "SECRET diary", time.Time{})
+	d.write("Garden/_site.md", "---\ntitle: Note title\ngroups: [garden]\n---\n- [[Second|Second note]]\n", time.Time{})
 	res := d.mustPush()
 	if res.Build.State != protocol.BuildSucceeded {
 		t.Fatalf("build: %+v", res.Build)
@@ -61,6 +62,13 @@ func TestPushBuildServe(t *testing.T) {
 	}
 	if hdr.Get("Cache-Control") != "public, max-age=60" {
 		t.Errorf("HTML cache control = %q", hdr.Get("Cache-Control"))
+	}
+	// The settings note sets the title and the menu, and is never a page.
+	if !strings.Contains(body, "Note title</title>") || !strings.Contains(body, `<a href="/garden/second/">Second note</a>`) {
+		t.Errorf("settings note not applied:\n%s", body)
+	}
+	if code, _, _ := get(t, h, "http://garden.example.com/garden/_site/"); code != 404 {
+		t.Errorf("the settings note was published: %d", code)
 	}
 	if code, _, hdr := get(t, h, "http://garden.example.com/garden/hello-world"); code != 301 || hdr.Get("Location") != "/garden/hello-world/" {
 		t.Errorf("redirect: %d %q", code, hdr.Get("Location"))

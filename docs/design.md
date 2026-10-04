@@ -439,10 +439,11 @@ themes/garden/
   templates.
 - Site config can override individual templates/static files via a local
   overrides folder, so users customize without forking.
-- Default theme **garden**: digital-garden look (cards on the home page,
-  "planted/tended" dates, growth-stage badge from frontmatter `stage`), folder
-  tree sidebar, backlinks panel, local + global graph, TOC, search modal,
-  dark/light with system default + toggle, OpenGraph tags.
+- Default theme **garden**: digital-garden look ("planted/tended" dates,
+  growth-stage badge from frontmatter `stage`), three panes (a nav pane with
+  folders or tag groups, a list of the notes around the page, the page),
+  backlinks panel, local + global graph, TOC, search modal, dark/light with
+  system default + toggle, OpenGraph tags.
 - Client-side JS is progressive enhancement: pages read fine without JS
   (except math/Mermaid/graph/search).
 - Vendored, MIT-licensed libraries: MiniSearch (search) and KaTeX (math).
@@ -521,9 +522,10 @@ serve    = true                 # serve public/ from this binary on host match
   accent = "#3f7d4e"
 ```
 
-**Vault-side overrides.** An optional `.kvist/site.toml` pushed with the
-content may override *presentation* fields only: `title`, `description`,
-`author`, `language`, `nav`, `theme_params`. Everything security-relevant
+**Vault-side overrides.** An optional settings note (`_site.md`, pushed as
+`.kvist/site.md`; earlier `.kvist/site.toml`) may override *presentation*
+fields only: `title`, `description`, `author`, `language`, `home`, the
+menu and theme parameters. Everything security-relevant
 (`publish.*`, `theme`, `base_url`, paths, limits) is server-only; unknown or
 forbidden keys are a build warning and are ignored. This keeps the token's
 scope at "content" while letting you edit the site from Obsidian.
