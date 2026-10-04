@@ -91,6 +91,7 @@ footer   = "© 2026 Ada · [Contact](mailto:ada@example.com)"</code></pre>
 <p>The menu's <em>Content</em> section lists your top-level folders. If you keep all public notes in one folder, that shows a single “Garden” entry, which doesn't help visitors. Group notes by tags instead:</p>
 <pre data-label=".kvist/site.toml"><code>[theme_params]
 nav_tags = ["articles", "projects", "books"]</code></pre>
+<figure class="shot narrow"><img src="assets/screens/groups.webp" width="1200" height="1040" alt="The menu shows tag groups Kvist, Ideas and Meta with note counts; Kvist is highlighted and the middle column lists its notes." loading="lazy"><figcaption>Groups in the menu. The note's group is highlighted, and the middle column lists the group.</figcaption></figure>
 <p>Then tag each note, either in the text (<code>#articles</code>) or in its properties (<code>tags: [articles]</code>). Now:</p>
 <ul>
   <li>The menu shows <strong>Articles</strong>, <strong>Projects</strong> and <strong>Books</strong>, in your order, each with a note count.</li>
@@ -109,12 +110,17 @@ nav_tags = ["articles", "projects", "books"]</code></pre>
 
 <h2 id="layout">The layout</h2>
 <p>The built-in theme, <em>garden</em>, has three columns on a computer screen:</p>
+<figure class="shot"><img src="assets/screens/note-dark.webp" width="2000" height="1125" alt="A note in dark mode with the menu, the list, the note, and a contents list and graph on the right." loading="lazy"><figcaption>The three columns, in dark mode. On wide screens, contents and connections appear on the right.</figcaption></figure>
 <ul>
   <li><strong>Menu</strong>: Home, Search, Graph, Tags, your folders or groups, and your links.</li>
   <li><strong>List</strong>: the notes around the current page, with a filter box. On the home page, the most recently updated notes.</li>
   <li><strong>Note</strong>: the page itself, with backlinks at the bottom. On wide screens, the table of contents and a small graph of connected notes sit beside it.</li>
 </ul>
 <p>On a phone, the menu folds into a button at the top, and the list moves below the note. Visitors can switch between light and dark with the button next to the title; by default the site follows their system setting.</p>
+<div class="phones">
+<figure class="shot"><img src="assets/screens/mobile.webp" width="780" height="1688" alt="A note on a phone screen." loading="lazy"><figcaption>A note on a phone.</figcaption></figure>
+<figure class="shot"><img src="assets/screens/mobile-menu.webp" width="780" height="1688" alt="The phone menu opened." loading="lazy"><figcaption>The menu, opened.</figcaption></figure>
+</div>
 
 <h2 id="theme">Theme settings</h2>
 <p>Put these under <code>[theme_params]</code> in <code>.kvist/site.toml</code> <span class="where vault">vault</span>, or in the site's <code>[site.theme_params]</code> in <code>kvist.toml</code> <span class="where server">server</span>. The vault wins if both set one.</p>

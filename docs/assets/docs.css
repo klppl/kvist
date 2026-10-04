@@ -197,6 +197,23 @@ td code { white-space: nowrap; }
 .next small { display: block; color: var(--muted); font-size: .78rem; }
 .next .fwd { margin-left: auto; text-align: right; }
 
+/* screenshots */
+.shot { margin: 1.6rem 0; }
+.shot img {
+  display: block; width: 100%; height: auto; border-radius: 10px;
+  border: 1px solid var(--border); box-shadow: 0 8px 28px rgba(15, 20, 25, .08);
+}
+.shot figcaption { margin-top: .55rem; color: var(--muted); font-size: .86rem; text-align: center; }
+.shot.narrow img { max-width: 30rem; margin: 0 auto; }
+.shot-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.6rem 0; }
+.shot-pair .shot { margin: 0; }
+.phones { display: flex; justify-content: center; gap: 1.5rem; margin: 1.6rem 0; }
+.phones .shot { margin: 0; width: 15rem; }
+@media (max-width: 860px) {
+  .shot-pair { grid-template-columns: 1fr; }
+  .phones .shot { width: 46%; }
+}
+
 /* small screens */
 @media (max-width: 860px) {
   .shell { display: block; }
