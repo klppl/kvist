@@ -22,6 +22,7 @@ import (
 // sources. Nil and empty fields leave the server's values alone.
 type siteSettings struct {
 	Title, Description, Author, Language *string
+	StrictLineBreaks                     *bool
 	Home                                 *string // vault path or [[wikilink]]
 	HomeFrom                             string  // file that set Home, for warnings
 	Nav                                  []navRef
@@ -39,13 +40,14 @@ type navRef struct {
 
 // siteTomlSettings is the shape of .kvist/site.toml.
 type siteTomlSettings struct {
-	Title       *string        `toml:"title"`
-	Description *string        `toml:"description"`
-	Author      *string        `toml:"author"`
-	Language    *string        `toml:"language"`
-	Home        *string        `toml:"home"`
-	Nav         []NavItem      `toml:"nav"`
-	ThemeParams map[string]any `toml:"theme_params"`
+	Title            *string        `toml:"title"`
+	Description      *string        `toml:"description"`
+	Author           *string        `toml:"author"`
+	Language         *string        `toml:"language"`
+	StrictLineBreaks *bool          `toml:"strict_line_breaks"`
+	Home             *string        `toml:"home"`
+	Nav              []NavItem      `toml:"nav"`
+	ThemeParams      map[string]any `toml:"theme_params"`
 }
 
 // readSettings merges site.toml and then the settings note.
@@ -102,6 +104,7 @@ func (b *builder) readSiteToml(st *siteSettings, src []byte) {
 		b.warn(WarnSiteConfig, protocol.SiteConfigPath, "key %q is not allowed in the vault and was ignored (it can only be set in the server config)", k.String())
 	}
 	st.Title, st.Description, st.Author, st.Language = o.Title, o.Description, o.Author, o.Language
+	st.StrictLineBreaks = o.StrictLineBreaks
 	if o.Home != nil {
 		st.Home, st.HomeFrom = o.Home, protocol.SiteConfigPath
 	}
@@ -156,6 +159,12 @@ func (b *builder) readSiteNote(st *siteSettings, src []byte) {
 			st.Language = s()
 		case lk == "home":
 			st.Home, st.HomeFrom = s(), protocol.SiteNotePath
+		case lk == "strict_line_breaks":
+			if on, ok := boolValue(v); ok {
+				st.StrictLineBreaks = &on
+			} else {
+				b.warn(WarnSiteConfig, protocol.SiteNotePath, "%q should be true or false; ignored", k)
+			}
 		case ignoredKeys[lk]:
 		case serverOnlyKeys[lk]:
 			b.warn(WarnSiteConfig, protocol.SiteNotePath, "%q can only be set in the server config; ignored", k)
@@ -179,6 +188,22 @@ func isEmpty(v any) bool {
 		return len(v) == 0
 	}
 	return false
+}
+
+// boolValue reads a checkbox property (or "true"/"false" written as text).
+func boolValue(v any) (bool, bool) {
+	switch v := v.(type) {
+	case bool:
+		return v, true
+	case string:
+		switch strings.ToLower(strings.TrimSpace(v)) {
+		case "true", "yes", "on":
+			return true, true
+		case "false", "no", "off":
+			return false, true
+		}
+	}
+	return false, false
 }
 
 // scalar renders a property value as text (YAML may give numbers or bools).
@@ -253,6 +278,9 @@ func applySettings(c *SiteConfig, st siteSettings) {
 	set(&c.Description, st.Description)
 	set(&c.Author, st.Author)
 	set(&c.Language, st.Language)
+	if st.StrictLineBreaks != nil {
+		c.StrictLineBreaks = *st.StrictLineBreaks
+	}
 	for k, v := range st.Params {
 		c.Params[k] = v
 	}

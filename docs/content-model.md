@@ -29,10 +29,11 @@ folder, note ↔ tag, backlinks) are written as note ids.
 ## SiteConfig
 
 `Title`, `Description`, `BaseURL` (no trailing slash), `Language`, `Author`,
+`StrictLineBreaks` (single line breaks were rendered as spaces, not `<br>`),
 `Nav` (list of `{Title, URL}`) and `Params` (theme parameters).
 
 The server config sets these. The vault may override `title`,
-`description`, `author`, `language`, `home`, the menu (`Nav`) and theme
+`description`, `author`, `language`, `strict_line_breaks`, `home`, the menu (`Nav`) and theme
 parameters with a **settings note**: a note named `_site.md` in any folder,
 never published as a page. Clients push its content as `.kvist/site.md`.
 

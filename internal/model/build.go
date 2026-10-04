@@ -74,6 +74,7 @@ type builder struct {
 	aliases  map[string][]string // lower(alias) → note paths
 	warnings []protocol.Warning
 	problems []string
+	strict   bool // strict line breaks
 }
 
 // Build builds the content model from a snapshot. It reads every file it
@@ -133,6 +134,7 @@ func Build(site *config.Site, snap source.Snapshot) (*Site, error) {
 	settings := b.readSettings(siteToml, siteNote)
 	s.Config = b.siteConfig(settings)
 
+	b.strict = s.Config.StrictLineBreaks
 	b.makeNotes(s)
 	b.checkURLs(s)
 	if len(b.problems) > 0 {
@@ -183,6 +185,8 @@ func (b *builder) siteConfig(st siteSettings) SiteConfig {
 		Language:    b.cfg.Language,
 		Author:      b.cfg.Author,
 		Params:      map[string]any{},
+
+		StrictLineBreaks: b.cfg.StrictLineBreaks,
 	}
 	for k, v := range b.cfg.ThemeParams {
 		c.Params[k] = v
@@ -368,6 +372,7 @@ func (b *builder) render(s *Site) {
 		ns := b.notes[n.Path]
 		r := &noteResolver{b: b, from: ns, stack: []string{n.Path}, top: true, root: n}
 		ns.doc.Resolve(r)
+		ns.doc.StrictLineBreaks = b.strict
 		html, err := ns.doc.Render()
 		if err != nil {
 			b.problems = append(b.problems, fmt.Sprintf("%s: %v", n.Path, err))
@@ -557,6 +562,7 @@ func (r *noteResolver) Embed(t markdown.Target, ref markdown.Ref) (string, bool)
 		body = sec
 	}
 	doc := markdown.Parse(body)
+	doc.StrictLineBreaks = r.b.strict
 	doc.Resolve(&noteResolver{b: r.b, from: ns, stack: append(append([]string(nil), r.stack...), t.Path), root: r.root})
 	r.root.Features.Math = r.root.Features.Math || doc.Features.Math
 	r.root.Features.Mermaid = r.root.Features.Mermaid || doc.Features.Mermaid

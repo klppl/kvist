@@ -28,20 +28,23 @@ type Config struct {
 
 // Site configures one published site.
 type Site struct {
-	ID          string         `toml:"id"`
-	BaseURL     string         `toml:"base_url"`
-	Title       string         `toml:"title"`
-	Description string         `toml:"description"`
-	Author      string         `toml:"author"`
-	Language    string         `toml:"language"`
-	Theme       string         `toml:"theme"`
-	ThemeDir    string         `toml:"theme_overrides"` // folder whose files override the theme's
-	Serve       bool           `toml:"serve"`
-	Publish     Publish        `toml:"publish"`
-	Limits      Limits         `toml:"limits"`
-	Retention   Retention      `toml:"retention"`
-	Cloudflare  Cloudflare     `toml:"cloudflare"`
-	ThemeParams map[string]any `toml:"theme_params"`
+	ID          string `toml:"id"`
+	BaseURL     string `toml:"base_url"`
+	Title       string `toml:"title"`
+	Description string `toml:"description"`
+	Author      string `toml:"author"`
+	Language    string `toml:"language"`
+	// StrictLineBreaks keeps single line breaks as spaces, like
+	// Obsidian's "strict line breaks"; by default they become <br>.
+	StrictLineBreaks bool           `toml:"strict_line_breaks"`
+	Theme            string         `toml:"theme"`
+	ThemeDir         string         `toml:"theme_overrides"` // folder whose files override the theme's
+	Serve            bool           `toml:"serve"`
+	Publish          Publish        `toml:"publish"`
+	Limits           Limits         `toml:"limits"`
+	Retention        Retention      `toml:"retention"`
+	Cloudflare       Cloudflare     `toml:"cloudflare"`
+	ThemeParams      map[string]any `toml:"theme_params"`
 }
 
 // Cloudflare purges the zone's cache after every successful build. The API

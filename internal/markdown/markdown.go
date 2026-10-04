@@ -57,6 +57,10 @@ type Doc struct {
 	Features Features
 	blockIDs map[string]bool
 	refs     []*refNode
+
+	// StrictLineBreaks renders single line breaks as spaces (Obsidian's
+	// "strict line breaks"); by default each one becomes <br>.
+	StrictLineBreaks bool
 }
 
 // refNode is an internal link or embed in the document.

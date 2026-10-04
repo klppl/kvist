@@ -38,6 +38,7 @@ func funcMap(t *Theme, site *model.Site) template.FuncMap {
 		// markdownify renders a string as Markdown (links stay plain text).
 		"markdownify": func(s string) (template.HTML, error) {
 			d := markdown.Parse([]byte(s))
+			d.StrictLineBreaks = site != nil && site.Config.StrictLineBreaks
 			d.Resolve(nullResolver{})
 			out, err := d.Render()
 			out = strings.TrimSpace(out)

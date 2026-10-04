@@ -101,6 +101,7 @@ serve    = true
     <tr><td><code>base_url</code></td><td>required</td><td>The site's address, e.g. <code>https://garden.example.com</code>. Must be the root of a domain (sub-paths aren't supported yet).</td></tr>
     <tr><td><code>title</code>, <code>description</code>, <code>author</code></td><td>empty</td><td>Defaults; the settings note can override them.</td></tr>
     <tr><td><code>language</code></td><td><code>"en"</code></td><td>Language code for pages and feeds.</td></tr>
+    <tr><td><code>strict_line_breaks</code></td><td><code>false</code></td><td>Render a single line break as a space (Obsidian's <em>Strict line breaks</em>) instead of a line break. The settings note can override it.</td></tr>
     <tr><td><code>serve</code></td><td><code>false</code></td><td>Let kvist serve the site itself. Keep <code>true</code> with the Docker setup.</td></tr>
     <tr><td><code>theme</code></td><td><code>"garden"</code></td><td>The theme: a built-in name, a folder in <code>themes_dir</code>, or a path.</td></tr>
     <tr><td><code>theme_overrides</code></td><td>none</td><td>Folder whose files replace the theme's files with the same path.</td></tr>
@@ -175,6 +176,7 @@ accent: "#8a4f9e"
     <tr><td><code>title</code>, <code>description</code>, <code>author</code>, <code>language</code></td><td>Override the server's values.</td></tr>
     <tr><td><code>home</code></td><td>A published note to use as the home page: <code>"[[Welcome]]"</code> or a vault path.</td></tr>
     <tr><td><code>groups</code></td><td>Tags that group the menu.</td></tr>
+    <tr><td><code>strict_line_breaks</code></td><td><code>true</code>: a single line break is a space, not a line break.</td></tr>
     <tr><td>Anything else</td><td>A <a href="customizing.html#theme">theme setting</a>.</td></tr>
   </tbody>
 </table>

@@ -40,13 +40,15 @@ type Site struct {
 
 // SiteConfig is the presentation config visible to themes.
 type SiteConfig struct {
-	Title       string         `json:"title"`
-	Description string         `json:"description,omitempty"`
-	BaseURL     string         `json:"base_url"`
-	Language    string         `json:"language"`
-	Author      string         `json:"author,omitempty"`
-	Nav         []NavItem      `json:"nav,omitempty"`
-	Params      map[string]any `json:"params,omitempty"`
+	Title       string `json:"title"`
+	Description string `json:"description,omitempty"`
+	BaseURL     string `json:"base_url"`
+	Language    string `json:"language"`
+	Author      string `json:"author,omitempty"`
+	// StrictLineBreaks: single line breaks in notes are spaces, not <br>.
+	StrictLineBreaks bool           `json:"strict_line_breaks,omitempty"`
+	Nav              []NavItem      `json:"nav,omitempty"`
+	Params           map[string]any `json:"params,omitempty"`
 }
 
 // NavItem is one navigation link.

@@ -168,3 +168,21 @@ func TestTwoSettingsNotes(t *testing.T) {
 		t.Errorf("expected an error naming both notes, got %v", err)
 	}
 }
+
+func TestStrictLineBreaks(t *testing.T) {
+	note := "one\ntwo"
+	site := buildVault(t, map[string]string{"Kvist/Note.md": note})
+	if c := string(site.Notes[0].Content); !strings.Contains(c, "<br>") {
+		t.Errorf("line breaks should become <br> by default: %s", c)
+	}
+	site = buildVault(t, map[string]string{
+		"Kvist/Note.md":  note,
+		"Kvist/_site.md": "---\nstrict_line_breaks: true\n---\n",
+	})
+	if c := string(site.Notes[0].Content); strings.Contains(c, "<br>") {
+		t.Errorf("strict line breaks: single breaks should stay spaces: %s", c)
+	}
+	if _, ok := site.Config.Params["strict_line_breaks"]; ok {
+		t.Error("strict_line_breaks is a site setting, not a theme parameter")
+	}
+}

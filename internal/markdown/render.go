@@ -21,7 +21,10 @@ import (
 // Render writes the document as HTML. Resolve must have been called.
 func (d *Doc) Render() (string, error) {
 	nr := &nodeRenderer{doc: d}
-	opts := []gmhtml.Option{gmhtml.WithUnsafe(), gmhtml.WithHardWraps()}
+	opts := []gmhtml.Option{gmhtml.WithUnsafe()}
+	if !d.StrictLineBreaks {
+		opts = append(opts, gmhtml.WithHardWraps())
+	}
 	r := renderer.NewRenderer(renderer.WithNodeRenderers(
 		util.Prioritized(gmhtml.NewRenderer(opts...), 1000),
 		util.Prioritized(extension.NewTableHTMLRenderer(), 500),
