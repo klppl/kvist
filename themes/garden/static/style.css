@@ -213,6 +213,20 @@ pre code { background: none; padding: 0; font-size: inherit; }
 }
 @media (hover: none) { .heading-anchor { opacity: .45; } }
 
+/* link previews (added by garden.js) */
+.link-preview {
+  position: fixed; z-index: 20; width: min(26rem, calc(100vw - 1rem)); overflow-y: auto; overscroll-behavior: contain;
+  background: var(--bg); color: var(--fg); border: 1px solid var(--border); border-radius: 10px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, .18); padding: .8rem 1rem .9rem;
+}
+.link-preview-title { display: block; font-weight: 700; font-size: 1.05rem; line-height: 1.3; color: var(--fg); text-decoration: none; }
+.link-preview-title:hover { color: var(--accent); }
+.content.link-preview-body { margin-top: .5rem; font-size: .9rem; line-height: 1.6; }
+.link-preview-body > :first-child { margin-top: 0; }
+.link-preview-body h1, .link-preview-body h2, .link-preview-body h3, .link-preview-body h4 { margin: 1rem 0 .4rem; font-size: 1rem; }
+.link-preview-body img { max-height: 12rem; width: auto; }
+.link-preview-open { display: block; margin-top: .7rem; padding-top: .6rem; border-top: 1px solid var(--border); font-weight: 600; text-decoration: none; }
+
 /* links that point nowhere public: plain text, no hint whether private or missing */
 .link-unpublished { color: var(--muted); text-decoration: underline dotted; text-underline-offset: .2em; cursor: help; }
 a.internal-link { text-decoration-style: solid; }

@@ -141,14 +141,16 @@
   document.querySelectorAll(".link-unpublished").forEach(function (el) { el.title = "Not published"; });
 
   // ---- math (KaTeX is loaded only on pages that need it) ----
-  if (window.katex) {
-    document.querySelectorAll(".math").forEach(function (el) {
+  function renderMath(scope) {
+    if (!window.katex) return;
+    scope.querySelectorAll(".math").forEach(function (el) {
       var tex = el.textContent.replace(/^\\[([]/, "").replace(/\\[)\]]$/, "");
       try {
         window.katex.render(tex, el, { displayMode: el.classList.contains("math-display"), throwOnError: false });
       } catch (e) { /* leave the source visible */ }
     });
   }
+  renderMath(document);
 
   // ---- diagrams (Mermaid is loaded only on pages that need it) ----
   if (window.mermaid) {
@@ -186,6 +188,135 @@
     if (cls) e.className = cls;
     if (text != null) e.textContent = text;
     return e;
+  }
+
+  // ---- link previews: hover a link to a note (tap on touch screens) ----
+  if (document.body.hasAttribute("data-previews") && window.fetch && window.DOMParser) {
+    var pages = {}, popup = null, popupFor = null, showTimer = 0, hideTimer = 0, lastPointer = "mouse";
+    var fetchPage = function (url) {
+      if (!pages[url]) {
+        pages[url] = fetch(url, { credentials: "same-origin" }).then(function (r) {
+          if (!r.ok) throw new Error(r.status);
+          return r.text();
+        }).then(function (html) { return new DOMParser().parseFromString(html, "text/html"); });
+        pages[url].catch(function () { delete pages[url]; });
+      }
+      return pages[url];
+    };
+    // The part of the page a link points to: the section of a #heading,
+    // the block of a #^id, else the whole note.
+    var excerpt = function (doc, hash) {
+      var content = doc.querySelector(".note .content");
+      if (!content) return null;
+      var out = document.createDocumentFragment();
+      var start = null;
+      if (hash) {
+        try { start = content.querySelector("#" + CSS.escape(decodeURIComponent(hash))); } catch (e) {}
+      }
+      if (start && /^H[1-6]$/.test(start.tagName) && start.parentNode === content) {
+        var level = Number(start.tagName[1]);
+        for (var n = start; n; n = n.nextElementSibling) {
+          if (n !== start && /^H[1-6]$/.test(n.tagName) && Number(n.tagName[1]) <= level) break;
+          out.appendChild(document.importNode(n, true));
+        }
+      } else if (start) {
+        out.appendChild(document.importNode(start, true));
+      } else {
+        Array.prototype.forEach.call(content.children, function (c) { out.appendChild(document.importNode(c, true)); });
+      }
+      // Keep previews light: no players or frames, no duplicate ids.
+      out.querySelectorAll("iframe, video, audio, script").forEach(function (x) { x.remove(); });
+      out.querySelectorAll("[id]").forEach(function (x) { x.removeAttribute("id"); });
+      return out;
+    };
+    var hide = function () {
+      clearTimeout(showTimer); clearTimeout(hideTimer);
+      if (popup) popup.hidden = true;
+      popupFor = null;
+    };
+    var place = function (link) {
+      var r = link.getBoundingClientRect(), vw = document.documentElement.clientWidth, vh = window.innerHeight;
+      var w = Math.min(popup.offsetWidth, vw - 16);
+      var left = Math.max(8, Math.min(r.left, vw - w - 8));
+      var below = vh - r.bottom, above = r.top;
+      popup.style.left = left + "px";
+      popup.style.maxHeight = Math.max(160, Math.min(352, (below > above ? below : above) - 16)) + "px";
+      if (below >= popup.offsetHeight + 12 || below > above) {
+        popup.style.top = r.bottom + 6 + "px"; popup.style.bottom = "auto";
+      } else {
+        popup.style.top = "auto"; popup.style.bottom = vh - r.top + 6 + "px";
+      }
+    };
+    var show = function (link) {
+      var url = new URL(link.href, location.href);
+      var page = url.pathname;
+      if (!popup) {
+        popup = el("div", "link-preview");
+        popup.setAttribute("role", "dialog");
+        popup.setAttribute("aria-label", "Preview");
+        popup.hidden = true;
+        popup.addEventListener("mouseenter", function () { clearTimeout(hideTimer); });
+        popup.addEventListener("mouseleave", function () { if (lastPointer === "mouse") hideTimer = setTimeout(hide, 250); });
+        document.body.appendChild(popup);
+      }
+      popupFor = link;
+      fetchPage(page).then(function (doc) {
+        if (popupFor !== link) return;
+        var body = excerpt(doc, url.hash.slice(1));
+        if (!body) { hide(); return; }
+        popup.textContent = "";
+        var head = el("a", "link-preview-title", (doc.querySelector(".note h1") || {}).textContent || link.textContent);
+        head.href = link.href;
+        popup.appendChild(head);
+        var inner = el("div", "content link-preview-body");
+        inner.appendChild(body);
+        popup.appendChild(inner);
+        if (lastPointer !== "mouse") {
+          var open = el("a", "link-preview-open", "Open note →");
+          open.href = link.href;
+          popup.appendChild(open);
+        }
+        renderMath(inner);
+        popup.hidden = false;
+        popup.scrollTop = 0;
+        place(link);
+      }).catch(hide);
+    };
+    var previewable = function (a) {
+      if (!a || !a.matches("a.internal-link") || !a.closest(".content, .backlinks") || a.closest(".link-preview")) return false;
+      var url = new URL(a.href, location.href);
+      return url.origin === location.origin && url.pathname !== location.pathname && url.pathname.indexOf("/_assets/") !== 0;
+    };
+    document.addEventListener("pointerdown", function (e) {
+      lastPointer = e.pointerType || "mouse";
+      if (popup && !popup.hidden && !popup.contains(e.target) && e.target.closest("a") !== popupFor) hide();
+    }, true);
+    document.addEventListener("mouseover", function (e) {
+      if (lastPointer !== "mouse") return;
+      var a = e.target.closest && e.target.closest("a");
+      if (!previewable(a)) return;
+      clearTimeout(hideTimer);
+      if (a === popupFor) return;
+      clearTimeout(showTimer);
+      showTimer = setTimeout(function () { show(a); }, 350);
+    });
+    document.addEventListener("mouseout", function (e) {
+      var a = e.target.closest && e.target.closest("a");
+      if (!previewable(a) || (e.relatedTarget && a.contains(e.relatedTarget))) return;
+      clearTimeout(showTimer);
+      if (popupFor) hideTimer = setTimeout(hide, 250);
+    });
+    // On touch screens the first tap previews, a second tap opens.
+    document.addEventListener("click", function (e) {
+      if (lastPointer === "mouse" || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey) return;
+      var a = e.target.closest && e.target.closest("a");
+      if (!previewable(a) || (a === popupFor && popup && !popup.hidden)) return;
+      e.preventDefault();
+      hide();
+      show(a);
+    });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") hide(); });
+    window.addEventListener("scroll", function () { if (popupFor && lastPointer === "mouse") hide(); }, { passive: true });
   }
 
   // ---- search ----
