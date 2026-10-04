@@ -145,7 +145,8 @@ and never if it is in an `exclude_folders` folder.
 
 `Nodes`: `{ID, Title, URL, Tags}` for every published note. `Edges`:
 `{Source, Target}` for every resolved link between published notes. There
-are no nodes for unresolved links.
+are no nodes for unresolved links. `Tags`: `{Name, URL}` for every tag (as
+in `AllTags`), so a theme can draw tags as nodes.
 
 ## Generated files
 

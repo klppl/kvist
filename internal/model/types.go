@@ -144,6 +144,13 @@ type Folder struct {
 type Graph struct {
 	Nodes []GraphNode `json:"nodes"`
 	Edges []GraphEdge `json:"edges"`
+	Tags  []GraphTag  `json:"tags"` // every tag, sorted by name, for tag nodes
+}
+
+// GraphTag is a tag with its page, so themes can draw tags as nodes.
+type GraphTag struct {
+	Name string `json:"name"`
+	URL  string `json:"url"`
 }
 
 // GraphNode is a note in the graph.

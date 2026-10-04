@@ -17,6 +17,10 @@ code_style_light = "github"
 code_style_dark  = "github-dark"
 footer           = ""          # Markdown, shown at the bottom of every page
 show_graph       = true        # local graph on note pages and a global graph view
+graph_orphans    = true        # global graph: show notes without links
+graph_tags       = false       # global graph: tags as nodes, linked to their notes
+graph_node_size  = "links"     # "links": bigger nodes for more links; "same": all alike
+graph_link_distance = 45       # length of a link at rest, in pixels
 # Mermaid is ~5 MB, so it is not bundled. It loads only on pages with a
 # diagram. Point mermaid_url at a self-hosted copy to avoid the CDN request:
 # a theme file such as "vendor/mermaid.min.js" (see docs/themes.md) or a URL,

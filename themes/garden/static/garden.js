@@ -322,7 +322,7 @@
     var nodes = data.nodes.map(function (n, i) {
       var a = i * 2.399963; // golden angle spiral as a stable start
       var r = 12 * Math.sqrt(i + 1);
-      return { id: n.id, title: n.title, url: n.url, x: r * Math.cos(a), y: r * Math.sin(a), vx: 0, vy: 0, deg: 0 };
+      return { id: n.id, title: n.title, url: n.url, tag: n.tag, x: r * Math.cos(a), y: r * Math.sin(a), vx: 0, vy: 0, deg: 0 };
     });
     var byId = {};
     nodes.forEach(function (n) { byId[n.id] = n; });
@@ -331,7 +331,8 @@
     var current = byId[opts.current];
     var view = { x: 0, y: 0, k: 1 }, w = 0, h = 0, hover = null, alpha = 1, raf = 0, dragging = null;
 
-    function radius(n) { return 3 + Math.min(6, Math.sqrt(n.deg) * 1.6); }
+    var distance = graphOptions.distance;
+    function radius(n) { return graphOptions.size === "links" ? 3 + Math.min(6, Math.sqrt(n.deg) * 1.6) : 4; }
 
     function resize() {
       var dpr = window.devicePixelRatio || 1;
@@ -358,7 +359,7 @@
       links.forEach(function (l) {
         dx = l.t.x - l.s.x; dy = l.t.y - l.s.y;
         var d = Math.sqrt(dx * dx + dy * dy) || 1;
-        f = (d - 45) / d * 0.06 * alpha;
+        f = (d - distance) / d * 0.06 * alpha;
         l.s.vx += dx * f; l.s.vy += dy * f; l.t.vx -= dx * f; l.t.vy -= dy * f;
       });
       nodes.forEach(function (p) {
@@ -389,8 +390,10 @@
       nodes.forEach(function (n) {
         var p = toScreen(n), r = radius(n) * Math.max(0.7, Math.min(1.6, view.k));
         ctx.globalAlpha = hover && !near[n.id] ? 0.25 : 1;
-        ctx.fillStyle = n === current ? accent : (n === hover ? accent : muted);
-        ctx.beginPath(); ctx.arc(p[0], p[1], r, 0, 6.2832); ctx.fill();
+        ctx.fillStyle = n === current || n === hover ? accent : muted;
+        ctx.beginPath(); ctx.arc(p[0], p[1], r, 0, 6.2832);
+        if (n.tag && n !== hover) { ctx.strokeStyle = accent; ctx.lineWidth = 1.5; ctx.stroke(); ctx.lineWidth = 1; }
+        else ctx.fill();
         if (n === current || n === hover || near[n.id] && hover || view.k > 1.6 || opts.labels) {
           ctx.fillStyle = fg;
           ctx.font = (n === current ? "600 " : "") + "12px system-ui, sans-serif";
@@ -476,6 +479,46 @@
     kick(Math.min(alpha, 0.05));
   }
 
+  // Graph settings from the theme params (graph_orphans, graph_tags,
+  // graph_node_size, graph_link_distance), written on <body>.
+  var graphOptions = (function () {
+    var o = {};
+    try { o = JSON.parse(document.body.dataset.graph || "{}") || {}; } catch (e) {}
+    var on = function (v, def) { return v == null || v === "" ? def : v === true || String(v).toLowerCase() === "true"; };
+    var dist = Number(o.distance);
+    return {
+      orphans: on(o.orphans, true),
+      tags: on(o.tags, false),
+      size: String(o.size || "links").toLowerCase() === "links" ? "links" : "same",
+      distance: dist > 0 ? Math.min(dist, 400) : 45
+    };
+  })();
+
+  // The global graph's data with the settings applied: tags become nodes
+  // linked to their notes (and nested tags to their parent), and notes
+  // without any link are left out unless orphans are shown.
+  function globalGraph(data) {
+    var nodes = data.nodes.slice(), edges = data.edges.slice();
+    if (graphOptions.tags && data.tags) {
+      var known = {};
+      data.tags.forEach(function (t) { known[t.name] = true; });
+      data.tags.forEach(function (t) {
+        nodes.push({ id: "#" + t.name, title: "#" + t.name, url: t.url, tag: true });
+        var slash = t.name.lastIndexOf("/");
+        if (slash > 0 && known[t.name.slice(0, slash)]) edges.push({ source: "#" + t.name, target: "#" + t.name.slice(0, slash) });
+      });
+      data.nodes.forEach(function (n) {
+        (n.tags || []).forEach(function (t) { if (known[t]) edges.push({ source: n.id, target: "#" + t }); });
+      });
+    }
+    if (!graphOptions.orphans) {
+      var linked = {};
+      edges.forEach(function (e) { if (e.source !== e.target) { linked[e.source] = true; linked[e.target] = true; } });
+      nodes = nodes.filter(function (n) { return linked[n.id]; });
+    }
+    return { nodes: nodes, edges: edges };
+  }
+
   // Neighborhood of a note: the note, its links and backlinks, and theirs.
   function neighborhood(data, id, depth) {
     var keep = {}, frontier = [id];
@@ -526,6 +569,7 @@
         document.body.appendChild(gdialog);
         gdialog.showModal();
         getJSON("/graph.json").then(function (data) {
+          data = globalGraph(data);
           new Graph(area, data, { current: noteId, labels: data.nodes.length <= 40 });
         }).catch(function () { area.textContent = "The graph is not available."; });
         return;

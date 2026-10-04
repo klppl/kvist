@@ -134,6 +134,10 @@ Params (set them in `theme_params`):
 | `list_max` | `100` | notes in the list pane before a "more…" link |
 | `groups` | `[]` | tags that group the sidebar instead of folders (below); `nav_tags` is an older name for it |
 | `show_toc`, `show_backlinks`, `show_graph` | `true` | note page parts |
+| `graph_orphans` | `true` | the global graph shows notes without links |
+| `graph_tags` | `false` | the global graph shows tags as nodes, linked to their notes (nested tags to their parent) |
+| `graph_node_size` | `links` | `links`: nodes grow with their number of links; `same`: all nodes alike |
+| `graph_link_distance` | `45` | how long links are at rest, in pixels; larger spreads the graph out |
 | `show_properties` | `false` | the note's properties under its title; only keys listed in `expose_frontmatter` exist, so nothing new reaches the page |
 | `code_style_light`, `code_style_dark` | `github`, `github-dark` | highlighting |
 | `footer` | `""` | Markdown at the bottom of the menu |

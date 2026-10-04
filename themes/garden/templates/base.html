@@ -30,7 +30,8 @@
 {{- $group := false}}
 {{- with .Note}}{{$n := .}}{{range $name := param "groups"}}{{if not $group}}{{range $.Site.AllTags}}{{if eq (lower .Name) (lower (str $name))}}{{$g := .}}{{range $n.Tags}}{{if or (eq .Name $g.Name) (hasPrefix .Name (print $g.Name "/"))}}{{$group = $g}}{{end}}{{end}}{{end}}{{end}}{{end}}{{end}}{{end}}
 {{- $ctx := dict "P" . "Group" $group}}
-<body class="kind-{{.Kind}}{{if $list}} has-list{{end}}"{{with .Note}} data-note="{{.ID}}"{{end}}>
+<body class="kind-{{.Kind}}{{if $list}} has-list{{end}}"{{with .Note}} data-note="{{.ID}}"{{end}}
+  {{- if param "show_graph"}} data-graph="{{json (dict "orphans" (param "graph_orphans") "tags" (param "graph_tags") "size" (param "graph_node_size") "distance" (param "graph_link_distance"))}}"{{end}}>
 <a class="skip" href="#main">Skip to content</a>
 <div class="shell">
   {{template "nav-pane" $ctx}}

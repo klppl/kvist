@@ -724,7 +724,10 @@ func (b *builder) makeTags(s *Site) {
 }
 
 func (b *builder) makeGraph(s *Site) {
-	s.Graph = Graph{Nodes: []GraphNode{}, Edges: []GraphEdge{}}
+	s.Graph = Graph{Nodes: []GraphNode{}, Edges: []GraphEdge{}, Tags: []GraphTag{}}
+	for _, t := range s.AllTags {
+		s.Graph.Tags = append(s.Graph.Tags, GraphTag{Name: t.Name, URL: t.URL})
+	}
 	for _, n := range s.Notes {
 		s.Graph.Nodes = append(s.Graph.Nodes, GraphNode{ID: n.ID, Title: n.Title, URL: n.URL, Tags: n.TagNames})
 		for _, l := range n.Links {
