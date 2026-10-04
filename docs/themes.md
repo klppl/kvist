@@ -167,6 +167,9 @@ folder for notes without one. Tags with no published notes are left out.
 It shows the growth stage from the frontmatter `stage` (`seedling`,
 `budding`, `evergreen`) when `stage` is listed in `expose_frontmatter`.
 
+Hovering a heading in a note shows a `#` next to it; clicking it copies a
+link to that section.
+
 Printing a page prints only the note, in light colors: the panes, the
 table of contents, the graph and backlinks are left out, folded callouts
 are opened, and external links show their address.

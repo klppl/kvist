@@ -116,6 +116,28 @@
     });
   }
 
+  // ---- heading anchors: copy a link to the section ----
+  document.querySelectorAll(".content :is(h1, h2, h3, h4, h5, h6)[id]").forEach(function (h) {
+    if (h.closest(".embed")) return; // ids of embedded notes belong to their own page
+    var a = document.createElement("a");
+    a.className = "heading-anchor";
+    a.href = "#" + encodeURIComponent(h.id);
+    a.textContent = "#";
+    a.setAttribute("aria-label", "Copy link to “" + h.textContent + "”");
+    a.addEventListener("click", function (e) {
+      if (!navigator.clipboard) return; // plain jump to the section
+      e.preventDefault();
+      var url = location.origin + location.pathname + a.getAttribute("href");
+      history.replaceState(null, "", a.getAttribute("href"));
+      navigator.clipboard.writeText(url).then(function () {
+        a.classList.add("copied");
+        a.dataset.label = "Link copied";
+        setTimeout(function () { a.classList.remove("copied"); }, 1600);
+      }, function () { location.hash = a.getAttribute("href"); });
+    });
+    h.appendChild(a);
+  });
+
   document.querySelectorAll(".link-unpublished").forEach(function (el) { el.title = "Not published"; });
 
   // ---- math (KaTeX is loaded only on pages that need it) ----
