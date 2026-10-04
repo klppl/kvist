@@ -22,6 +22,7 @@
 {{- if .Features.Mermaid}}
 {{- $m := str (param "mermaid_url")}}
 <script defer src="{{if or (hasPrefix $m "https://") (hasPrefix $m "/")}}{{$m}}{{else}}{{asset $m}}{{end}}"{{with param "mermaid_integrity"}} integrity="{{.}}" crossorigin="anonymous"{{end}}></script>{{end}}
+{{template "head-extra" .}}
 </head>
 {{- $list := and (param "show_list") (eq .Kind "home" "note" "folder" "tag")}}
 {{- /* With nav_tags set, the sidebar groups notes by those tags. A note's

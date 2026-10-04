@@ -23,6 +23,18 @@ it replaces the theme's file with the same path, for example
 `templates/partials/note-parts.html` or `static/style.css`. This lets you
 change one template without forking the theme.
 
+The garden theme includes an empty `templates/partials/head-extra.html` at
+the end of `<head>`. Override it to add a stylesheet (after the theme's
+own), a script or meta tags without copying any other file:
+
+```html
+{{define "head-extra" -}}
+<link rel="stylesheet" href="{{asset "custom.css"}}">
+{{- end}}
+```
+
+with `static/custom.css` in the same overrides folder.
+
 `theme_params` can also be set from the vault in `.kvist/site.toml`.
 
 ## Layout

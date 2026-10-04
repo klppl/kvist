@@ -48,6 +48,7 @@
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; scroll-padding-top: 1.5rem; }
 body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.65 var(--font); }
+img, video, svg { max-width: 100%; height: auto; }
 a { color: var(--accent); text-underline-offset: .18em; text-decoration-thickness: 1px; }
 a:hover { text-decoration-thickness: 2px; }
 [hidden] { display: none !important; }

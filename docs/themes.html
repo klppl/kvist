@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Writing a theme · kvist docs</title>
+<meta name="description" content="Change single theme files, add your own CSS, or write a complete kvist theme with Go templates.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<script>try{var t=localStorage.getItem("kvist-docs-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="stylesheet" href="assets/docs.css?v=38df0dda">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="shell">
+  <aside class="side">
+    <div class="brand">
+      <a href="index.html"><img src="assets/icon.svg" width="22" height="22" alt="">kvist <small>docs</small></a>
+      <button class="icon-button theme-toggle" type="button" aria-label="Switch color theme" hidden><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
+      <button class="icon-button menu-toggle" type="button" aria-label="Menu" aria-expanded="false" hidden><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    </div>
+    <nav aria-label="Documentation">
+      <h2>Start</h2>
+      <ul>
+        <li><a href="index.html">Overview</a></li>
+        <li><a href="getting-started.html">Getting started</a></li>
+      </ul>
+      <h2>Guides</h2>
+      <ul>
+        <li><a href="publishing.html">Publishing notes</a></li>
+        <li><a href="writing.html">Writing notes</a></li>
+        <li><a href="customizing.html">Customizing the site</a></li>
+        <li><a href="themes.html" aria-current="page">Writing a theme</a></li>
+        <li><a href="server.html">Running the server</a></li>
+      </ul>
+      <h2>Reference</h2>
+      <ul>
+        <li><a href="configuration.html">Configuration</a></li>
+        <li><a href="troubleshooting.html">Troubleshooting</a></li>
+      </ul>
+      <h2>More</h2>
+      <ul>
+        <li><a href="https://github.com/klppl/kvist" class="ext">GitHub</a></li>
+      </ul>
+    </nav>
+    <p class="side-foot">kvist is open source (MIT). <a href="https://github.com/klppl/kvist/issues">Report a problem</a></p>
+  </aside>
+  <main id="main">
+    <div class="page">
+      <article>
+<p class="eyebrow">Guides</p>
+<h1>Writing a theme</h1>
+<p class="lead">The <a href="customizing.html#theme">theme settings</a> cover colors and layout options. To go further, replace single files of the built-in theme, add your own CSS, or write a theme from scratch. All of it happens on the server.</p>
+
+<h2 id="choose">Three levels</h2>
+<table>
+  <thead><tr><th>You want to</th><th>Do this</th></tr></thead>
+  <tbody>
+    <tr><td>Tweak styles: fonts, spacing, colors beyond <code>accent</code></td><td><a href="#custom-css">Add a CSS file</a> with an overrides folder</td></tr>
+    <tr><td>Change one part of the page, like the note header or the footer</td><td><a href="#overrides">Override that template</a></td></tr>
+    <tr><td>A completely different look</td><td><a href="#new-theme">Write a new theme</a></td></tr>
+  </tbody>
+</table>
+<p>A theme only ever sees <strong>published</strong> notes. Whatever you write, it can't leak a private note, because it never receives one.</p>
+
+<h2 id="overrides">Overriding theme files</h2>
+<p>An <em>overrides folder</em> has the same layout as a theme. Each file in it replaces the theme's file with the same path, and new files are added. Everything else comes from the theme, so you only copy what you change.</p>
+<pre data-label="kvist.toml"><code>[[site]]
+id              = "garden"
+theme           = "garden"
+theme_overrides = "/etc/kvist/theme"   <span class="c"># a folder on the server</span></code></pre>
+<p>With Docker, put the folder next to <code>docker-compose.yml</code> and mount it into the container:</p>
+<pre data-label="docker-compose.yml"><code>services:
+  kvist:
+    volumes:
+      - kvist-data:/data
+      - ./kvist.toml:/etc/kvist/kvist.toml:ro
+      - ./theme:/etc/kvist/theme:ro        <span class="c"># add this line</span></code></pre>
+<p>Then run <code>docker compose up -d</code> and publish, so the site is rebuilt with your files.</p>
+<p>The built-in theme's files are in the repository under <a href="https://github.com/klppl/kvist/tree/main/themes/garden"><code>themes/garden/</code></a>. Copy the one you want to change into your overrides folder at the same path. The main parts:</p>
+<table>
+  <thead><tr><th>File</th><th>What it renders</th></tr></thead>
+  <tbody>
+    <tr><td><code>templates/base.html</code></td><td>The page skeleton: <code>&lt;head&gt;</code>, the three columns, scripts</td></tr>
+    <tr><td><code>templates/note.html</code></td><td>A note: header, content, backlinks, contents and graph</td></tr>
+    <tr><td><code>templates/home.html</code></td><td>The home page</td></tr>
+    <tr><td><code>templates/partials/nav.html</code></td><td>The menu column</td></tr>
+    <tr><td><code>templates/partials/list.html</code></td><td>The middle list column</td></tr>
+    <tr><td><code>templates/partials/note-parts.html</code></td><td>Cards, growth stages, backlinks, contents list</td></tr>
+    <tr><td><code>templates/partials/head-meta.html</code></td><td>Link-preview tags in <code>&lt;head&gt;</code></td></tr>
+    <tr><td><code>templates/partials/head-extra.html</code></td><td>Empty: your own additions at the end of <code>&lt;head&gt;</code></td></tr>
+    <tr><td><code>static/style.css</code></td><td>All styles</td></tr>
+  </tbody>
+</table>
+<div class="callout warn">
+  <p class="callout-title">Overridden files don't update</p>
+  <p>When kvist updates, your copies stay as they are. Override as few files as you can, and compare them with the new versions after an update.</p>
+</div>
+
+<h2 id="custom-css">Adding your own CSS</h2>
+<p>The lightest way to restyle the site is an extra stylesheet loaded after the theme's own, so you don't copy <code>style.css</code> at all. Two small files in your overrides folder do it:</p>
+<pre data-label="theme/static/custom.css"><code>:root {
+  --font: "Iowan Old Style", Georgia, serif;   <span class="c">/* the theme's styles use CSS variables */</span>
+}
+.note-header h1 { letter-spacing: 0; }</code></pre>
+<pre data-label="theme/templates/partials/head-extra.html"><code>{{define "head-extra" -}}
+&lt;link rel="stylesheet" href="{{asset "custom.css"}}"&gt;
+{{- end}}</code></pre>
+<p>The theme includes <code>head-extra</code> at the very end of <code>&lt;head&gt;</code> and leaves it empty, just for this. Your stylesheet loads after the theme's, so your rules win. <code>{{asset "custom.css"}}</code> gives the file's address, with a fingerprint that changes when the file does, so browsers never use an old copy. The same file is the place for extra meta tags or a script.</p>
+<p>Useful variables to change: <code>--bg</code>, <code>--fg</code>, <code>--muted</code>, <code>--border</code>, <code>--pane</code>, <code>--font</code>, <code>--font-mono</code> and <code>--radius</code>. For dark mode, set them again under <code>:root[data-theme="dark"]</code> and in a <code>@media (prefers-color-scheme: dark)</code> block, as <code>style.css</code> does.</p>
+
+<h2 id="preview">Previewing while you work</h2>
+<p>Run the preview server on your computer with a copy of your server's config, pointing <code>theme_overrides</code> (or <code>theme</code>) at your local folder:</p>
+<pre><code>kvist dev --dir ~/Documents/MyVault --config kvist.toml</code></pre>
+<p>It rebuilds and reloads the browser whenever a note <strong>or a theme file</strong> changes. A mistake in a template shows at the bottom of the page, while the last working version stays up. See <a href="server.html#cli">the command line</a> for how to get <code>kvist</code>.</p>
+
+<h2 id="new-theme">A new theme</h2>
+<p>A theme is a folder:</p>
+<pre><code>mytheme/
+  theme.toml
+  templates/
+    base.html          the page skeleton; fills {{block "main"}} and {{block "aside"}}
+    home.html          the home page, /
+    note.html          every note
+    folder.html        folders without a folder note
+    tag.html           /tags/&lt;tag&gt;/
+    tags.html          /tags/
+    404.html           the "not found" page
+    partials/*.html    shared {{define}} blocks
+  static/              CSS, JavaScript, fonts, images</code></pre>
+<pre data-label="theme.toml"><code>name    = "mytheme"
+version = "1.0.0"
+license = "MIT"
+model   = [1]              <span class="c"># content model versions this theme understands</span>
+
+[params]                   <span class="c"># defaults; sites change them with theme_params</span>
+accent = "#3f7d4e"</code></pre>
+<p>Put the folder in <code>themes_dir</code> (default: <code>themes</code>, next to where kvist runs) and set <code>theme = "mytheme"</code>, or give a path: <code>theme = "/etc/kvist/mytheme"</code>. In Docker, mount the folder like the overrides above. A folder in <code>themes_dir</code> named <code>garden</code> replaces the built-in one.</p>
+<p>The quickest start is to copy <code>themes/garden</code> from the repository, rename it, and change it from there.</p>
+
+<h3 id="templates">Templates</h3>
+<p>Templates use Go's <a href="https://pkg.go.dev/html/template"><code>html/template</code></a>, which escapes text by context, so note titles can't break your HTML. Each page template is combined with <code>base.html</code> and all partials, and <code>base.html</code> is run with a <strong>page</strong>:</p>
+<table>
+  <thead><tr><th>Field</th><th></th></tr></thead>
+  <tbody>
+    <tr><td><code>.Kind</code></td><td><code>home</code>, <code>note</code>, <code>folder</code>, <code>tag</code>, <code>tags</code> or <code>404</code></td></tr>
+    <tr><td><code>.Title</code>, <code>.URL</code>, <code>.Description</code></td><td>For <code>&lt;title&gt;</code>, links and meta tags</td></tr>
+    <tr><td><code>.Note</code></td><td>The note, on note pages (and on the home page if it uses a note)</td></tr>
+    <tr><td><code>.Folder</code>, <code>.Tag</code></td><td>The folder or tag, on their pages</td></tr>
+    <tr><td><code>.Site</code></td><td>Everything published (below)</td></tr>
+    <tr><td><code>.Features</code></td><td><code>.Math</code>, <code>.Mermaid</code>, <code>.Code</code>: load KaTeX, Mermaid and highlighting styles only when the page needs them</td></tr>
+  </tbody>
+</table>
+<p>A minimal <code>base.html</code> and <code>note.html</code>:</p>
+<pre data-label="templates/base.html"><code>&lt;!doctype html&gt;
+&lt;html lang="{{.Site.Config.Language}}"&gt;
+&lt;head&gt;
+&lt;meta charset="utf-8"&gt;
+&lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+&lt;title&gt;{{.Title}} · {{.Site.Config.Title}}&lt;/title&gt;
+&lt;link rel="stylesheet" href="{{asset "style.css"}}"&gt;
+{{- if .Features.Code}}&lt;link rel="stylesheet" href="{{asset "syntax.css"}}"&gt;{{end}}
+&lt;/head&gt;
+&lt;body&gt;
+&lt;header&gt;&lt;a href="/"&gt;{{.Site.Config.Title}}&lt;/a&gt;&lt;/header&gt;
+&lt;main&gt;{{block "main" .}}{{end}}&lt;/main&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+<pre data-label="templates/note.html"><code>{{define "main" -}}
+&lt;article&gt;
+  &lt;h1&gt;{{.Note.Title}}&lt;/h1&gt;
+  &lt;p&gt;{{dateFormat "2 January 2006" .Note.Updated}}&lt;/p&gt;
+  {{.Note.Content}}
+  {{- with .Note.Backlinks}}
+  &lt;h2&gt;Links to this note&lt;/h2&gt;
+  &lt;ul&gt;{{range .}}&lt;li&gt;&lt;a href="{{.Source.URL}}"&gt;{{.Source.Title}}&lt;/a&gt;&lt;/li&gt;{{end}}&lt;/ul&gt;
+  {{- end}}
+&lt;/article&gt;
+{{- end}}</code></pre>
+
+<h3 id="data">What a theme receives</h3>
+<table>
+  <thead><tr><th>Object</th><th>Fields</th></tr></thead>
+  <tbody>
+    <tr><td><code>.Site</code></td><td><code>Notes</code> (all, sorted by address), <code>Root</code> (the top folder), <code>AllTags</code>, <code>Tags</code> (top-level), <code>Home</code>, <code>Graph</code>, <code>Config</code></td></tr>
+    <tr><td><code>.Site.Config</code></td><td><code>Title</code>, <code>Description</code>, <code>BaseURL</code>, <code>Language</code>, <code>Author</code>, <code>Nav</code> (list of <code>Title</code>, <code>URL</code>), <code>Params</code></td></tr>
+    <tr><td>A note</td><td><code>Title</code>, <code>URL</code>, <code>Description</code>, <code>Content</code> (HTML), <code>Created</code>, <code>Updated</code>, <code>Tags</code>, <code>Aliases</code>, <code>TOC</code>, <code>Links</code>, <code>Backlinks</code> (<code>Source</code>, <code>Context</code>), <code>Folder</code>, <code>Params</code>, <code>WordCount</code>, <code>ReadingTime</code></td></tr>
+    <tr><td>A folder</td><td><code>Name</code>, <code>URL</code>, <code>Notes</code>, <code>Children</code>, <code>Index</code> (its folder note), <code>Parent</code></td></tr>
+    <tr><td>A tag</td><td><code>Name</code> (e.g. <code>projects/kvist</code>), <code>URL</code>, <code>Notes</code> (including child tags' notes), <code>Children</code>, <code>Parent</code></td></tr>
+    <tr><td>A heading (<code>TOC</code>)</td><td><code>Level</code>, <code>Text</code>, <code>ID</code>, <code>Children</code></td></tr>
+  </tbody>
+</table>
+<p>A note's <code>Params</code> holds only the properties listed in the server's <code>expose_frontmatter</code>. To see all the data for a vault, write it out as JSON:</p>
+<pre><code>kvist build --dir ~/Documents/MyVault --config kvist.toml --out /tmp/site --emit-model model.json</code></pre>
+<p>The <a href="https://github.com/klppl/kvist/blob/main/docs/content-model.md">content model reference</a> describes every field in detail.</p>
+
+<h3 id="functions">Functions</h3>
+<table>
+  <thead><tr><th>Function</th><th>Example</th><th></th></tr></thead>
+  <tbody>
+    <tr><td><code>asset</code></td><td><code>{{asset "style.css"}}</code></td><td>Address of a file in <code>static/</code>, fingerprinted</td></tr>
+    <tr><td><code>param</code></td><td><code>{{param "accent"}}</code></td><td>A theme setting: the site's value, else the theme's default</td></tr>
+    <tr><td><code>recent</code></td><td><code>{{range recent 10}}</code></td><td>The most recently updated notes</td></tr>
+    <tr><td><code>dateFormat</code></td><td><code>{{dateFormat "2 Jan 2006" .Note.Updated}}</code></td><td>Format a date: write 2 January 2006 the way you want dates to look</td></tr>
+    <tr><td><code>isoDate</code></td><td><code>{{isoDate .Note.Created}}</code></td><td>For <code>&lt;time datetime&gt;</code></td></tr>
+    <tr><td><code>absURL</code></td><td><code>{{absURL .URL}}</code></td><td>Full address with the site's domain</td></tr>
+    <tr><td><code>markdownify</code></td><td><code>{{markdownify (str (param "footer"))}}</code></td><td>Markdown to HTML</td></tr>
+    <tr><td><code>truncate</code></td><td><code>{{truncate 160 .Description}}</code></td><td>Shorten at a word boundary</td></tr>
+    <tr><td><code>default</code></td><td><code>{{default "Untitled" .Title}}</code></td><td>A fallback for empty values</td></tr>
+    <tr><td><code>dict</code></td><td><code>{{template "card" (dict "Note" . "Big" true)}}</code></td><td>Pass several values to a template</td></tr>
+    <tr><td><code>json</code></td><td><code>{{json .Site.Graph}}</code></td><td>A value as JSON</td></tr>
+    <tr><td>Text helpers</td><td><code>lower</code>, <code>upper</code>, <code>title</code>, <code>join</code>, <code>contains</code>, <code>hasPrefix</code>, <code>str</code></td><td></td></tr>
+    <tr><td>Numbers</td><td><code>add</code>, <code>sub</code></td><td></td></tr>
+  </tbody>
+</table>
+<p>Templates can't read files or reach the network.</p>
+
+<h3 id="content-html">Styling note content</h3>
+<p>A note's <code>Content</code> is ready-made HTML. These are the classes to style:</p>
+<table>
+  <thead><tr><th>Class</th><th>What</th></tr></thead>
+  <tbody>
+    <tr><td><code>a.internal-link</code></td><td>A link to another published note</td></tr>
+    <tr><td><code>span.link-unpublished</code></td><td>A link to a private or missing note. <strong>Style it as plain text</strong>, so visitors can't tell that a private note exists.</td></tr>
+    <tr><td><code>div.embed</code>, <code>.embed-title</code>, <code>.embed-content</code></td><td>An embedded note or section</td></tr>
+    <tr><td><code>div.callout[data-callout="tip"]</code>, <code>.callout-title</code>, <code>.callout-content</code></td><td>Callouts; foldable ones use <code>&lt;details&gt;</code></td></tr>
+    <tr><td><code>a.tag</code>, <code>span.tag-hidden</code></td><td>Tags; the publish tags are hidden ones</td></tr>
+    <tr><td><code>div.code-block[data-lang]</code>, <code>pre.chroma</code></td><td>Highlighted code; colors come from <code>syntax.css</code></td></tr>
+    <tr><td><code>.math-inline</code>, <code>.math-display</code></td><td>Math, for KaTeX to render in the browser</td></tr>
+    <tr><td><code>pre.mermaid</code></td><td>A diagram, for Mermaid to draw</td></tr>
+    <tr><td><code>mark</code>, <code>iframe.embed-pdf</code>, <code>audio</code>, <code>video</code></td><td>Highlights and embedded files</td></tr>
+  </tbody>
+</table>
+<p>Every build also writes <code>/search-index.json</code> and <code>/graph.json</code>, which a theme's scripts can load for search and graphs, plus <code>/index.xml</code> (RSS) and <code>/sitemap.xml</code>.</p>
+
+<h2 id="rules">Good theme manners</h2>
+<ul>
+  <li><strong>Work without JavaScript.</strong> Use scripts for extras like search, the graph and the theme toggle.</li>
+  <li><strong>Keep private notes invisible.</strong> Style <code>.link-unpublished</code> like normal text, with no “locked” icons or hints.</li>
+  <li><strong>Load heavy things only when needed.</strong> Check <code>.Features.Math</code> and <code>.Features.Mermaid</code> before loading KaTeX or Mermaid.</li>
+  <li><strong>Don't load from other websites.</strong> Put fonts and libraries in <code>static/</code>, so visitors aren't tracked and the site keeps working.</li>
+  <li><strong>Keep pages small.</strong> Don't list every note on every page; big gardens have thousands. The built-in theme shows only the current folder or group.</li>
+</ul>
+<p>The theme reference with every detail, including caching and the built-in theme's settings, is in <a href="https://github.com/klppl/kvist/blob/main/docs/themes.md"><code>docs/themes.md</code></a>.</p>
+<nav class="next" aria-label="Pages"><a href="customizing.html"><small>Previous</small>Customizing the site</a><a class="fwd" href="server.html"><small>Next</small>Running the server</a></nav>
+      </article>
+      <aside class="toc"></aside>
+    </div>
+  </main>
+</div>
+<script src="assets/docs.js?v=eee218fc" defer></script>
+</body>
+</html>
