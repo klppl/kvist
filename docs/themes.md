@@ -139,6 +139,7 @@ Params (set them in `theme_params`):
 | `graph_node_size` | `links` | `links`: nodes grow with their number of links; `same`: all nodes alike |
 | `graph_link_distance` | `45` | how long links are at rest, in pixels; larger spreads the graph out |
 | `link_previews` | `true` | hovering a link to a note shows a preview of it (of the section, for `#heading` links); on touch screens the first tap previews and the second opens |
+| `show_profile` | `true` | the profile (`Site.Config.Profile`: avatar, author, bio, links) at the top of the menu |
 | `show_properties` | `false` | the note's properties under its title; only keys listed in `expose_frontmatter` exist, so nothing new reaches the page |
 | `code_style_light`, `code_style_dark` | `github`, `github-dark` | highlighting |
 | `footer` | `""` | Markdown at the bottom of the menu |

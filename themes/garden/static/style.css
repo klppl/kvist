@@ -118,6 +118,20 @@ main { min-width: 0; }
 .nav-foot a { color: inherit; }
 .footer-text p { margin: 0 0 .3rem; }
 
+/* profile */
+.profile { margin: 0 .45rem 1.3rem; padding-bottom: 1.1rem; border-bottom: 1px solid var(--border); }
+.profile-avatar { display: block; width: 4rem; height: 4rem; object-fit: cover; border-radius: 50%; margin-bottom: .7rem; }
+.profile-name { margin: 0; font-weight: 650; font-size: .95rem; }
+.profile-bio { margin-top: .25rem; color: var(--muted); font-size: .85rem; line-height: 1.5; }
+.profile-bio p { margin: 0 0 .3rem; }
+.profile-links { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .35rem; }
+.profile-links a {
+  display: inline-flex; align-items: center; gap: .35rem; padding: .2rem .55rem; border-radius: 999px;
+  background: var(--hover); color: var(--fg); font-size: .78rem; text-decoration: none;
+}
+.profile-links a:hover { background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); }
+.profile-links .icon { width: 14px; height: 14px; color: var(--muted); }
+
 /* list pane */
 .list-pane { background: var(--bg); padding-bottom: 2rem; }
 .list-head {

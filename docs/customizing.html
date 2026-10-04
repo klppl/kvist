@@ -79,6 +79,7 @@ Settings for my website.
     <tr><td><code>author</code>, <code>language</code></td><td>Used in page metadata and feeds. <code>language</code> is a code like <code>en</code> or <code>sv</code>.</td></tr>
     <tr><td><code>home</code></td><td>A published note to use as the home page, as a link: <code>"[[Welcome]]"</code>. Obsidian keeps it up to date if you rename the note.</td></tr>
     <tr><td><code>groups</code></td><td>Tags that group the menu (<a href="#groups">below</a>).</td></tr>
+    <tr><td><code>avatar</code>, <code>bio</code>, <code>profile_links</code></td><td>A profile at the top of the menu (<a href="#profile">below</a>).</td></tr>
     <tr><td><code>image</code></td><td>The picture shown when a page is shared on social media or in chats, unless the note has its own <code>image</code> or <code>cover</code>: <code>"[[preview.png]]"</code> or a web address. About 1200×630 pixels works everywhere.</td></tr>
     <tr><td><code>strict_line_breaks</code></td><td><code>true</code> to treat a single line break as a space, like Obsidian's <em>Strict line breaks</em>. By default it is kept as a line break.</td></tr>
     <tr><td>Anything else</td><td>A theme setting, such as <code>accent</code> or <code>footer</code>. See <a href="#theme">Theme settings</a>.</td></tr>
@@ -91,6 +92,26 @@ Settings for my website.
   <p>If the vault has two notes called <code>_site.md</code>, publishing stops and names both, so you can delete one.</p>
 </div>
 <p>Older sites may use a hidden <code>.kvist/site.toml</code> file instead. It still works, and the settings note wins where both set something. See <a href="configuration.html#site-toml">Configuration</a>.</p>
+
+<h2 id="profile">A profile in the menu</h2>
+<p>Add a picture, a line about yourself and your links to the top of the menu:</p>
+<pre data-label="Kvist/_site.md"><code>---
+author: Ada
+avatar: "[[ada.jpg]]"
+bio: Notes on what I'm learning and building.
+profile_links:
+  - https://github.com/ada
+  - https://mastodon.social/@ada
+  - mailto:ada@example.com
+  - Blog: https://ada.example.com
+---</code></pre>
+<ul>
+  <li><code>avatar</code> (or <code>logo</code>) is an image in your vault, or a web address. It is published even though no note shows it, unless it sits in an excluded folder.</li>
+  <li><code>bio</code> is a line of Markdown shown under your name (<code>author</code>).</li>
+  <li><code>profile_links</code> is a list of addresses. GitHub, GitLab, Mastodon, Bluesky, LinkedIn, X, YouTube and email links are named for you; write <code>Name: https://…</code> or <code>[Name](https://…)</code> to choose the label. Only web and <code>mailto:</code> addresses are kept.</li>
+  <li>The links carry <code>rel="me"</code>, so Mastodon can show your site as verified once you link to it from your Mastodon profile.</li>
+</ul>
+<p>Turn the profile off without deleting it with the theme setting <code>show_profile: false</code>.</p>
 
 <h2 id="groups">Grouping the menu by tags</h2>
 <p>The menu's <em>Content</em> section lists your top-level folders. If you keep all public notes in one folder, that shows a single “Kvist” entry, which doesn't help visitors. Group notes by tags instead:</p>
@@ -146,6 +167,7 @@ groups: [articles, projects, books]
     <tr><td><code>graph_tags</code></td><td><code>false</code></td><td>Show tags as nodes in the graph, connected to their notes.</td></tr>
     <tr><td><code>graph_node_size</code></td><td><code>"links"</code></td><td><code>"links"</code> makes well-linked notes bigger; <code>"same"</code> draws every note the same size.</td></tr>
     <tr><td><code>graph_link_distance</code></td><td><code>45</code></td><td>Length of the links in the graph. A larger number spreads it out.</td></tr>
+    <tr><td><code>show_profile</code></td><td><code>true</code></td><td>Show the <a href="#profile">profile</a>, if the settings note has one.</td></tr>
     <tr><td><code>show_properties</code></td><td><code>false</code></td><td>A list of the note's properties under its title. Only properties the server lists in <code>expose_frontmatter</code> <span class="where server">server</span> are shown; all others stay private.</td></tr>
     <tr><td><code>show_graph</code></td><td><code>true</code></td><td>The Graph button and the small graph beside notes.</td></tr>
     <tr><td><code>footer</code></td><td><code>""</code></td><td>Text at the bottom of the menu. Markdown works.</td></tr>
