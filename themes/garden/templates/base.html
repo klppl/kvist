@@ -24,12 +24,17 @@
 <script defer src="{{if or (hasPrefix $m "https://") (hasPrefix $m "/")}}{{$m}}{{else}}{{asset $m}}{{end}}"{{with param "mermaid_integrity"}} integrity="{{.}}" crossorigin="anonymous"{{end}}></script>{{end}}
 </head>
 {{- $list := and (param "show_list") (eq .Kind "home" "note" "folder" "tag")}}
+{{- /* With nav_tags set, the sidebar groups notes by those tags. A note's
+     group is the first of them it carries (or a child tag of it). */}}
+{{- $group := false}}
+{{- with .Note}}{{$n := .}}{{range $name := param "nav_tags"}}{{if not $group}}{{range $.Site.AllTags}}{{if eq (lower .Name) (lower (str $name))}}{{$g := .}}{{range $n.Tags}}{{if or (eq .Name $g.Name) (hasPrefix .Name (print $g.Name "/"))}}{{$group = $g}}{{end}}{{end}}{{end}}{{end}}{{end}}{{end}}{{end}}
+{{- $ctx := dict "P" . "Group" $group}}
 <body class="kind-{{.Kind}}{{if $list}} has-list{{end}}"{{with .Note}} data-note="{{.ID}}"{{end}}>
 <a class="skip" href="#main">Skip to content</a>
 <div class="shell">
-  {{template "nav-pane" .}}
+  {{template "nav-pane" $ctx}}
   {{- if $list}}
-  {{template "list-pane" .}}
+  {{template "list-pane" $ctx}}
   {{- end}}
   <main id="main">
     <div class="page">

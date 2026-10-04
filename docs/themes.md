@@ -116,6 +116,7 @@ Params (set them in `theme_params`):
 | `home_recent` | `12` | notes in the home page's list |
 | `show_list` | `true` | the list pane (below) |
 | `list_max` | `100` | notes in the list pane before a "more…" link |
+| `nav_tags` | `[]` | tags that group the sidebar instead of folders (below) |
 | `show_toc`, `show_backlinks`, `show_graph` | `true` | note page parts |
 | `code_style_light`, `code_style_dark` | `github`, `github-dark` | highlighting |
 | `footer` | `""` | Markdown at the bottom of every page |
@@ -129,6 +130,21 @@ small screens it moves below the page. Neither pane lists the whole vault,
 and the list stops at `list_max`, because a full tree on every page made a
 5 000-note site 2 GB. On wide screens the table of contents and the local
 graph sit to the right of a note; otherwise they follow it.
+
+**Grouping by tags.** By default the sidebar lists your top-level folders.
+If everything you publish lives in one folder, group it by tags instead:
+
+```toml
+# .kvist/site.toml in your vault
+[theme_params]
+nav_tags = ["articles", "projects", "books"]
+```
+
+Each tag becomes a sidebar entry, in this order, labeled with a capital
+first letter ("Articles") and linked to its tag page; notes with a child
+tag (`#projects/kvist`) count too. On a note page, the list pane shows the
+note's group, the first `nav_tags` tag it carries, and falls back to its
+folder for notes without one. Tags with no published notes are left out.
 
 It shows the growth stage from the frontmatter `stage` (`seedling`,
 `budding`, `evergreen`) when `stage` is listed in `expose_frontmatter`.

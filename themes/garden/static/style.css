@@ -107,6 +107,8 @@ main { min-width: 0; }
 .nav-list [aria-current] .icon { color: var(--fg); }
 .nav-list kbd { margin-left: auto; font: .72rem var(--font-mono); color: var(--muted); border: 1px solid var(--border); border-radius: 4px; padding: 0 .35rem; }
 .nav-external { justify-content: space-between; }
+.nav-list .count { margin-left: auto; font-size: .76rem; }
+.nav-list [aria-current] .count { color: var(--fg); }
 .nav-foot { margin-top: auto; padding: 1.5rem .45rem 0; font-size: .8rem; color: var(--muted); }
 .nav-foot p { margin: .3rem 0 0; }
 .nav-foot a { color: inherit; }

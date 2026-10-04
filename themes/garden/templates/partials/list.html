@@ -1,22 +1,31 @@
 {{/*
   The list pane: the notes around the current page. A note shows its
-  folder, a folder page its notes, a tag page the tagged notes and the home
+  nav_tags group if it has one, else its folder; a folder page its notes, a tag page the tagged notes and the home
   page the most recent ones. Long lists stop at list_max and link to the
   full folder or tag page, so pages stay small in big folders.
 */}}
 {{define "list-pane" -}}
+{{- $group := .Group}}
+{{- with .P}}
 {{- $cur := .URL}}
 {{- $max := param "list_max"}}
 <section class="list-pane" aria-labelledby="list-title">
   {{- if eq .Kind "home"}}
   {{template "list-body" (dict "Title" "Recently tended" "URL" "" "Notes" (recent (param "home_recent")) "Cur" $cur "Max" $max)}}
   {{- else if eq .Kind "tag"}}
-  {{template "list-body" (dict "Title" (print "#" .Tag.Name) "URL" .Tag.URL "Notes" .Tag.Notes "Cur" $cur "Max" $max)}}
+  {{- $t := .Tag}}{{$label := print "#" $t.Name}}
+  {{- range param "nav_tags"}}{{if eq (lower (str .)) (lower $t.Name)}}{{$label = title (str .)}}{{end}}{{end}}
+  {{template "list-body" (dict "Title" $label "URL" $t.URL "Notes" $t.Notes "Cur" $cur "Max" $max)}}
+  {{- else if $group}}
+  {{- $label := $group.Name}}
+  {{- range param "nav_tags"}}{{if eq (lower (str .)) (lower $group.Name)}}{{$label = title (str .)}}{{end}}{{end}}
+  {{template "list-body" (dict "Title" $label "URL" $group.URL "Notes" $group.Notes "Cur" $cur "Max" $max)}}
   {{- else}}
   {{- $f := .Folder}}{{with .Note}}{{$f = .Folder}}{{end}}
   {{template "list-body" (dict "Title" (default "Notes" $f.Name) "URL" $f.URL "Notes" $f.Notes "Folders" $f.Children "Parent" $f.Parent "Cur" $cur "Max" $max)}}
   {{- end}}
 </section>
+{{- end}}
 {{- end}}
 
 {{define "list-body" -}}

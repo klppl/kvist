@@ -9,7 +9,19 @@
   {{- with .Site.Config.Description}}<p class="lead">{{.}}</p>{{end}}
 </section>
 {{- end}}
-{{- with .Site.Root.Children}}
+{{- if param "nav_tags"}}
+<section class="explore" aria-labelledby="explore-title">
+  <h2 id="explore-title" class="section-label">Explore</h2>
+  <ul class="cards">
+    {{- range $name := param "nav_tags"}}{{range $.Site.AllTags}}{{if eq (lower .Name) (lower (str $name))}}
+    <li class="card"><a class="card-link" href="{{.URL}}">
+      <span class="card-title">{{title (str $name)}}</span>
+      <span class="card-meta">{{len .Notes}} {{if eq (len .Notes) 1}}note{{else}}notes{{end}}</span>
+    </a></li>
+    {{- end}}{{end}}{{end}}
+  </ul>
+</section>
+{{- else}}{{with .Site.Root.Children}}
 <section class="explore" aria-labelledby="explore-title">
   <h2 id="explore-title" class="section-label">Explore</h2>
   <ul class="cards">
@@ -21,7 +33,7 @@
     {{- end}}
   </ul>
 </section>
-{{- end}}
+{{- end}}{{end}}
 {{- if not (param "show_list")}}{{with recent (param "home_recent")}}
 <section class="recent" aria-labelledby="recent-title">
   <h2 id="recent-title" class="section-label">Recently tended</h2>
