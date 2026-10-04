@@ -28,6 +28,20 @@
     });
   }
 
+  // ---- print: light colors and folded callouts opened ----
+  var printState = null;
+  window.addEventListener("beforeprint", function () {
+    var closed = Array.prototype.filter.call(document.querySelectorAll("details:not([open])"), function (d) { d.open = true; return true; });
+    printState = { theme: root.dataset.theme, closed: closed };
+    root.dataset.theme = "light"; // also switches code highlighting to light
+  });
+  window.addEventListener("afterprint", function () {
+    if (!printState) return;
+    if (printState.theme) root.dataset.theme = printState.theme; else delete root.dataset.theme;
+    printState.closed.forEach(function (d) { d.open = false; });
+    printState = null;
+  });
+
   // ---- nav menu on small screens ----
   var menuToggle = $(".menu-toggle");
   if (menuToggle) {

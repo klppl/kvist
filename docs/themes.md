@@ -167,6 +167,10 @@ folder for notes without one. Tags with no published notes are left out.
 It shows the growth stage from the frontmatter `stage` (`seedling`,
 `budding`, `evergreen`) when `stage` is listed in `expose_frontmatter`.
 
+Printing a page prints only the note, in light colors: the panes, the
+table of contents, the graph and backlinks are left out, folded callouts
+are opened, and external links show their address.
+
 Search (press <kbd>/</kbd>) loads MiniSearch and `/search-index.json` the first time
 it opens. The graph (the Graph item in the menu, and the "Connections" box on note pages)
 reads `/graph.json` and draws on a canvas. KaTeX is vendored and loads only

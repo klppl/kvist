@@ -372,3 +372,24 @@ pre.mermaid { background: none; text-align: center; }
   .note-header h1, .intro h1, .listing h1 { font-size: 2rem; }
   img.align-left, img.align-right { float: none; display: block; max-width: 100%; margin: 1rem auto; }
 }
+
+/* print: only the note, in light colors */
+@media print {
+  :root, :root[data-theme="dark"], :root:not([data-theme="light"]) {
+    --bg: #fff; --pane: #fff; --hover: #f1f2f4; --fg: #000; --muted: #555; --border: #ccc;
+    --mark: #f6e7a6; --code-bg: #f5f5f5; color-scheme: light;
+  }
+  body { font-size: 11pt; }
+  .shell, .has-list .shell { display: block; min-height: 0; }
+  .nav-pane, .list-pane, .page-aside, .skip, .backlinks, .icon-button,
+  .search-dialog, .graph-dialog, .heading-anchor, .link-preview, iframe.embed-video { display: none !important; }
+  .page { max-width: none; padding: 0; }
+  .note-header h1, .intro h1, .listing h1 { font-size: 22pt; }
+  .content { margin-top: 1.2rem; font-size: 11pt; }
+  a { color: inherit; }
+  a.external-link::after { content: " (" attr(href) ")"; font-size: .85em; color: var(--muted); overflow-wrap: anywhere; }
+  .content h1, .content h2, .content h3, .content h4 { break-after: avoid; }
+  pre, blockquote, table, img, figure, .callout, .embed { break-inside: avoid; }
+  pre { white-space: pre-wrap; }
+  .tag { border: 1px solid var(--border); }
+}
