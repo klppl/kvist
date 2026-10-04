@@ -61,7 +61,6 @@
     <tr><td>A completely different look</td><td><a href="#new-theme">Write a new theme</a></td></tr>
   </tbody>
 </table>
-<p>A theme only ever sees <strong>published</strong> notes. Whatever you write, it can't leak a private note, because it never receives one.</p>
 
 <h2 id="overrides">Overriding theme files</h2>
 <p>An <em>overrides folder</em> has the same layout as a theme. Each file in it replaces the theme's file with the same path, and new files are added. Everything else comes from the theme, so you only copy what you change.</p>
@@ -182,7 +181,7 @@ accent = "#3f7d4e"</code></pre>
 <table>
   <thead><tr><th>Object</th><th>Fields</th></tr></thead>
   <tbody>
-    <tr><td><code>.Site</code></td><td><code>Notes</code> (all, sorted by address), <code>Root</code> (the top folder), <code>AllTags</code>, <code>Tags</code> (top-level), <code>Home</code>, <code>Graph</code>, <code>Config</code></td></tr>
+    <tr><td><code>.Site</code></td><td><code>Notes</code> (every published note, sorted by address; private notes are never included, so there's nothing to filter), <code>Root</code> (the top folder), <code>AllTags</code>, <code>Tags</code> (top-level), <code>Home</code>, <code>Graph</code>, <code>Config</code></td></tr>
     <tr><td><code>.Site.Config</code></td><td><code>Title</code>, <code>Description</code>, <code>BaseURL</code>, <code>Language</code>, <code>Author</code>, <code>Nav</code> (list of <code>Title</code>, <code>URL</code>), <code>Params</code></td></tr>
     <tr><td>A note</td><td><code>Title</code>, <code>URL</code>, <code>Description</code>, <code>Content</code> (HTML), <code>Created</code>, <code>Updated</code>, <code>Tags</code>, <code>Aliases</code>, <code>TOC</code>, <code>Links</code>, <code>Backlinks</code> (<code>Source</code>, <code>Context</code>), <code>Folder</code>, <code>Params</code>, <code>WordCount</code>, <code>ReadingTime</code></td></tr>
     <tr><td>A folder</td><td><code>Name</code>, <code>URL</code>, <code>Notes</code>, <code>Children</code>, <code>Index</code> (its folder note), <code>Parent</code></td></tr>
