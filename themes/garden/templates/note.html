@@ -9,6 +9,7 @@
       <span>Tended <time datetime="{{isoDate .Note.Updated}}">{{dateFormat (param "date_format") .Note.Updated}}</time></span>{{end}}
       <span>{{.Note.ReadingTime}} min read</span>
     </p>
+    {{- if and (param "show_properties") .Note.Params}}{{template "properties" .Note.Params}}{{end}}
     {{- with .Note.Tags}}
     <p class="tags">{{range .}}<a class="tag" href="{{.URL}}">#{{.Name}}</a> {{end}}</p>{{end}}
   </header>

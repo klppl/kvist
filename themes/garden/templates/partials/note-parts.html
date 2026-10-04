@@ -4,6 +4,19 @@
 {{- if eq $s "seedling"}}🌱{{else if eq $s "budding"}}🌿{{else if eq $s "evergreen"}}🌳{{else}}•{{end}} {{$s}}</span>
 {{- end}}
 
+{{/* The note's exposed properties (only keys in expose_frontmatter reach
+     a theme). stage is shown as a badge already. */}}
+{{define "properties" -}}
+{{- $rows := false}}{{range $k, $v := .}}{{if and (ne $k "stage") (propertyValues "" $v)}}{{$rows = true}}{{end}}{{end}}
+{{- if $rows}}
+<dl class="properties">
+  {{- range $k, $v := .}}{{if ne $k "stage"}}{{with propertyValues (param "date_format") $v}}
+  <div><dt>{{title (replace $k "_" " ")}}</dt><dd>{{range $i, $s := .}}{{if $i}}, {{end}}<span>{{$s}}</span>{{end}}</dd></div>
+  {{- end}}{{end}}{{end}}
+</dl>
+{{- end}}
+{{- end}}
+
 {{define "card" -}}
 <li class="card">
   <a class="card-link" href="{{.URL}}">

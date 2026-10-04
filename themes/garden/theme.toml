@@ -12,6 +12,7 @@ list_max         = 100         # notes in the list pane before "more…"
 groups           = []          # tags that group the sidebar, e.g. ["articles", "projects"]; empty: folders
 show_toc         = true
 show_backlinks   = true
+show_properties  = false       # the note's properties under its title (only keys in expose_frontmatter)
 code_style_light = "github"
 code_style_dark  = "github-dark"
 footer           = ""          # Markdown, shown at the bottom of every page

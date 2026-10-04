@@ -104,7 +104,8 @@ a `Page`:
 | `default` | `{{default "Untitled" .Title}}` | |
 | `dict` | `{{template "x" (dict "A" 1 "B" .)}}` | pass several values |
 | `json` | `<script>var d = {{json .Site.Graph}}</script>` | |
-| `lower`, `upper`, `title`, `join`, `contains`, `hasPrefix`, `add`, `sub`, `str` | | |
+| `propertyValues` | `{{range propertyValues (param "date_format") .Note.Params.authors}}` | a property as display strings: one per list item, dates in the layout, `[[links]]` as their text |
+| `lower`, `upper`, `title`, `join`, `replace`, `contains`, `hasPrefix`, `add`, `sub`, `str` | | |
 
 Code highlighting styles come from the `code_style_light` and
 `code_style_dark` params ([chroma style names](https://xyproto.github.io/splash/docs/)).
@@ -133,6 +134,7 @@ Params (set them in `theme_params`):
 | `list_max` | `100` | notes in the list pane before a "more…" link |
 | `groups` | `[]` | tags that group the sidebar instead of folders (below); `nav_tags` is an older name for it |
 | `show_toc`, `show_backlinks`, `show_graph` | `true` | note page parts |
+| `show_properties` | `false` | the note's properties under its title; only keys listed in `expose_frontmatter` exist, so nothing new reaches the page |
 | `code_style_light`, `code_style_dark` | `github`, `github-dark` | highlighting |
 | `footer` | `""` | Markdown at the bottom of the menu |
 | `mermaid_url`, `mermaid_integrity` | jsDelivr, pinned with an SRI hash | see below |

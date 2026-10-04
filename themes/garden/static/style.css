@@ -178,6 +178,10 @@ main { min-width: 0; }
   display: inline-block; font-size: .74rem; color: var(--muted);
   border: 1px solid var(--border); border-radius: 999px; padding: 0 .55rem; text-transform: capitalize;
 }
+.properties { display: grid; grid-template-columns: max-content 1fr; gap: .25rem 1.2rem; margin: 1rem 0 0; font-size: .88rem; }
+.properties > div { display: contents; }
+.properties dt { color: var(--muted); }
+.properties dd { margin: 0; overflow-wrap: anywhere; }
 .content { font-size: 1.06rem; line-height: 1.7; margin-top: 2.2rem; }
 .content h1, .content h2, .content h3, .content h4 { line-height: 1.3; letter-spacing: -.01em; margin: 2.2rem 0 .6rem; }
 .content h2 { font-size: 1.45rem; }

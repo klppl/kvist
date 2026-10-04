@@ -79,6 +79,11 @@ func funcMap(t *Theme, site *model.Site) template.FuncMap {
 		"newest": func(nv any, notes []*model.Note) []*model.Note {
 			return byUpdated(toInt(nv), notes)
 		},
+		// propertyValues turns a note property into display strings: lists
+		// become one string per item, dates use the given layout, and
+		// [[links]] show their alias or target as text:
+		// {{range propertyValues (param "date_format") .}}.
+		"propertyValues": func(layout string, v any) []string { return propertyValues(layout, v) },
 		// dict builds a map for passing several values to a template.
 		"dict": func(kv ...any) (map[string]any, error) {
 			if len(kv)%2 != 0 {
@@ -104,12 +109,55 @@ func funcMap(t *Theme, site *model.Site) template.FuncMap {
 			return strings.ToUpper(string(r)) + s[size:]
 		},
 		"join":      strings.Join,
+		"replace":   strings.ReplaceAll,
 		"hasPrefix": strings.HasPrefix,
 		"contains":  strings.Contains,
 		"add":       func(a, b int) int { return a + b },
 		"sub":       func(a, b int) int { return a - b },
 		"str":       func(v any) string { return fmt.Sprint(v) },
 	}
+}
+
+func propertyValues(layout string, v any) []string {
+	switch v := v.(type) {
+	case nil:
+		return nil
+	case []any:
+		var out []string
+		for _, x := range v {
+			out = append(out, propertyValues(layout, x)...)
+		}
+		return out
+	case map[string]any:
+		return nil // nested objects have no sensible inline form
+	case time.Time:
+		if layout == "" {
+			layout = "2006-01-02"
+		}
+		return []string{v.Format(layout)}
+	case bool:
+		if v {
+			return []string{"yes"}
+		}
+		return []string{"no"}
+	case string:
+		s := strings.TrimSpace(v)
+		if inner, ok := strings.CutPrefix(s, "[["); ok {
+			if inner, ok = strings.CutSuffix(inner, "]]"); ok {
+				target, alias, hasAlias := strings.Cut(inner, "|")
+				if hasAlias {
+					s = alias
+				} else {
+					s, _, _ = strings.Cut(target, "#")
+				}
+			}
+		}
+		if s == "" {
+			return nil
+		}
+		return []string{s}
+	}
+	return []string{fmt.Sprint(v)}
 }
 
 func toInt(v any) int {
