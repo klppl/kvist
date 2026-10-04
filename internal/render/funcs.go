@@ -68,21 +68,15 @@ func funcMap(t *Theme, site *model.Site) template.FuncMap {
 		},
 		// recent returns the n most recently updated notes.
 		"recent": func(nv any) []*model.Note {
-			n := toInt(nv)
 			if site == nil {
 				return nil
 			}
-			notes := append([]*model.Note(nil), site.Notes...)
-			sort.SliceStable(notes, func(i, j int) bool {
-				if !notes[i].Updated.Equal(notes[j].Updated) {
-					return notes[i].Updated.After(notes[j].Updated)
-				}
-				return notes[i].URL < notes[j].URL
-			})
-			if n > 0 && len(notes) > n {
-				notes = notes[:n]
-			}
-			return notes
+			return byUpdated(toInt(nv), site.Notes)
+		},
+		// newest returns the n most recently updated of the given notes
+		// (all of them for n <= 0): {{range newest 3 .Tag.Notes}}.
+		"newest": func(nv any, notes []*model.Note) []*model.Note {
+			return byUpdated(toInt(nv), notes)
 		},
 		// dict builds a map for passing several values to a template.
 		"dict": func(kv ...any) (map[string]any, error) {
@@ -127,6 +121,22 @@ func toInt(v any) int {
 		return int(v)
 	}
 	return 0
+}
+
+// byUpdated sorts a copy of notes by update time, newest first (ties by
+// URL, so builds stay deterministic), and keeps the first n (all for n <= 0).
+func byUpdated(n int, notes []*model.Note) []*model.Note {
+	out := append([]*model.Note(nil), notes...)
+	sort.SliceStable(out, func(i, j int) bool {
+		if !out[i].Updated.Equal(out[j].Updated) {
+			return out[i].Updated.After(out[j].Updated)
+		}
+		return out[i].URL < out[j].URL
+	})
+	if n > 0 && len(out) > n {
+		out = out[:n]
+	}
+	return out
 }
 
 func lookupParam(t *Theme, site *model.Site, key string) any {

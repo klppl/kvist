@@ -68,6 +68,40 @@
     }
   }
 
+  // ---- tag index: filter and sort the tag cards ----
+  var tagTools = $(".tag-tools");
+  var tagGrid = $(".tag-grid");
+  if (tagTools && tagGrid) {
+    tagTools.hidden = false;
+    var cards = Array.prototype.slice.call(tagGrid.children);
+    var tagFilter = $(".tag-filter", tagTools);
+    var tagEmpty = $(".tag-empty");
+    tagFilter.addEventListener("input", function () {
+      var q = tagFilter.value.trim().replace(/^#/, "").toLowerCase();
+      var shown = 0;
+      cards.forEach(function (c) {
+        var hit = !q || c.dataset.search.toLowerCase().indexOf(q) >= 0;
+        c.hidden = !hit;
+        if (hit) shown++;
+      });
+      if (tagEmpty) tagEmpty.hidden = shown > 0;
+    });
+    tagTools.querySelectorAll("[data-sort]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var by = b.dataset.sort;
+        tagTools.querySelectorAll("[data-sort]").forEach(function (o) { o.setAttribute("aria-pressed", o === b ? "true" : "false"); });
+        cards.sort(function (x, y) {
+          if (by === "count") {
+            var d = Number(y.dataset.count) - Number(x.dataset.count);
+            if (d) return d;
+          }
+          return x.dataset.name.localeCompare(y.dataset.name);
+        });
+        cards.forEach(function (c) { tagGrid.appendChild(c); });
+      });
+    });
+  }
+
   document.querySelectorAll(".link-unpublished").forEach(function (el) { el.title = "Not published"; });
 
   // ---- math (KaTeX is loaded only on pages that need it) ----

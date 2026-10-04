@@ -43,7 +43,7 @@
         <li><a href="https://github.com/klppl/kvist" class="ext">GitHub</a></li>
       </ul>
     </nav>
-    <p class="side-foot">kvist is open source (MIT). <a href="https://github.com/klppl/kvist/issues">Report a problem</a></p>
+    <p class="side-foot">kvist is open source (<a href="https://github.com/klppl/kvist/blob/main/LICENSE">Lagom License</a>). <a href="https://github.com/klppl/kvist/issues">Report a problem</a></p>
   </aside>
   <main id="main">
     <div class="page">
@@ -200,6 +200,7 @@ accent = "#3f7d4e"</code></pre>
     <tr><td><code>asset</code></td><td><code>{{asset "style.css"}}</code></td><td>Address of a file in <code>static/</code>, fingerprinted</td></tr>
     <tr><td><code>param</code></td><td><code>{{param "accent"}}</code></td><td>A theme setting: the site's value, else the theme's default</td></tr>
     <tr><td><code>recent</code></td><td><code>{{range recent 10}}</code></td><td>The most recently updated notes</td></tr>
+    <tr><td><code>newest</code></td><td><code>{{range newest 3 .Tag.Notes}}</code></td><td>Any list of notes, most recently updated first (<code>0</code> for all)</td></tr>
     <tr><td><code>dateFormat</code></td><td><code>{{dateFormat "2 Jan 2006" .Note.Updated}}</code></td><td>Format a date: write 2 January 2006 the way you want dates to look</td></tr>
     <tr><td><code>isoDate</code></td><td><code>{{isoDate .Note.Created}}</code></td><td>For <code>&lt;time datetime&gt;</code></td></tr>
     <tr><td><code>absURL</code></td><td><code>{{absURL .URL}}</code></td><td>Full address with the site's domain</td></tr>

@@ -98,6 +98,7 @@ a `Page`:
 | `isoDate` | `{{isoDate .Note.Created}}` | RFC 3339 |
 | `param` | `{{param "accent"}}` | site `theme_params` over theme defaults |
 | `recent` | `{{range recent 10}}` | most recently updated notes |
+| `newest` | `{{range newest 3 .Tag.Notes}}` | the given notes, most recently updated first (`0` for all) |
 | `markdownify` | `{{markdownify (str (param "footer"))}}` | Markdown → HTML (internal links are not resolved) |
 | `truncate` | `{{truncate 160 .Description}}` | at a word boundary |
 | `default` | `{{default "Untitled" .Title}}` | |

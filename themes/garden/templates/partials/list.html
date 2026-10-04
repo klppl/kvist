@@ -1,8 +1,9 @@
 {{/*
-  The list pane: the notes around the current page. A note shows its
-  group if it has one, else its folder; a folder page its notes, a tag page the tagged notes and the home
-  page the most recent ones. Long lists stop at list_max and link to the
-  full folder or tag page, so pages stay small in big folders.
+  The list pane: the notes around the current page. A note shows its group
+  if it has one, else its folder; a folder page its notes (A–Z), a tag page
+  the tagged notes (newest first) and the home page the most recent ones.
+  Long lists stop at list_max and link to the full folder or tag page, so
+  pages stay small in big folders.
 */}}
 {{define "list-pane" -}}
 {{- $group := .Group}}
@@ -15,11 +16,11 @@
   {{- else if eq .Kind "tag"}}
   {{- $t := .Tag}}{{$label := print "#" $t.Name}}
   {{- range param "groups"}}{{if eq (lower (str .)) (lower $t.Name)}}{{$label = title (str .)}}{{end}}{{end}}
-  {{template "list-body" (dict "Title" $label "URL" $t.URL "Notes" $t.Notes "Cur" $cur "Max" $max)}}
+  {{template "list-body" (dict "Title" $label "URL" $t.URL "Notes" (newest 0 $t.Notes) "Cur" $cur "Max" $max)}}
   {{- else if $group}}
   {{- $label := $group.Name}}
   {{- range param "groups"}}{{if eq (lower (str .)) (lower $group.Name)}}{{$label = title (str .)}}{{end}}{{end}}
-  {{template "list-body" (dict "Title" $label "URL" $group.URL "Notes" $group.Notes "Cur" $cur "Max" $max)}}
+  {{template "list-body" (dict "Title" $label "URL" $group.URL "Notes" (newest 0 $group.Notes) "Cur" $cur "Max" $max)}}
   {{- else}}
   {{- $f := .Folder}}{{with .Note}}{{$f = .Folder}}{{end}}
   {{template "list-body" (dict "Title" (default "Notes" $f.Name) "URL" $f.URL "Notes" $f.Notes "Folders" $f.Children "Parent" $f.Parent "Cur" $cur "Max" $max)}}

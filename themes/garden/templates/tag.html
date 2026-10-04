@@ -1,9 +1,22 @@
 {{define "main" -}}
-<article class="listing">
-  <h1>#{{.Tag.Name}}</h1>
-  {{- with .Tag.Children}}
-  <p class="tags">{{range .}}<a class="tag" href="{{.URL}}">#{{.Name}}</a> {{end}}</p>
-  {{- end}}
-  <ul class="cards">{{range .Tag.Notes}}{{template "card" .}}{{end}}</ul>
+{{- $t := .Tag}}{{$n := len .Tag.Notes}}
+<article class="listing tag-page">
+  <header class="index-head">
+    <nav class="crumbs" aria-label="Tag path"><a href="/tags/">Tags</a>{{with .Tag.Parent}}{{template "tag-crumbs" .}}{{end}}</nav>
+    <h1><span class="hash" aria-hidden="true">#</span>{{.Tag.Name}}</h1>
+    <p class="meta">
+      <span>{{$n}} {{if eq $n 1}}note{{else}}notes{{end}}</span>
+      {{- range newest 1 .Tag.Notes}}
+      <span>Last tended <time datetime="{{isoDate .Updated}}">{{dateFormat (param "date_format") .Updated}}</time></span>{{end}}
+    </p>
+    {{- with .Tag.Children}}
+    <p class="tags sub-tags">{{range .}}<a class="tag" href="{{.URL}}">#{{slice .Name (add (len $t.Name) 1)}} <span class="count">{{len .Notes}}</span></a> {{end}}</p>
+    {{- end}}
+  </header>
+  <ul class="cards">{{range newest 0 .Tag.Notes}}{{template "card" .}}{{end}}</ul>
 </article>
+{{- end}}
+
+{{define "tag-crumbs" -}}
+{{with .Parent}}{{template "tag-crumbs" .}}{{end}}<span aria-hidden="true">/</span><a href="{{.URL}}">#{{.Name}}</a>
 {{- end}}
