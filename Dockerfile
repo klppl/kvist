@@ -15,7 +15,7 @@ RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -trimpath -ldflags 
 FROM alpine:3.24
 LABEL org.opencontainers.image.source="https://github.com/klppl/kvist" \
       org.opencontainers.image.description="kvist: publish an Obsidian vault as a digital garden" \
-      org.opencontainers.image.licenses="MIT"
+      org.opencontainers.image.licenses="LicenseRef-Lagom"
 RUN adduser -D -H -u 10001 kvist \
  && mkdir -p /data /etc/kvist \
  && chown kvist:kvist /data

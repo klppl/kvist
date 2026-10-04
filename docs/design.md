@@ -557,7 +557,7 @@ kvist/
   example-vault/          demo vault: every feature + deliberate private notes
   testdata/leaks/         leak-prevention fixture vaults
   docs/                   design.md, protocol.md, content-model.md, themes.md, deploy.md
-  Dockerfile  Makefile  CONTRIBUTING.md  LICENSE (MIT)
+  Dockerfile  Makefile  CONTRIBUTING.md  LICENSE (Lagom License)
 ```
 
 `internal/` keeps the Go API surface small; the public contracts are the

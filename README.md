@@ -34,8 +34,6 @@ Publish, and your site updates. Private notes never leave your device.
 The server runs from the Docker image `ghcr.io/klppl/kvist`; the
 [Obsidian plugin](plugin/README.md) works on desktop and mobile.
 
-**Status:** feature-complete, but not yet run in production.
-
 ## Development
 
 ```sh
@@ -52,4 +50,4 @@ what gets published. Developer notes: [design](docs/design.md),
 [themes](docs/themes.md), [deployment](docs/deploy.md). The user guide's
 source is `docs/*.html`.
 
-MIT licensed.
+Licensed under the [Lagom License](LICENSE).
