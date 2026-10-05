@@ -30,6 +30,9 @@ type Page struct {
 	Folder      *model.Folder // folder pages
 	Tag         *model.Tag    // tag pages
 	Features    markdown.Features
+	// SocialImage is the generated preview image of a note page without
+	// an image property, when the theme's social_images param is on.
+	SocialImage string
 }
 
 // Render writes every page and the theme's static files. It does not copy
@@ -45,6 +48,10 @@ func Render(site *model.Site, t *Theme, out Output) error {
 	}
 	r := &renderer{site: site, theme: t, pages: pages, out: out, written: map[string]string{}}
 	msg := t.Messages(site.Config.Language)
+	social, err := r.socialImages()
+	if err != nil {
+		return err
+	}
 
 	// Home.
 	home := &Page{Kind: "home", Title: site.Config.Title, URL: "/", Description: site.Config.Description, Note: site.Home}
@@ -61,7 +68,7 @@ func Render(site *model.Site, t *Theme, out Output) error {
 		if n.URL == "/" {
 			continue // rendered as the home page
 		}
-		if err := r.page(n.URL, &Page{Kind: "note", Title: n.Title, URL: n.URL, Description: n.Description, Note: n, Features: n.Features}); err != nil {
+		if err := r.page(n.URL, &Page{Kind: "note", Title: n.Title, URL: n.URL, Description: n.Description, Note: n, Features: n.Features, SocialImage: social[n.Path]}); err != nil {
 			return err
 		}
 	}

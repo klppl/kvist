@@ -44,7 +44,7 @@ complete client, and `kvist dev` previews a folder with live reload.
 - **Builds are deterministic.** No wall-clock time, map iteration order or
   randomness in the output.
 - Keep dependencies few. The server uses goldmark, chroma, yaml.v3,
-  BurntSushi/toml and x/text; the plugin uses only the Obsidian API.
+  BurntSushi/toml, x/text and x/image (for social images); the plugin uses only the Obsidian API.
 
 ## Commits and pull requests
 

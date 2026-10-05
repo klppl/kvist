@@ -8,10 +8,15 @@
 <meta property="og:description" content="{{.}}">{{end}}
 {{- with .Note}}
 <meta property="article:modified_time" content="{{isoDate .Updated}}">{{end}}
-{{- /* The note's image or cover property, else the site's image. */}}
-{{- $img := .Site.Config.Image}}{{with .Note}}{{with .Image}}{{$img = .}}{{end}}{{end}}
+{{- /* The note's image or cover property, else its generated image
+     (social_images), else the site's image. */}}
+{{- $img := .Site.Config.Image}}{{with .SocialImage}}{{$img = .}}{{end}}{{with .Note}}{{with .Image}}{{$img = .}}{{end}}{{end}}
 {{- with $img}}
-<meta property="og:image" content="{{if hasPrefix . "/"}}{{absURL .}}{{else}}{{.}}{{end}}">{{end}}
+<meta property="og:image" content="{{if hasPrefix . "/"}}{{absURL .}}{{else}}{{.}}{{end}}">
+{{- if eq . $.SocialImage}}
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{{$.Title}}">{{end}}{{end}}
 <meta name="twitter:card" content="{{if $img}}summary_large_image{{else}}summary{{end}}">
 <meta name="twitter:title" content="{{.Title}}">
 {{- with .Description}}

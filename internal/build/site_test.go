@@ -93,8 +93,8 @@ func TestSiteOutput(t *testing.T) {
 		`🌿 budding`,
 		`<span class="link-unpublished">a private note</span>`,
 		`href="/garden/leaf/"`,
-		// the settings note's image, as the default social preview image
-		`<meta property="og:image" content="https://garden.example.com/_assets/`,
+		// a generated social preview image
+		`<meta property="og:image" content="https://garden.example.com/_kvist/social/`,
 		`<meta name="twitter:card" content="summary_large_image">`,
 		// breadcrumbs
 		`<nav class="crumbs" aria-label="Folder path"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/garden/">Garden</a></nav>`,
@@ -102,6 +102,14 @@ func TestSiteOutput(t *testing.T) {
 		if !strings.Contains(string(hub), frag) {
 			t.Errorf("hub page lacks %q", frag)
 		}
+	}
+	// The settings note's image is the default social preview image of
+	// the other pages.
+	if home, _ := os.ReadFile(filepath.Join(out, "index.html")); !bytes.Contains(home, []byte(`<meta property="og:image" content="https://garden.example.com/_assets/`)) {
+		t.Error("home page lacks the site's image")
+	}
+	if social, _ := filepath.Glob(filepath.Join(out, "_kvist", "social", "*.png")); len(social) == 0 {
+		t.Error("no social images written")
 	}
 	if bytes.Contains(hub, []byte("<!--")) {
 		t.Error("HTML comment in output")

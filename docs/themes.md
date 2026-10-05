@@ -90,6 +90,7 @@ a `Page`:
 | `.Folder` | folder pages |
 | `.Tag` | tag pages |
 | `.Features` | `{Math, Mermaid, Code}`: load scripts and styles only where needed |
+| `.SocialImage` | note pages without an image property, when the theme's `social_images` param is `true`: the URL of a generated 1200×630 PNG with the title, description and site name (below) |
 | `.Theme` | name and version |
 
 ### Functions
@@ -148,8 +149,17 @@ a test keeps their keys in step with `en.toml`.
 | pages (`/kvist/note/index.html`, …) | `public, max-age=60` |
 | `/_assets/<hash>/…` (attachments) | `public, max-age=31536000, immutable` |
 | `/_kvist/<hash>/…` (theme files) | `public, max-age=31536000, immutable` |
+| `/_kvist/social/<hash>.png` (social images) | `public, max-age=31536000, immutable` |
 
 HTML comments are removed from every page.
+
+A theme whose `[params]` has `social_images = true` gets a preview image
+for every note page without an image property (not the home page): the
+site's name with a dot in the `accent` color, the title (as large as fits
+in three lines), the description and the site's domain, drawn with the Go
+fonts. Notes whose text those fonts can't show (Chinese, Japanese, …) get
+none. Images are named by a hash of what they show, so unchanged ones are
+reused from the previous build.
 
 ## The garden theme
 
@@ -173,6 +183,7 @@ Params (set them in `theme_params`):
 | `reader_mode` | `true` | a button in the page's top corner that hides the nav pane, the list pane and the aside (wide screens only); the reader's choice is kept in `localStorage` |
 | `show_profile` | `true` | the profile (`Site.Config.Profile`: avatar, author, bio, links) at the top of the menu |
 | `show_properties` | `false` | the note's properties under its title; only keys listed in `expose_frontmatter` exist, so nothing new reaches the page |
+| `social_images` | `true` | generate `.SocialImage` for notes without an `image`; the `og:image` is the note's image, else this, else the site's |
 | `code_style_light`, `code_style_dark` | `github`, `github-dark` | highlighting |
 | `footer` | `""` | Markdown at the bottom of the menu |
 | `mermaid_url`, `mermaid_integrity` | jsDelivr, pinned with an SRI hash | see below |

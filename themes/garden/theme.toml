@@ -17,6 +17,7 @@ link_previews    = true        # hover a link to a note to preview it (tap on to
 show_properties  = false       # the note's properties under its title (only keys in expose_frontmatter)
 reader_mode      = true        # a button that hides the menu, the list and the side panels
 show_profile     = true        # the profile from the settings note (avatar, bio, profile_links) atop the menu
+social_images    = true        # a preview image with the title for notes without image:
 code_style_light = "github"
 code_style_dark  = "github-dark"
 footer           = ""          # Markdown, shown at the bottom of every page

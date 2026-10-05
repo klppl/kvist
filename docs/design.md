@@ -572,7 +572,8 @@ kvist/
 
 `internal/` keeps the Go API surface small; the public contracts are the
 protocol and the content model, specified in docs and JSON. Dependencies kept
-minimal: goldmark, chroma, yaml.v3, BurntSushi/toml and x/text. (The dev
+minimal: goldmark, chroma, yaml.v3, BurntSushi/toml, x/text and x/image
+(text on generated social images, with the Go fonts it bundles). (The dev
 server polls the vault instead of using fsnotify.)
 HTTP via stdlib (`net/http` routing).
 

@@ -83,6 +83,10 @@ func (o *dirOutput) WriteFile(p string, data []byte) error {
 	return os.WriteFile(dst, data, 0o644)
 }
 
+// Reuse hard-links p from the previous build if it exists there, for the
+// renderer's content-named files (render.Reuser).
+func (o *dirOutput) Reuse(p string) bool { return o.reuse(p) }
+
 // reuse hard-links p from the previous build if it exists there. Asset
 // URLs contain a content hash, so the same path means the same bytes.
 func (o *dirOutput) reuse(p string) bool {
