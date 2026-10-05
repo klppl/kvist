@@ -293,12 +293,13 @@ func parseNavList(body []byte) []navRef {
 
 var (
 	profileMarkdown = regexp.MustCompile(`^\[([^\]]+)\]\(\s*<?([^)>\s]+)>?\s*\)$`)
+	profileTitled   = regexp.MustCompile(`^([^:\[\]]+?):\s+(\S+:\S+)$`)
 	webOrMail       = regexp.MustCompile(`^(?i:https?://[^\s/]+|mailto:\S+@\S+)`)
 )
 
 // parseProfileLinks reads profile_links: a list whose items are a URL
 // ("https://github.com/ada"), a Markdown link ("[Code](https://…)") or a
-// "Title: URL" pair. Only http(s) and mailto: addresses are kept; the
+// "Title: URL" pair (a YAML mapping, or the same written as text). Only http(s) and mailto: addresses are kept; the
 // others are returned as bad.
 func parseProfileLinks(v any) (links []ProfileLink, bad []string) {
 	items, ok := v.([]any)
@@ -322,6 +323,8 @@ func parseProfileLinks(v any) (links []ProfileLink, bad []string) {
 		case string:
 			if m := profileMarkdown.FindStringSubmatch(strings.TrimSpace(it)); m != nil {
 				add(m[1], m[2])
+			} else if m := profileTitled.FindStringSubmatch(strings.TrimSpace(it)); m != nil {
+				add(m[1], m[2]) // "Docs: https://…", as Obsidian's list editor stores it
 			} else {
 				add("", it)
 			}

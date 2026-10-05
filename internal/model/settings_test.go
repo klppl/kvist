@@ -203,6 +203,7 @@ profile_links:
   - https://github.com/ada
   - "[Toots](https://mastodon.social/@ada)"
   - Blog: https://ada.example.com
+  - "Docs: https://docs.example.com"
   - mailto:ada@example.com
   - javascript:alert(1)
 ---
@@ -241,6 +242,7 @@ profile_links:
 		{"GitHub", "https://github.com/ada", "github"},
 		{"Toots", "https://mastodon.social/@ada", "mastodon"},
 		{"Blog", "https://ada.example.com", "website"},
+		{"Docs", "https://docs.example.com", "website"},
 		{"Email", "mailto:ada@example.com", "email"},
 	}
 	if !reflect.DeepEqual(p.Links, want) {
