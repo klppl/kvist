@@ -5,25 +5,25 @@ of them has it today.
 
 ## Need to have
 
-- [ ] **Favicon.** A `favicon:` in `_site.md` pointing to an image in the
+- [x] **Favicon.** A `favicon:` in `_site.md` pointing to an image in the
   vault, with a default icon from the theme. Today the pages have no
   `<link rel="icon">`. (Quartz, Publish)
-- [ ] **Redirects for moved notes.** Renaming or moving a note changes its
+- [x] **Redirects for moved notes.** Renaming or moving a note changes its
   address and breaks old links. The server keeps earlier revisions, so it
   can record the old addresses and redirect them, and a `redirect_from:`
   property can cover the rest. (Quartz turns `aliases` into redirect pages)
-- [ ] **Folder tree in the menu.** The menu lists only top-level folders,
+- [x] **Folder tree in the menu.** The menu lists only top-level folders,
   so notes deeper down are reached only through the middle list. A
   collapsible tree, with the current note's folder open. (Quartz Explorer,
   Publish navigation)
-- [ ] **Translated interface.** `language` only sets page metadata; words
+- [x] **Translated interface.** `language` only sets page metadata; words
   like "Planted", "Tended", "Links to this note" and "Search" stay in
   English. Start with English and Swedish, in a file a theme can extend.
   (Quartz has about 30 languages)
-- [ ] **Analytics setting.** A choice of privacy-friendly analytics
+- [x] **Analytics setting.** A choice of privacy-friendly analytics
   (Plausible, Umami, GoatCounter) by domain or site ID, so no one needs a
   theme override for it. (Quartz, Publish with Google Analytics)
-- [ ] **Copy button on code blocks.** (Quartz)
+- [x] **Copy button on code blocks.** (Quartz)
 
 ## Nice to have
 
