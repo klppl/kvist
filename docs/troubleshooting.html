@@ -32,6 +32,7 @@
         <li><a href="customizing.html">Customizing the site</a></li>
         <li><a href="themes.html">Writing a theme</a></li>
         <li><a href="server.html">Running the server</a></li>
+        <li><a href="https.html">Domains and HTTPS</a></li>
       </ul>
       <h2>Reference</h2>
       <ul>
@@ -58,6 +59,7 @@
 <p>The kvist image is in GitHub's container registry. If it says access is denied, the image isn't public. If you run your own fork, open your GitHub profile → <strong>Packages</strong> → <strong>kvist</strong> → <strong>Package settings</strong> → <strong>Change visibility</strong> → <strong>Public</strong>. Or log in on the server with <code>docker login ghcr.io</code>, using a GitHub token with the <code>read:packages</code> permission.</p>
 
 <h3 id="no-https">The site doesn't load, or the browser warns about the certificate</h3>
+<p>First check on the server that kvist itself answers: <code>curl http://localhost:8080/api/v1/info</code>. If it does, the problem is in front of it. With the Caddy setup from <a href="https.html">Domains and HTTPS</a>:</p>
 <ul>
   <li>Check that your domain points at the server: <code>dig +short garden.example.com</code> should print its IP address.</li>
   <li>Ports 80 and 443 must be open. Caddy needs port 80 to get a certificate.</li>

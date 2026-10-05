@@ -28,7 +28,8 @@ Publish, and your site updates. Private notes never leave your device.
   to the new one.
 - **In your language:** the theme's menus, dates and search speak English,
   Swedish, German, French or Spanish.
-- **Self-hosted:** one small Go server in Docker, with HTTPS by Caddy. RSS,
+- **Self-hosted:** one small Go server in Docker, with a ready-made Caddy
+  setup for HTTPS and room for several sites. RSS,
   a sitemap, photo metadata stripping and optional cookie-free analytics
   included.
 
@@ -42,6 +43,9 @@ Publish, and your site updates. Private notes never leave your device.
   becomes public, and what stays private.
 - [Customizing the site](https://klppl.github.io/kvist/customizing.html):
   title, home page, menu groups and colors.
+- [Domains and HTTPS](https://klppl.github.io/kvist/https.html): your
+  domain with HTTPS, with the ready-made Caddy setup or your own proxy,
+  and several sites on one server.
 
 The server runs from the Docker image `ghcr.io/klppl/kvist`. The Obsidian
 plugin works on desktop and mobile: download

@@ -32,6 +32,7 @@
         <li><a href="customizing.html">Customizing the site</a></li>
         <li><a href="themes.html">Writing a theme</a></li>
         <li><a href="server.html">Running the server</a></li>
+        <li><a href="https.html">Domains and HTTPS</a></li>
       </ul>
       <h2>Reference</h2>
       <ul>
@@ -85,10 +86,10 @@ serve    = true
   <thead><tr><th>Key</th><th>Default</th><th></th></tr></thead>
   <tbody>
     <tr><td><code>data_dir</code></td><td>required</td><td>Where kvist stores everything. <code>/data</code> in Docker.</td></tr>
-    <tr><td><code>listen</code></td><td><code>"127.0.0.1:8080"</code></td><td>Address and port to listen on. <code>"0.0.0.0:8080"</code> in Docker, so Caddy can reach it.</td></tr>
+    <tr><td><code>listen</code></td><td><code>"127.0.0.1:8080"</code></td><td>Address and port to listen on. <code>"0.0.0.0:8080"</code> in Docker, so it can be reached from outside the container; <code>docker-compose.yml</code> decides who can.</td></tr>
     <tr><td><code>sync_ttl</code></td><td><code>"1h"</code></td><td>How long an unfinished upload may take.</td></tr>
     <tr><td><code>themes_dir</code></td><td><code>"themes"</code></td><td>Folder with extra themes, searched before the built-in ones.</td></tr>
-    <tr><td><code>tls_cert</code>, <code>tls_key</code></td><td>none</td><td>Serve HTTPS directly. Not needed behind Caddy.</td></tr>
+    <tr><td><code>tls_cert</code>, <code>tls_key</code></td><td>none</td><td>Serve HTTPS directly, with a certificate you renew yourself. Not needed behind a proxy that handles HTTPS (<a href="https.html">Domains and HTTPS</a>).</td></tr>
   </tbody>
 </table>
 
@@ -204,7 +205,7 @@ accent: "#8a4f9e"
   </tbody>
 </table>
 <p>Commands: <strong>Publish now</strong>, <strong>Toggle publish for current note</strong>, <strong>Open published page</strong>, <strong>Open publish report</strong> and <strong>Open site settings note</strong>.</p>
-<nav class="next" aria-label="Pages"><a href="server.html"><small>Previous</small>Running the server</a><a class="fwd" href="troubleshooting.html"><small>Next</small>Troubleshooting</a></nav>
+<nav class="next" aria-label="Pages"><a href="https.html"><small>Previous</small>Domains and HTTPS</a><a class="fwd" href="troubleshooting.html"><small>Next</small>Troubleshooting</a></nav>
       </article>
       <aside class="toc"></aside>
     </div>

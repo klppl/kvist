@@ -1,6 +1,6 @@
 # kvist config for the Docker setup in deploy/docker-compose.yml.
 data_dir = "/data"
-listen   = "0.0.0.0:8080"   # inside the container; Caddy is the only thing that reaches it
+listen   = "0.0.0.0:8080"   # inside the container; docker-compose.yml decides who can reach it
 
 [[site]]
 id       = "garden"

@@ -245,8 +245,9 @@ never resolve to something unpublished.
 ### 3.7 Authentication
 
 - Per-site tokens, created/revoked only via CLI on the server
-  (`kvist token create --site garden --name laptop`). Shown once, stored as
-  SHA-256 (tokens are 256-bit random, so a slow KDF adds nothing).
+  (`kvist token create`, with `--site` on a multi-site server and an
+  optional `--name laptop`). Shown once, stored as SHA-256 (tokens are
+  256-bit random, so a slow KDF adds nothing).
 - Scope in v1: `push` (sync + build status for one site). There is no HTTP API
   for config, tokens or themes — a stolen token can change content, never the
   server. Rollback undoes damage.

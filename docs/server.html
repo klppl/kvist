@@ -32,6 +32,7 @@
         <li><a href="customizing.html">Customizing the site</a></li>
         <li><a href="themes.html">Writing a theme</a></li>
         <li><a href="server.html" aria-current="page">Running the server</a></li>
+        <li><a href="https.html">Domains and HTTPS</a></li>
       </ul>
       <h2>Reference</h2>
       <ul>
@@ -56,7 +57,7 @@
 <h2 id="update">Updating</h2>
 <pre><code>docker compose pull
 docker compose up -d</code></pre>
-<p>This fetches the newest kvist and Caddy images and restarts what changed. Your published site and settings are kept.</p>
+<p>This fetches the newest kvist image (and Caddy's, if you use the <a href="https.html">Caddy setup</a>) and restarts what changed. Your published site and settings are kept.</p>
 <p><strong>Update the server first, then the plugin.</strong> A newer plugin may send things an older server doesn't understand yet, and publishing fails until the server catches up. The plugin and the server also check each other's protocol version and tell you if one is too old.</p>
 <p>Every build of kvist is also published with its own tag, <code>ghcr.io/klppl/kvist:sha-&lt;commit&gt;</code>. To stay on a known version, put that tag in <code>docker-compose.yml</code> instead of <code>latest</code>; to go back after a bad update, put the previous one there and run <code>docker compose up -d</code>.</p>
 
@@ -66,10 +67,10 @@ docker compose up -d</code></pre>
 <p>Then publish from Obsidian, so the site is rebuilt with the new settings. If the file has a mistake, kvist doesn't start; <code>docker compose logs kvist</code> says what's wrong.</p>
 
 <h2 id="tokens">Tokens</h2>
-<pre><code>docker compose exec kvist kvist token create --site garden --name phone
+<pre><code>docker compose exec kvist kvist token create --name phone
 docker compose exec kvist kvist token list
 docker compose exec kvist kvist token revoke 3f9a1c2e</code></pre>
-<p>Use one token per device. If a device is lost, revoke its token (by the id from <code>token list</code>); the others keep working. Changes take effect immediately, without a restart. Anyone with a token can replace your site, so treat it like a password.</p>
+<p><code>--name</code> is a label that <code>token list</code> shows; without it, the token is named after today's date. A server with <a href="https.html#several-sites">several sites</a> also needs <code>--site</code> with the site's <code>id</code>. Use one token per device. If a device is lost, revoke its token (by the id from <code>token list</code>); the others keep working. Changes take effect immediately, without a restart. Anyone with a token can replace your site, so treat it like a password.</p>
 
 <h2 id="rollback">Undoing a publish</h2>
 <p>The server keeps the last 10 versions (<em>revisions</em>) of each site. The log names the revision each publish created:</p>
@@ -98,7 +99,7 @@ builds    = 3    <span class="c"># built copies of the site</span></code></pre>
 <h2 id="cloudflare">Cloudflare</h2>
 <p>kvist works behind Cloudflare's proxy (the orange cloud). Set it up like this:</p>
 <ul>
-  <li><strong>SSL/TLS mode:</strong> <em>Full (strict)</em>. Caddy already has a valid certificate.</li>
+  <li><strong>SSL/TLS mode:</strong> <em>Full (strict)</em>. Your server already has a valid certificate, from Caddy or your own proxy.</li>
   <li><strong>Caching:</strong> leave Cloudflare's cache on “respect existing headers”. kvist tells it to keep pages for 60 seconds and images and styles for a year (their addresses change when they change). Don't add a “cache everything” rule with a long edge lifetime, or unpublished pages stay visible until it expires.</li>
   <li><strong>The API:</strong> add a Cache Rule: <em>URI Path starts with <code>/api/</code></em> → <em>Bypass cache</em>.</li>
   <li><strong>Upload size:</strong> Cloudflare's free plan accepts up to 100 MB per request. kvist's default file limit, 50 MiB, fits.</li>
@@ -136,7 +137,7 @@ api_token_env = "CF_API_TOKEN"</code></pre></li>
 
 <h2 id="without-docker">Without Docker</h2>
 <p>kvist is a single program, so it also runs directly under systemd, behind Caddy or nginx. The <a href="https://github.com/klppl/kvist/blob/main/docs/deploy.md">deployment notes</a> have a ready-made systemd unit and an nginx example that serves the built files directly.</p>
-<nav class="next" aria-label="Pages"><a href="themes.html"><small>Previous</small>Writing a theme</a><a class="fwd" href="configuration.html"><small>Next</small>Configuration</a></nav>
+<nav class="next" aria-label="Pages"><a href="themes.html"><small>Previous</small>Writing a theme</a><a class="fwd" href="https.html"><small>Next</small>Domains and HTTPS</a></nav>
       </article>
       <aside class="toc"></aside>
     </div>

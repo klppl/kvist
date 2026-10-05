@@ -1,9 +1,11 @@
-# kvist behind Caddy (automatic HTTPS). Put this file, Caddyfile and
-# kvist.toml in one folder on the server, edit the domain, then:
+# kvist behind Caddy, which gets HTTPS certificates on its own. Save this
+# file as docker-compose.yml, next to Caddyfile and kvist.toml, put your
+# domain in both, then:
 #   docker compose up -d
-#   docker compose exec kvist kvist token create --site garden --name laptop
 # Upgrade:
 #   docker compose pull && docker compose up -d
+# See docs/https.html (Domains and HTTPS) for DNS, other proxies and
+# several sites.
 services:
   kvist:
     image: ghcr.io/klppl/kvist:latest   # or a pinned tag such as :sha-7822899

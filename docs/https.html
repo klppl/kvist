@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Domains and HTTPS · kvist docs</title>
+<meta name="description" content="Put kvist on your domain with HTTPS using the ready-made Caddy setup or your own proxy, and host several sites on one server.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<script>try{var t=localStorage.getItem("kvist-docs-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="stylesheet" href="assets/docs.css?v=38df0dda">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="shell">
+  <aside class="side">
+    <div class="brand">
+      <a href="index.html"><img src="assets/icon.svg" width="22" height="22" alt="">kvist <small>docs</small></a>
+      <button class="icon-button theme-toggle" type="button" aria-label="Switch color theme" hidden><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
+      <button class="icon-button menu-toggle" type="button" aria-label="Menu" aria-expanded="false" hidden><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    </div>
+    <nav aria-label="Documentation">
+      <h2>Start</h2>
+      <ul>
+        <li><a href="index.html">Overview</a></li>
+        <li><a href="getting-started.html">Getting started</a></li>
+      </ul>
+      <h2>Guides</h2>
+      <ul>
+        <li><a href="publishing.html">Publishing notes</a></li>
+        <li><a href="writing.html">Writing notes</a></li>
+        <li><a href="customizing.html">Customizing the site</a></li>
+        <li><a href="themes.html">Writing a theme</a></li>
+        <li><a href="server.html">Running the server</a></li>
+        <li><a href="https.html" aria-current="page">Domains and HTTPS</a></li>
+      </ul>
+      <h2>Reference</h2>
+      <ul>
+        <li><a href="configuration.html">Configuration</a></li>
+        <li><a href="troubleshooting.html">Troubleshooting</a></li>
+      </ul>
+      <h2>More</h2>
+      <ul>
+        <li><a href="https://github.com/klppl/kvist" class="ext">GitHub</a></li>
+      </ul>
+    </nav>
+    <p class="side-foot">kvist is open source (<a href="https://github.com/klppl/kvist/blob/main/LICENSE">Lagom License</a>). <a href="https://github.com/klppl/kvist/issues">Report a problem</a></p>
+  </aside>
+  <main id="main">
+    <div class="page">
+      <article>
+<p class="eyebrow">Guides</p>
+<h1>Domains and HTTPS</h1>
+<p class="lead">kvist serves your site and its API over plain HTTP on port 8080. To reach it on your own domain, something in front of it has to answer on HTTPS. This page has a ready-made setup for that, notes for using your own proxy, and how one server can host several sites.</p>
+<p>The Obsidian plugin only connects over <code>https://</code> (or to <code>localhost</code>), so your token is never sent unencrypted. Your site needs HTTPS before you can publish to it.</p>
+
+<h2 id="caddy">The ready-made setup: Caddy</h2>
+<p><a href="https://caddyserver.com">Caddy</a> is a small web server that gets and renews certificates from Let's Encrypt on its own. This setup runs it next to kvist, in the same Docker setup as <a href="getting-started.html">Getting started</a>.</p>
+<ol class="steps">
+  <li>
+    <h3 id="dns">Point your domain at the server</h3>
+    <p>At your DNS provider, add an <strong>A record</strong> for your site's name (for example <code>garden</code>) with your server's IP address, and an <strong>AAAA record</strong> if the server has an IPv6 address. Open ports 80 and 443 in the server's firewall. Caddy needs both to get its certificate, so wait until <code>dig +short garden.example.com</code> prints your server's address.</p>
+  </li>
+  <li>
+    <h3 id="caddy-files">Add Caddy</h3>
+    <p>In the folder with <code>kvist.toml</code> (<code>~/kvist</code>), replace <code>docker-compose.yml</code> with the version that includes Caddy, and download Caddy's settings:</p>
+<pre><code>cd ~/kvist
+curl -fsSL https://raw.githubusercontent.com/klppl/kvist/main/deploy/docker-compose.caddy.yml -o docker-compose.yml
+curl -fsSLO https://raw.githubusercontent.com/klppl/kvist/main/deploy/Caddyfile</code></pre>
+    <p>Your published notes and tokens are kept: they live in the same Docker volume as before.</p>
+  </li>
+  <li>
+    <h3 id="caddy-domain">Put in your domain</h3>
+    <p>In <code>Caddyfile</code>, replace <code>garden.example.com</code> with your domain. Check that <code>base_url</code> in <code>kvist.toml</code> is the same address, starting with <code>https://</code>.</p>
+<pre data-label="Caddyfile"><code>garden.example.com {
+	encode zstd gzip
+	reverse_proxy kvist:8080
+}</code></pre>
+  </li>
+  <li>
+    <h3 id="caddy-start">Start it</h3>
+<pre><code>docker compose up -d</code></pre>
+    <p>Caddy gets a certificate within a minute. Check from your own computer:</p>
+<pre><code>curl https://garden.example.com/api/v1/info</code></pre>
+    <p>If it doesn't answer, see <a href="troubleshooting.html#no-https">Troubleshooting</a>. From now on, <code>docker compose pull</code> updates Caddy along with kvist.</p>
+  </li>
+</ol>
+
+<h2 id="own-proxy">Your own proxy</h2>
+<p>If the server already runs nginx, Caddy, Traefik or a Cloudflare Tunnel, use that instead. Forward your whole domain, the site and <code>/api/</code>, to <code>http://127.0.0.1:8080</code>. The <code>docker-compose.yml</code> from Getting started already listens there, for the server itself only. Things to get right:</p>
+<ul>
+  <li><strong>Keep the <code>Host</code> header.</strong> kvist picks the site by the domain a request was made for (see <a href="#several-sites">several sites</a>). Most proxies pass it on by default; for nginx, add <code>proxy_set_header Host $host;</code>.</li>
+  <li><strong>Allow large uploads.</strong> The plugin uploads files of up to 50 MiB by default (<code>max_file_size</code>). nginx stops at 1 MB unless you set <code>client_max_body_size 64m;</code>.</li>
+  <li><strong>Use the same address in <code>base_url</code></strong>, with <code>https://</code>. kvist uses it for links in feeds, the sitemap and social previews.</li>
+</ul>
+<p>The <a href="https://github.com/klppl/kvist/blob/main/docs/deploy.md">deployment notes</a> have a complete nginx example, including one that serves the built pages straight from disk. If Cloudflare's proxy is in front, see <a href="server.html#cloudflare">Cloudflare</a> for the settings.</p>
+
+<h2 id="several-sites">Several sites on one server</h2>
+<p>One kvist server can host several sites, say a personal garden and a work wiki, each on its own domain and with its own rules. Each site is a <code>[[site]]</code> block in <code>kvist.toml</code>:</p>
+<pre data-label="kvist.toml"><code>[[site]]
+id       = "garden"
+base_url = "https://garden.example.com"
+serve    = true
+  [site.publish]
+  always_public_folders = ["Kvist"]
+
+[[site]]
+id       = "work"
+base_url = "https://notes.example.org"
+serve    = true
+  [site.publish]
+  always_public_folders = ["Public"]</code></pre>
+<p>This is how the sites stay apart:</p>
+<ul>
+  <li><strong>Visitors:</strong> kvist matches the domain a request was made for against each site's <code>base_url</code>, and serves that site.</li>
+  <li><strong>Storage:</strong> each site has its own folder in kvist's data, <code>sites/&lt;id&gt;/</code>, with its notes, builds and published pages.</li>
+  <li><strong>Publishing:</strong> a token belongs to one site. Create tokens per site with <code>--site</code>, and enter that <code>id</code> as the <em>Site</em> in the plugin. The sites can come from different vaults, or from different people.</li>
+  <li><strong>Settings:</strong> rules, theme and theme settings are per site, and each vault has its own settings note.</li>
+</ul>
+<p>To add a site: add its block to <code>kvist.toml</code>, point its domain at the server, and give it its own block in <code>Caddyfile</code> (or your proxy):</p>
+<pre data-label="Caddyfile"><code>garden.example.com {
+	encode zstd gzip
+	reverse_proxy kvist:8080
+}
+
+notes.example.org {
+	encode zstd gzip
+	reverse_proxy kvist:8080
+}</code></pre>
+<p>Then restart, and create a token for the new site:</p>
+<pre><code>docker compose restart
+docker compose exec kvist kvist token create --site work --name laptop</code></pre>
+<nav class="next" aria-label="Pages"><a href="server.html"><small>Previous</small>Running the server</a><a class="fwd" href="configuration.html"><small>Next</small>Configuration</a></nav>
+      </article>
+      <aside class="toc"></aside>
+    </div>
+  </main>
+</div>
+<script src="assets/docs.js?v=eee218fc" defer></script>
+</body>
+</html>

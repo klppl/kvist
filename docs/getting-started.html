@@ -32,6 +32,7 @@
         <li><a href="customizing.html">Customizing the site</a></li>
         <li><a href="themes.html">Writing a theme</a></li>
         <li><a href="server.html">Running the server</a></li>
+        <li><a href="https.html">Domains and HTTPS</a></li>
       </ul>
       <h2>Reference</h2>
       <ul>
@@ -54,35 +55,29 @@
 
 <div class="callout">
   <p class="callout-title">Before you begin</p>
-  <p>You need a Linux server with <a href="https://docs.docker.com/engine/install/">Docker</a> installed, a domain name you can point at it, and Obsidian on your computer. In the examples, the site lives at <code>garden.example.com</code>; replace that with your own address everywhere.</p>
+  <p>You need a Linux server with <a href="https://docs.docker.com/engine/install/">Docker</a> installed, and Obsidian on your computer. To publish, kvist also needs an address with HTTPS, such as <code>garden.example.com</code>: your own setup, or the ready-made one in <a href="https.html">Domains and HTTPS</a>. In the examples, replace <code>garden.example.com</code> with your address.</p>
 </div>
 
 <h2 id="server">Part 1: the server</h2>
 <ol class="steps">
   <li>
-    <h3 id="dns">Point your domain at the server</h3>
-    <p>At your DNS provider, add an <strong>A record</strong> for your site's name (for example <code>garden</code>) with your server's IP address. Add an <strong>AAAA record</strong> too if the server has an IPv6 address. Make sure ports 80 and 443 are open in the server's firewall.</p>
-    <p>DNS changes can take a few minutes to arrive. The next steps need them, because the server asks Let's Encrypt for an HTTPS certificate for that name.</p>
-  </li>
-  <li>
-    <h3 id="download">Download the three server files</h3>
+    <h3 id="download">Download the server files</h3>
     <p>Log in to the server with SSH and run:</p>
 <pre><code>mkdir -p ~/kvist &amp;&amp; cd ~/kvist
-base=https://raw.githubusercontent.com/klppl/kvist/main/deploy
-curl -fsSLO $base/docker-compose.yml -O $base/Caddyfile -O $base/kvist.toml</code></pre>
+curl -fsSLO https://raw.githubusercontent.com/klppl/kvist/main/deploy/docker-compose.yml
+curl -fsSLO https://raw.githubusercontent.com/klppl/kvist/main/deploy/kvist.toml</code></pre>
     <p>You now have:</p>
     <table>
       <thead><tr><th>File</th><th>What it does</th></tr></thead>
       <tbody>
-        <tr><td><code>docker-compose.yml</code></td><td>Runs two containers: kvist, and <a href="https://caddyserver.com">Caddy</a>, which handles HTTPS.</td></tr>
-        <tr><td><code>Caddyfile</code></td><td>Tells Caddy your domain name.</td></tr>
-        <tr><td><code>kvist.toml</code></td><td>The kvist server settings: your site's address, title and publish rules.</td></tr>
+        <tr><td><code>docker-compose.yml</code></td><td>Runs kvist in Docker and keeps its data in a Docker volume.</td></tr>
+        <tr><td><code>kvist.toml</code></td><td>The kvist settings: your site's address, title and publish rules.</td></tr>
       </tbody>
     </table>
   </li>
   <li>
-    <h3 id="edit">Put in your domain and rules</h3>
-    <p>In <code>Caddyfile</code>, replace <code>garden.example.com</code> with your domain. In <code>kvist.toml</code>, set <code>base_url</code> and <code>title</code>, and look at the publish rules:</p>
+    <h3 id="edit">Set your address and rules</h3>
+    <p>In <code>kvist.toml</code>, set <code>base_url</code> to the address your site will have and give it a <code>title</code>. Then look at the publish rules:</p>
 <pre data-label="kvist.toml"><code>data_dir = "/data"
 listen   = "0.0.0.0:8080"
 
@@ -103,15 +98,24 @@ serve    = true
   <li>
     <h3 id="start">Start it</h3>
 <pre><code>docker compose up -d</code></pre>
-    <p>Docker downloads kvist and Caddy and starts both. Caddy gets an HTTPS certificate on its own. Check that kvist answers:</p>
-<pre><code>curl https://garden.example.com/api/v1/info</code></pre>
-    <p>You should see something like <code>{"protocol":{"min":1,"max":1},"server":"…"}</code>. The site itself shows “404 not found” until you publish for the first time. That's expected.</p>
+    <p>Docker downloads kvist and starts it. Check that it answers:</p>
+<pre><code>curl http://localhost:8080/api/v1/info</code></pre>
+    <p>You should see something like <code>{"protocol":{"min":1,"max":1},"server":"…"}</code>. kvist is now running on port 8080 of the server, reachable from the server itself.</p>
   </li>
   <li>
     <h3 id="token">Create a token for your computer</h3>
-    <p>A token is the password the plugin uses to publish. Create one per device, so you can revoke a lost phone without touching the others:</p>
-<pre><code>docker compose exec kvist kvist token create --site garden --name laptop</code></pre>
+    <p>A token is the password the plugin uses to publish:</p>
+<pre><code>docker compose exec kvist kvist token create</code></pre>
     <p>It prints a token that starts with <code>kvist_</code>. <strong>Copy it now:</strong> it is shown only once, and the server only keeps a fingerprint of it.</p>
+  </li>
+  <li>
+    <h3 id="https">Give it your address with HTTPS</h3>
+    <p>Visitors and the plugin reach kvist through your address, over HTTPS. The plugin refuses plain <code>http://</code>, so your token is never sent unencrypted. Point your address at <code>http://127.0.0.1:8080</code> on the server:</p>
+    <ul>
+      <li><strong>You already run a web server or proxy</strong> (nginx, Caddy, Traefik, a Cloudflare Tunnel): forward your address, all of it, to <code>127.0.0.1:8080</code>.</li>
+      <li><strong>You don't:</strong> <a href="https.html">Domains and HTTPS</a> has a ready-made setup that gets a certificate on its own. It takes a few minutes.</li>
+    </ul>
+    <p>Check from your own computer that <code>https://garden.example.com/api/v1/info</code> answers like before. The site itself shows “404 not found” until you publish for the first time. That's expected.</p>
   </li>
 </ol>
 
@@ -138,7 +142,7 @@ unzip -o /tmp/kvist-plugin.zip -d "$VAULT/.obsidian/plugins"</code></pre>
       <tbody>
         <tr><td>Server URL</td><td><code>https://garden.example.com</code></td></tr>
         <tr><td>Site</td><td><code>garden</code> (the <code>id</code> from <code>kvist.toml</code>)</td></tr>
-        <tr><td>Token</td><td>The token from step 5</td></tr>
+        <tr><td>Token</td><td>The token from step 4</td></tr>
       </tbody>
     </table>
     <p>Press <strong>Test</strong>. You should see <em>connected to “garden”</em>. If not, see <a href="troubleshooting.html#test-fails">Troubleshooting</a>.</p>
@@ -182,7 +186,7 @@ Settings for your kvist website. …
 <h2 id="more-devices">Publishing from more devices</h2>
 <p>For each extra device (another computer, your phone):</p>
 <ol>
-  <li>Create a new token on the server with a new <code>--name</code>.</li>
+  <li>Create a new token on the server, named after the device so you can tell them apart later: <code>docker compose exec kvist kvist token create --name phone</code>.</li>
   <li>Make sure the plugin files are in that device's copy of the vault. If you sync your vault with Obsidian Sync or iCloud, including the <code>.obsidian</code> folder, they usually arrive by themselves.</li>
   <li>Enable the plugin and paste the new token. The server URL and site sync with your vault; the token never does.</li>
 </ol>

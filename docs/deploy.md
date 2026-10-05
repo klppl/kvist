@@ -25,20 +25,23 @@ plugin or the example vault publish nothing. For an ARM server, add
 | `ghcr.io/klppl/kvist:1.2.3`, `:1.2` | releases (git tags `v1.2.3`) |
 
 You don't need the repository on the server, only three files in one
-folder:
+folder. `deploy/docker-compose.yml` runs kvist alone on `127.0.0.1:8080`
+for your own HTTPS proxy; `deploy/docker-compose.caddy.yml` adds Caddy,
+which gets certificates on its own. With Caddy:
 
 ```sh
 mkdir -p ~/kvist && cd ~/kvist
 base=https://raw.githubusercontent.com/klppl/kvist/main/deploy
-curl -fsSLO $base/docker-compose.yml -O $base/Caddyfile -O $base/kvist.toml
+curl -fsSL $base/docker-compose.caddy.yml -o docker-compose.yml
+curl -fsSLO $base/Caddyfile -O $base/kvist.toml
 $EDITOR kvist.toml Caddyfile        # your domain, title and publish rules
 docker compose up -d
-docker compose exec kvist kvist token create --site garden --name laptop
+docker compose exec kvist kvist token create --name laptop
 ```
 
 The token is printed once; enter it in the Obsidian plugin (step 3).
 
-`docker-compose.yml`:
+`docker-compose.caddy.yml`, saved as `docker-compose.yml`:
 
 ```yaml
 services:
@@ -127,7 +130,7 @@ sudo install -D -m 0640 -g kvist kvist.example.toml /etc/kvist/kvist.toml
 sudo $EDITOR /etc/kvist/kvist.toml   # data_dir = "/var/lib/kvist", listen = "127.0.0.1:8080"
 sudo cp deploy/kvist.service /etc/systemd/system/
 sudo systemctl enable --now kvist
-sudo -u kvist KVIST_CONFIG=/etc/kvist/kvist.toml kvist token create --site garden --name laptop
+sudo -u kvist KVIST_CONFIG=/etc/kvist/kvist.toml kvist token create --name laptop
 ```
 
 Put Caddy (see `deploy/Caddyfile`) or nginx in front for HTTPS. With nginx,

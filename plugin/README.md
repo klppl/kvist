@@ -23,7 +23,7 @@ runs it; it can also be run by hand from the Actions tab. Bump `version` in
 ## Set up
 
 1. On the server, create a token for this device:
-   `kvist token create --site garden --name "My phone"`.
+   `kvist token create --name "My phone"` (add `--site` if the server has several sites).
 2. In the plugin settings, enter the **server URL** (https) and the **site**.
 3. Under *This device*, paste the **token**, then press **Test**.
 4. Run **Open site settings note** to create `_site.md`, where you set the

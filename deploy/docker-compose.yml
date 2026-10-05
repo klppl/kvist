@@ -1,0 +1,25 @@
+# kvist on its own: the site and the API on port 8080, plain HTTP. Put this
+# file and kvist.toml in one folder on the server, edit kvist.toml, then:
+#   docker compose up -d
+#   docker compose exec kvist kvist token create
+# Upgrade:
+#   docker compose pull && docker compose up -d
+#
+# The Obsidian plugin only connects over HTTPS, so put kvist behind your
+# HTTPS setup, or use docker-compose.caddy.yml, which adds Caddy and gets
+# certificates on its own (docs/https.html).
+services:
+  kvist:
+    image: ghcr.io/klppl/kvist:latest   # or a pinned tag such as :sha-7822899
+    # build: ..                         # instead of image: to build from a checkout
+    restart: unless-stopped
+    volumes:
+      - kvist-data:/data
+      - ./kvist.toml:/etc/kvist/kvist.toml:ro
+    environment:
+      - CF_API_TOKEN=${CF_API_TOKEN:-}  # only for the optional Cloudflare purge
+    ports:
+      - "127.0.0.1:8080:8080"           # this machine only; your HTTPS proxy forwards to it
+
+volumes:
+  kvist-data:
