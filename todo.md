@@ -1,7 +1,5 @@
 # todo
 
-Features compared against [Perlite](https://github.com/secure-77/Perlite).
-
 - [x] **Link previews on hover.** Show a popup with the linked note when
   hovering an internal link. On touch screens, a tap opens the preview.
   Only published notes, so it can reuse the rendered pages.
