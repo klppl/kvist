@@ -113,6 +113,10 @@ func (s *Static) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	rel := strings.TrimPrefix(clean, "/")
+	if rel == redirectsFile {
+		s.notFound(w, r, dir) // read from disk only; it changes on every build
+		return
+	}
 	if strings.HasSuffix(r.URL.Path, "/") || rel == "" {
 		rel = path.Join(rel, "index.html")
 	}

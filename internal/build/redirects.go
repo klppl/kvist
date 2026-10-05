@@ -27,8 +27,8 @@ import (
 // again stops redirecting, so redirects never hide a page or reveal a
 // private note.
 
-// RedirectsFile is the redirect map in a build's output, read by the
-// built-in server. Pages at the old addresses also redirect, for servers
+// RedirectsFile is the redirect map in a build's output, read from disk
+// by the built-in server, which doesn't serve it. Pages at the old addresses also redirect, for servers
 // that only serve files.
 const RedirectsFile = "_kvist/redirects.json"
 

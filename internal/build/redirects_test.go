@@ -149,6 +149,11 @@ func TestRedirectsEndToEnd(t *testing.T) {
 		}
 	}
 	rec := httptest.NewRecorder()
+	srv.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/"+RedirectsFile, nil))
+	if rec.Code != http.StatusNotFound {
+		t.Errorf("the redirect map is served: %d", rec.Code)
+	}
+	rec = httptest.NewRecorder()
 	srv.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/garden/stays/", nil))
 	if rec.Code != http.StatusOK {
 		t.Errorf("an unmoved page: %d", rec.Code)
