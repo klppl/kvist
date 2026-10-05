@@ -338,7 +338,7 @@ export default class KvistPlugin extends Plugin {
       return;
     }
     const fm = this.app.metadataCache.getFileCache(file)?.frontmatter;
-    window.open(base + noteURL(file.path, fm?.permalink));
+    window.open(base + noteURL(file.path, fm?.permalink, this.lastResult?.site.root_folder));
   }
 
   async openReport() {

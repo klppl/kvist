@@ -8,5 +8,15 @@
   {"path": "index.md", "url": "/"},
   {"path": "A/B/Note.md", "permalink": "/About Me/", "url": "/about-me/"},
   {"path": "A/x.md", "permalink": "/", "url": "/"},
-  {"path": "A/y.md", "permalink": "../escape", "url": "/a/y/"}
+  {"path": "A/y.md", "permalink": "../escape", "url": "/a/y/"},
+  {"path": "Kvist/Garden/My Note.md", "root": "Kvist", "url": "/garden/my-note/"},
+  {"path": "Kvist/Garden/Garden.md", "root": "Kvist", "url": "/garden/"},
+  {"path": "Kvist/About.md", "root": "Kvist", "url": "/about/"},
+  {"path": "Kvist/Kvist.md", "root": "Kvist", "url": "/"},
+  {"path": "Kvist/index.md", "root": "Kvist", "url": "/"},
+  {"path": "Reading list.md", "root": "Kvist", "url": "/reading-list/"},
+  {"path": "Kvistar/Note.md", "root": "Kvist", "url": "/kvistar/note/"},
+  {"path": "Notes/Garden/Soil.md", "root": "Notes/Garden", "url": "/soil/"},
+  {"path": "Notes/Garden/Garden.md", "root": "Notes/Garden", "url": "/"},
+  {"path": "Kvist/X/Y.md", "permalink": "/y/", "root": "Kvist", "url": "/y/"}
 ]

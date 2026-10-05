@@ -17,6 +17,7 @@ data_dir = "unused"
 [[site]]
 id = "garden"
 base_url = "https://garden.example.com"
+root_folder = "/" # keep the folder in addresses (root_test.go covers root folders)
   [site.publish]
   always_public_folders = ["Garden"]
   exclude_folders = ["Private", "Templates"]

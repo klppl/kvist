@@ -20,6 +20,7 @@ data_dir = "unused"
 [[site]]
 id = "garden"
 base_url = "https://garden.example.com"
+root_folder = "/" # keep the folder in addresses (root_test.go covers root folders)
   [site.publish]
   always_public_folders = ["Garden"]
   exclude_folders = ["Private", "Templates"]
@@ -213,14 +214,14 @@ func TestURLParity(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	var cases []struct{ Path, Permalink, URL string }
+	var cases []struct{ Path, Permalink, Root, URL string }
 	if err := json.Unmarshal(b, &cases); err != nil {
 		t.Fatal(err)
 	}
-	bl := &builder{}
 	for _, c := range cases {
+		bl := &builder{root: c.Root}
 		if got := bl.noteURL(protocol.NormalizePath(c.Path), c.Permalink); got != c.URL {
-			t.Errorf("%q (permalink %q): %q, want %q", c.Path, c.Permalink, got, c.URL)
+			t.Errorf("%q (permalink %q, root %q): %q, want %q", c.Path, c.Permalink, c.Root, got, c.URL)
 		}
 	}
 }

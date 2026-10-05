@@ -70,6 +70,8 @@ func (s *Service) SiteInfo(site string) (protocol.SiteInfo, error) {
 		RulesHash: rules.Hash(),
 		Limits:    sc.ProtocolLimits(),
 		Revision:  head,
+
+		RootFolder: sc.SiteRoot(),
 	}, nil
 }
 

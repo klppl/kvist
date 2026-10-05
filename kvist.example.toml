@@ -9,6 +9,7 @@ base_url = "https://garden.example.com"
 title    = "My garden"
 theme    = "garden"
 serve    = true              # serve the built site from this binary (or point Caddy/nginx at <data_dir>/sites/garden/public)
+# root_folder = "Kvist"      # the vault folder that is the site's root (default: the only always-public folder); "/" keeps folder names in addresses
 
   [site.publish]
   always_public_folders = ["Kvist"]

@@ -76,7 +76,7 @@ note wins where both set a value. The theme parameter `nav_tags` is read as
 |---|---|---|
 | `ID` | string | URL without slashes (`garden/my-note`); `index` for `/`. |
 | `Path` | string | Vault path (`Kvist/My Note.md`). |
-| `URL` | string | `/kvist/my-note/`. |
+| `URL` | string | `/my-note/` (for `Kvist/My Note.md`, with `Kvist` as the root folder). |
 | `Slug` | string | URL without surrounding slashes. |
 | `Title` | string | Frontmatter `title`, else the first `# Heading`, else the file name. |
 | `Aliases` | []string | Frontmatter `aliases`. |
@@ -96,7 +96,12 @@ note wins where both set a value. The theme parameter `nav_tags` is read as
 
 ### URLs
 
-`Kvist/My Note.md` becomes `/kvist/my-note/`. Each path segment is
+A note's URL comes from its path relative to the site's root folder
+(`root_folder` in the server config; by default the only always-public
+folder, if there is just one): with root folder `Kvist`, `Kvist/My Note.md`
+becomes `/my-note/`, and notes outside it keep their full path
+(`Reading list.md` → `/reading-list/`). The root folder's own note
+(`Kvist/Kvist.md` or `Kvist/index.md`) gets `/`. Each path segment is
 lowercased and runs of characters other than letters and digits become `-`.
 Unicode letters are kept. Frontmatter `permalink: /about/` overrides the URL.
 `index.md`, or a note named like its folder (`Recipes/Recipes.md`), is the
@@ -159,9 +164,11 @@ it is in an `exclude_folders` folder.
 
 ## Folder
 
-`Name`, `Path`, `URL`, `Notes` (listed notes only), `Children`, `Index` (the
-folder note, if any), `Parent`. Only folders that contain published notes
-exist. A folder with only unlisted notes, in it and below it, has
+`Name`, `Path` (the vault path), `URL`, `Notes` (listed notes only),
+`Children`, `Index` (the folder note, if any), `Parent`. Only folders that
+contain published notes exist. Folders follow the URLs: the root folder is
+`Site.Root` (its `Path` is the root folder's vault path), and its subfolders
+are the top-level folders. A folder with only unlisted notes, in it and below it, has
 `Unlisted` set: it is not among its parent's `Children` and gets no page,
 but its notes' `Folder` points to it.
 

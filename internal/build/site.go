@@ -162,10 +162,16 @@ func writeSite(ctx context.Context, site *config.Site, theme *render.Theme, snap
 		for _, n := range m.Notes {
 			pages[n.Path] = Page{URL: n.URL, Hash: files[n.Path].Hash}
 		}
-		hist = hist.next(pages, func(u string) bool {
-			_, err := os.Stat(filepath.Join(dir, filepath.FromSlash(strings.TrimPrefix(u, "/")), "index.html"))
-			return err == nil
-		})
+		page := func(root string) func(u string) bool {
+			return func(u string) bool {
+				_, err := os.Stat(filepath.Join(root, filepath.FromSlash(strings.TrimPrefix(u, "/")), "index.html"))
+				return err == nil
+			}
+		}
+		hist = hist.next(pages, page(dir))
+		if prev != "" {
+			hist.movedFolders(m.Root, page(prev), page(dir))
+		}
 		if err := writeRedirects(out, hist.Redirects, site.BaseURL); err != nil {
 			return nil, nil, err
 		}

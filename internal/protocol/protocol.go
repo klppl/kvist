@@ -100,6 +100,9 @@ type SiteInfo struct {
 	RulesHash string `json:"rules_hash"`
 	Limits    Limits `json:"limits"`
 	Revision  string `json:"revision"` // current HEAD, "" if nothing committed yet
+	// RootFolder is the vault folder addresses start from ("Kvist/Soil.md"
+	// is at /soil/), "" for the vault itself; for "open published page".
+	RootFolder string `json:"root_folder,omitempty"`
 }
 
 // Client identifies the pushing device.

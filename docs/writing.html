@@ -125,16 +125,19 @@ stage: budding
 <p>Other properties stay private: they are never put on the site unless the server lists them in <code>expose_frontmatter</code> (which is how <code>stage</code> is enabled in the default config).</p>
 
 <h2 id="addresses">Page addresses</h2>
-<p>A note's address comes from its path: each part is lowercased, and spaces and punctuation become dashes.</p>
+<p>A note's address comes from its path inside the folder you publish from: each part is lowercased, and spaces and punctuation become dashes. When you publish one folder (<code>always_public_folders = ["Kvist"]</code>), that folder is the site's root, so <code>Kvist</code> itself doesn't appear in addresses or the menu. The examples below assume that.</p>
 <table>
   <thead><tr><th>Note</th><th>Address</th></tr></thead>
   <tbody>
-    <tr><td><code>Kvist/My First Note.md</code></td><td><code>/kvist/my-first-note/</code></td></tr>
-    <tr><td><code>Kvist/Recipes/Recipes.md</code></td><td><code>/kvist/recipes/</code> (a <em>folder note</em>, named like its folder)</td></tr>
-    <tr><td><code>Kvist/Recipes/index.md</code></td><td><code>/kvist/recipes/</code> (also a folder note)</td></tr>
+    <tr><td><code>Kvist/My First Note.md</code></td><td><code>/my-first-note/</code></td></tr>
+    <tr><td><code>Kvist/Recipes/Soup.md</code></td><td><code>/recipes/soup/</code></td></tr>
+    <tr><td><code>Kvist/Recipes/Recipes.md</code></td><td><code>/recipes/</code> (a <em>folder note</em>, named like its folder)</td></tr>
+    <tr><td><code>Kvist/Recipes/index.md</code></td><td><code>/recipes/</code> (also a folder note)</td></tr>
+    <tr><td><code>Reading list.md</code>, outside <code>Kvist</code> but tagged <code>#public</code></td><td><code>/reading-list/</code></td></tr>
     <tr><td>A note with <code>permalink: /about/</code></td><td><code>/about/</code></td></tr>
   </tbody>
 </table>
+<p>A note can't take an address the site uses itself, like <code>/tags/</code>: a note called <em>Tags</em> right in your published folder stops the build with a message saying so. Rename it or give it a <code>permalink</code>. To keep the folder in addresses instead, set <a href="configuration.html#server-site"><code>root_folder = "/"</code></a> on the server.</p>
 <p>Renaming or moving a note changes its address. The server remembers the old one and sends visitors on to the new address, so links from elsewhere keep working. It finds the note again by its path (when only a <code>permalink</code> or a folder changed), by its unchanged text, or by its file name if no other new note has that name. A note that is no longer published isn't redirected to, and writing a new note at an old address replaces the redirect. If two notes would get the same address, the build stops and names both, and your site keeps showing the previous version until you fix it.</p>
 
 <h2 id="home">The home page</h2>

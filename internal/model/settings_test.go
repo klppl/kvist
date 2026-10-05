@@ -17,6 +17,7 @@ data_dir = "unused"
 [[site]]
 id = "garden"
 base_url = "https://garden.example.com"
+root_folder = "/" # keep the folder in addresses (root_test.go covers root folders)
 title = "Server title"
 description = "Server description"
   [site.publish]

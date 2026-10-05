@@ -420,7 +420,8 @@ Tag     Name, Slug, URL, Notes, Children, Parent
 Folder  Name, Path, URL, Notes, Children, Index *Note (folder note, if any)
 ```
 
-URLs: `Kvist/My Note.md` → `/kvist/my-note/` (slugified, configurable;
+URLs: `Kvist/My Note.md` → `/my-note/` when `Kvist` is the root folder
+(slugified, from the path inside `root_folder`, configurable;
 frontmatter `permalink` overrides). Slug collisions are a build error naming
 both notes (both are published, so naming them is safe). Attachments:
 `/_assets/<hash8>/<file-name>` — content-hashed, so CDN caching can be

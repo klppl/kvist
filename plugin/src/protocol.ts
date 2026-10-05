@@ -36,6 +36,7 @@ export interface SiteInfo {
   rules_hash: string;
   limits: Limits;
   revision: string;
+  root_folder?: string; // addresses start from this vault folder; absent: the vault
 }
 
 export interface ClientInfo {

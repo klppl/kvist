@@ -45,6 +45,26 @@ type Site struct {
 	Retention        Retention      `toml:"retention"`
 	Cloudflare       Cloudflare     `toml:"cloudflare"`
 	ThemeParams      map[string]any `toml:"theme_params"`
+	// RootFolder is the vault folder that is the site's root: its notes
+	// and folders are published as if it were the vault ("Garden/Soil.md"
+	// at /soil/). Empty means automatic (the only always-public folder, if
+	// there is just one); "/" means the vault itself. See SiteRoot.
+	RootFolder string `toml:"root_folder"`
+}
+
+// SiteRoot is the vault folder the site's addresses start from, "" for
+// the vault itself: root_folder, else the only always-public folder.
+func (s *Site) SiteRoot() string {
+	switch f := strings.Trim(protocol.NormalizePath(strings.TrimSpace(s.RootFolder)), "/"); {
+	case f != "":
+		return f
+	case strings.TrimSpace(s.RootFolder) != "":
+		return "" // "/": the vault
+	}
+	if fs := s.Publish.AlwaysPublicFolders; len(fs) == 1 && fs[0] != "/" {
+		return fs[0]
+	}
+	return ""
 }
 
 // Cloudflare purges the zone's cache after every successful build. The API

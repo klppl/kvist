@@ -178,3 +178,69 @@ func readFile(t *testing.T, p string) string {
 	}
 	return string(b)
 }
+
+// TestRootFolderRedirects builds a site with the folder in its addresses,
+// then with it as the root folder: old note and folder addresses redirect.
+func TestRootFolderRedirects(t *testing.T) {
+	vault := t.TempDir()
+	for p, s := range map[string]string{
+		"Garden/Soil.md":            "# Soil",
+		"Garden/Beds/Raised.md":     "# Raised",
+		"Garden/Kitchen/Kitchen.md": "# Kitchen",
+	} {
+		if err := os.MkdirAll(filepath.Dir(filepath.Join(vault, p)), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(filepath.Join(vault, p), []byte(s), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	base := t.TempDir()
+	buildOnce := func(cfgText, out, prev string) *History {
+		t.Helper()
+		cfg, err := config.Parse([]byte(cfgText))
+		if err != nil {
+			t.Fatal(err)
+		}
+		sc := cfg.Sites[0]
+		theme, err := LoadTheme("", sc)
+		if err != nil {
+			t.Fatal(err)
+		}
+		snap, err := dir.New(vault).Snapshot(context.Background())
+		if err != nil {
+			t.Fatal(err)
+		}
+		h, err := LoadHistory(base)
+		if err != nil {
+			t.Fatal(err)
+		}
+		_, h, err = WriteSiteIncremental(context.Background(), sc, theme, snap, out, prev, h)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := h.Save(base); err != nil {
+			t.Fatal(err)
+		}
+		return h
+	}
+	automatic := strings.Replace(fixtureConfig, "root_folder = \"/\"", "", 1)
+	buildOnce(fixtureConfig, filepath.Join(base, "b1"), "")
+	h := buildOnce(automatic, filepath.Join(base, "b2"), filepath.Join(base, "b1"))
+	for from, to := range map[string]string{
+		"/garden/soil/":        "/soil/",    // a note, by its path
+		"/garden/kitchen/":     "/kitchen/", // a folder note
+		"/garden/beds/":        "/beds/",    // a folder page
+		"/garden/":             "/",         // the root folder itself
+		"/garden/beds/raised/": "/beds/raised/",
+	} {
+		if got := h.Redirects[from]; got != to {
+			t.Errorf("%s redirects to %q, want %q (all: %v)", from, got, to, h.Redirects)
+		}
+	}
+	// The next build keeps them.
+	h = buildOnce(automatic, filepath.Join(base, "b3"), filepath.Join(base, "b2"))
+	if h.Redirects["/garden/beds/"] != "/beds/" || h.Redirects["/garden/"] != "/" {
+		t.Errorf("folder redirects dropped: %v", h.Redirects)
+	}
+}

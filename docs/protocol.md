@@ -69,11 +69,15 @@ Clients must stop if their version is outside `[min, max]`.
   },
   "rules_hash": "sha256:…",
   "limits": {"max_file_size": 52428800, "max_files": 20000, "max_path_bytes": 512},
-  "revision": "r000041"
+  "revision": "r000041",
+  "root_folder": "Kvist"
 }
 ```
 
-`revision` is `""` before the first commit. The client applies `rules` to
+`revision` is `""` before the first commit. `root_folder` is the vault
+folder that addresses start from (`Kvist/Soil.md` is at `/soil/`), absent
+when it is the vault itself; clients use it to open a note's published
+page. The client applies `rules` to
 choose what to push ([§ Publish rules](#publish-rules)) and echoes
 `rules_hash` in the manifest.
 

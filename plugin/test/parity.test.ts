@@ -21,7 +21,7 @@ test("publish rules match the server", () => {
 
 test("published URLs match the server", () => {
   for (const c of urls) {
-    assert.equal(noteURL(c.path.normalize("NFC"), c.permalink), c.url, c.path);
+    assert.equal(noteURL(c.path.normalize("NFC"), c.permalink, c.root), c.url, c.path);
   }
 });
 

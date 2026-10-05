@@ -75,7 +75,8 @@ type builder struct {
 	aliases  map[string][]string // lower(alias) → note paths
 	warnings []protocol.Warning
 	problems []string
-	strict   bool // strict line breaks
+	strict   bool   // strict line breaks
+	root     string // the vault folder addresses start from, "" for the vault
 }
 
 // Build builds the content model from a snapshot. It reads every file it
@@ -90,6 +91,7 @@ func Build(site *config.Site, snap source.Snapshot) (*Site, error) {
 		assets:  map[string]source.File{},
 		used:    map[string]bool{},
 		aliases: map[string][]string{},
+		root:    site.SiteRoot(),
 	}
 	var siteToml, siteNote []byte
 	for _, f := range snap.Files() {
@@ -254,9 +256,21 @@ func (b *builder) makeNotes(s *Site) {
 	sort.Slice(s.Notes, func(i, j int) bool { return s.Notes[i].URL < s.Notes[j].URL })
 }
 
+// sitePath is a vault path relative to the site's root folder, the path
+// that addresses and folders come from. Paths outside it are unchanged.
+func (b *builder) sitePath(p string) string {
+	if b.root != "" {
+		if rest, ok := strings.CutPrefix(p, b.root+"/"); ok {
+			return rest
+		}
+	}
+	return p
+}
+
 // noteURL derives a note's URL: a sanitized permalink if given, else the
-// slugified path. index.md and a note named like its folder ("A/A.md") are
-// folder notes and get the folder's URL.
+// slugified path from the root folder. index.md and a note named like its
+// folder ("A/A.md") are folder notes and get the folder's URL; for the
+// root folder that is "/".
 func (b *builder) noteURL(p, permalink string) string {
 	if permalink != "" {
 		u := "/" + slug.Path(strings.Trim(permalink, "/")) + "/"
@@ -269,7 +283,11 @@ func (b *builder) noteURL(p, permalink string) string {
 			return u
 		}
 	}
-	dir, file := path.Split(p)
+	if b.root != "" && path.Dir(p) == b.root && strings.TrimSuffix(path.Base(p), path.Ext(p)) == path.Base(b.root) {
+		return "/" // the root folder's own note
+	}
+	rel := b.sitePath(p)
+	dir, file := path.Split(rel)
 	stem := strings.TrimSuffix(file, path.Ext(file))
 	dir = strings.TrimSuffix(dir, "/")
 	if strings.EqualFold(stem, "index") || (dir != "" && stem == path.Base(dir)) {
@@ -278,7 +296,7 @@ func (b *builder) noteURL(p, permalink string) string {
 		}
 		return "/" + slug.Path(dir) + "/"
 	}
-	u := slug.Path(p)
+	u := slug.Path(rel)
 	if u == "" {
 		u = slug.Make(fmt.Sprintf("note-%x", p))
 	}
@@ -678,21 +696,26 @@ func (b *builder) makeAssets(s *Site) {
 // --- folders, tags, graph, home ---
 
 func (b *builder) makeFolders(s *Site) {
-	s.Root = &Folder{Name: "", Path: "", URL: "/"}
+	// Folders are keyed by their path from the root folder; Path stays
+	// the vault path.
+	s.Root = &Folder{Name: "", Path: b.root, URL: "/"}
 	byPath := map[string]*Folder{"": s.Root}
-	var get func(p string) *Folder
-	get = func(p string) *Folder {
+	// get returns the folder at p (from the root folder), whose vault path
+	// is vp. A folder outside the root folder with the same name as one in
+	// it shares its address, so they are one folder.
+	var get func(p, vp string) *Folder
+	get = func(p, vp string) *Folder {
 		if f, ok := byPath[p]; ok {
 			return f
 		}
-		parent := get(dirOf(p))
-		f := &Folder{Name: path.Base(p), Path: p, URL: "/" + slug.Path(p) + "/", Parent: parent}
+		parent := get(dirOf(p), dirOf(vp))
+		f := &Folder{Name: path.Base(p), Path: vp, URL: "/" + slug.Path(p) + "/", Parent: parent}
 		parent.Children = append(parent.Children, f)
 		byPath[p] = f
 		return f
 	}
 	for _, n := range s.Notes {
-		f := get(dirOf(n.Path))
+		f := get(dirOf(b.sitePath(n.Path)), dirOf(n.Path))
 		n.Folder, n.FolderPath = f, f.Path
 		if !n.Unlisted {
 			f.Notes = append(f.Notes, n)

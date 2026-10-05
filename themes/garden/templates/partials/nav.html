@@ -27,6 +27,7 @@
       <li><a href="/tags/"{{if or (eq $cur "/tags/") (and (hasPrefix $cur "/tags/") (not (param "groups")))}} aria-current="page"{{end}}>{{template "icon" "tag"}}{{t "tags"}}</a></li>
     </ul>
     {{- $root := .Site.Root}}
+    {{- $home := "/"}}{{with .Site.Home}}{{$home = .URL}}{{end}}
     {{- if param "groups"}}
     <h2 class="nav-section">{{t "content"}}</h2>
     <ul class="nav-list">
@@ -34,7 +35,7 @@
       {{- $on := or (hasPrefix $cur .URL) (and $group (eq $group.URL .URL))}}
       <li><a href="{{.URL}}"{{if $on}} aria-current="{{if eq $cur .URL}}page{{else}}true{{end}}"{{end}}>{{template "icon" "tag"}}<span>{{title (str $name)}}</span><span class="count">{{len .Notes}}</span></a></li>
       {{- end}}{{end}}{{end}}
-      {{- range $i, $n := $root.Notes}}{{if and (ne $n.URL "/") (lt $i 20)}}
+      {{- range $i, $n := $root.Notes}}{{if and (ne $n.URL "/") (ne $n.URL $home) (lt $i 20)}}
       <li><a href="{{$n.URL}}"{{if eq $cur $n.URL}} aria-current="page"{{end}}>{{template "icon" "note"}}{{$n.Title}}</a></li>
       {{- end}}{{end}}
     </ul>
@@ -45,7 +46,7 @@
       {{- range $root.Children}}
       {{template "nav-folder" (dict "F" . "Cur" $cur "Open" $only)}}
       {{- end}}
-      {{- range $i, $n := $root.Notes}}{{if and (ne $n.URL "/") (lt $i 20)}}
+      {{- range $i, $n := $root.Notes}}{{if and (ne $n.URL "/") (ne $n.URL $home) (lt $i 20)}}
       <li><a href="{{$n.URL}}"{{if eq $cur $n.URL}} aria-current="page"{{end}}>{{template "icon" "note"}}{{$n.Title}}</a></li>
       {{- end}}{{end}}
     </ul>

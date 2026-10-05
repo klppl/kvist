@@ -6,15 +6,22 @@ kvist (Swedish for "twig") turns the notes you choose into a fast,
 searchable digital garden on your own server. Write in Obsidian, press
 Publish, and your site updates. Private notes never leave your device.
 
-![A kvist site: a menu with a profile and folder tree, a list of the notes in the folder, and a note with breadcrumbs above its title](docs/assets/screens/note-light.webp)
+![A kvist site: a menu with a profile and folder tree, a list of the notes beside it, and a note with callouts and code](docs/assets/screens/note-light.webp)
 
 - **Obsidian syntax:** wikilinks, embeds, callouts, tags, footnotes, math
   and Mermaid diagrams.
 - **Private stays private:** you choose what's public by folder, tag or
   property, and the server checks every note again. Links to private notes
   become plain text.
+- **Your folder is the site:** publish one folder from your vault and it
+  becomes the site's root, so its subfolders are the menu and the folder's
+  name stays out of every address.
 - **Search, backlinks and a graph,** in a three-pane theme with light and
-  dark mode.
+  dark mode, breadcrumbs, a reader mode and instant page loads. Search
+  filters by `#tag`.
+- **Shares well:** every note gets a preview image with its title for
+  chats and social media, and `unlisted: true` publishes a note without
+  listing it anywhere.
 - **Settings in a note:** the site's title, menu and colors live in
   `_site.md`, so you change them from Obsidian on any device.
 - **Links keep working:** a renamed or moved note's old address redirects

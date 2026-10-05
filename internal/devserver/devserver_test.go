@@ -19,6 +19,7 @@ func TestDevServerRebuilds(t *testing.T) {
 [[site]]
 id = "dev"
 base_url = "http://localhost:1313"
+root_folder = "/" # keep the folder in addresses (root_test.go covers root folders)
   [site.publish]
   always_public_folders = ["Garden"]
 `))

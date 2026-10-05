@@ -116,7 +116,7 @@ profile_links:
 <p>Turn the profile off without deleting it with the theme setting <code>show_profile: false</code>.</p>
 
 <h2 id="groups">Grouping the menu by tags</h2>
-<p>The menu's <em>Content</em> section shows your folders as a tree: the arrow next to a folder opens it, and the folders around the current page are open already. If you keep all public notes in one folder, the tree starts with a single “Kvist” folder, which says little to visitors. Group notes by tags instead:</p>
+<p>The menu's <em>Content</em> section shows your folders as a tree: the arrow next to a folder opens it, and the folders around the current page are open already. When you publish one folder, the tree starts inside it: its subfolders are the top of the menu, not the folder itself (see <a href="configuration.html#server-site"><code>root_folder</code></a>). If your notes aren't sorted into folders at all, group them by tags instead:</p>
 <pre data-label="Kvist/_site.md"><code>---
 groups: [articles, projects, books]
 ---</code></pre>

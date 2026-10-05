@@ -10,6 +10,9 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"github.com/klppl/kvist/internal/model"
+	"github.com/klppl/kvist/internal/slug"
 )
 
 // Redirects keep old links working when a note moves. After every build
@@ -154,6 +157,28 @@ func (h *History) next(pages map[string]Page, live func(url string) bool) *Histo
 
 // validURL accepts the addresses of note pages: an absolute path ending in
 // a slash, without dot segments.
+// movedFolders redirects the old addresses of folder pages to their new
+// ones after the site's root folder changed: with root_folder "Kvist",
+// /kvist/garden/ is now /garden/ and /kvist/ is the home page. Notes are
+// followed by their path already; this covers the folders. Only addresses
+// the previous build had (existed) are redirected, and never one that has
+// a page now (live).
+func (h *History) movedFolders(root *model.Folder, existed, live func(url string) bool) {
+	var walk func(f *model.Folder)
+	walk = func(f *model.Folder) {
+		if f.Path != "" {
+			old := "/" + slug.Path(f.Path) + "/"
+			if _, set := h.Redirects[old]; !set && old != f.URL && validURL(old) && existed(old) && !live(old) {
+				h.Redirects[old] = f.URL
+			}
+		}
+		for _, c := range f.Children {
+			walk(c)
+		}
+	}
+	walk(root)
+}
+
 func validURL(u string) bool {
 	return strings.HasPrefix(u, "/") && strings.HasSuffix(u, "/") && u != "/" &&
 		path.Clean(u)+"/" == u && !strings.ContainsAny(u, "\x00?#\\")

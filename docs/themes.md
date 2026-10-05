@@ -146,7 +146,7 @@ a test keeps their keys in step with `en.toml`.
 
 | Path | Cache-Control (built-in server) |
 |---|---|
-| pages (`/kvist/note/index.html`, …) | `public, max-age=60` |
+| pages (`/note/index.html`, …) | `public, max-age=60` |
 | `/_assets/<hash>/…` (attachments) | `public, max-age=31536000, immutable` |
 | `/_kvist/<hash>/…` (theme files) | `public, max-age=31536000, immutable` |
 | `/_kvist/social/<hash>.png` (social images) | `public, max-age=31536000, immutable` |
@@ -202,8 +202,9 @@ and the list stops at `list_max`, because a full tree of notes on every
 page made a 5 000-note site 2 GB. On wide screens the table of contents and the local
 graph sit to the right of a note; otherwise they follow it.
 
-**Grouping by tags.** By default the sidebar shows your folders.
-If everything you publish lives in one folder, group it by tags instead:
+**Grouping by tags.** By default the sidebar shows your folders, from the
+site's root folder down (`Site.Root`). If your notes aren't sorted into
+folders, group them by tags instead:
 
 ```markdown
 ---
