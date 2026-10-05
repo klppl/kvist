@@ -227,10 +227,7 @@ func (b *builder) makeNotes(s *Site) {
 		if n.Created.After(n.Updated) {
 			n.Updated = n.Created
 		}
-		n.Description = firstString(fm, "description", "summary")
-		if n.Description == "" {
-			n.Description = truncate(ns.doc.FirstParagraph(), 200)
-		}
+		n.Description = firstString(fm, "description", "summary") // else the first paragraph, once resolved (render)
 		for k, v := range fm {
 			if expose[k] {
 				if n.Params == nil {
@@ -393,6 +390,11 @@ func (b *builder) render(s *Site) {
 		ns := b.notes[n.Path]
 		r := &noteResolver{b: b, from: ns, stack: []string{n.Path}, top: true, root: n}
 		ns.doc.Resolve(r)
+		if n.Description == "" {
+			// After Resolve, so tags keep their text and only control tags
+			// are left out.
+			n.Description = truncate(ns.doc.FirstParagraph(), 200)
+		}
 		ns.doc.StrictLineBreaks = b.strict
 		html, err := ns.doc.Render()
 		if err != nil {
