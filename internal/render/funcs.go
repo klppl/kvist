@@ -16,7 +16,17 @@ import (
 
 // funcMap is the documented template function set (docs/themes.md).
 func funcMap(t *Theme, site *model.Site) template.FuncMap {
+	lang := ""
+	if site != nil {
+		lang = site.Config.Language
+	}
+	msg := t.Messages(lang)
 	return template.FuncMap{
+		// t returns a word of the interface in the site's language:
+		// {{t "search"}}, {{t "notes" (len .Notes)}} (see i18n.go).
+		"t": msg.T,
+		// i18n returns a table of words, e.g. for a script: {{json (i18n "script")}}.
+		"i18n": msg.Table,
 		// asset returns the URL of a theme static file: {{asset "style.css"}}.
 		"asset": func(p string) string { return t.AssetURL(p) },
 		// absURL makes a site URL absolute with the base URL.
@@ -27,7 +37,8 @@ func funcMap(t *Theme, site *model.Site) template.FuncMap {
 			return site.Config.BaseURL + "/" + strings.TrimPrefix(u, "/")
 		},
 		// dateFormat formats a time with a Go layout: {{dateFormat "2 Jan 2006" .Updated}}.
-		"dateFormat": func(layout string, v time.Time) string { return v.Format(layout) },
+		// Month and day names are in the site's language.
+		"dateFormat": msg.FormatDate,
 		// isoDate formats a time as RFC 3339.
 		"isoDate": func(v time.Time) string { return v.UTC().Format(time.RFC3339) },
 		// json encodes a value for use inside <script>.
@@ -83,7 +94,7 @@ func funcMap(t *Theme, site *model.Site) template.FuncMap {
 		// become one string per item, dates use the given layout, and
 		// [[links]] show their alias or target as text:
 		// {{range propertyValues (param "date_format") .}}.
-		"propertyValues": func(layout string, v any) []string { return propertyValues(layout, v) },
+		"propertyValues": func(layout string, v any) []string { return propertyValues(msg, layout, v) },
 		// dict builds a map for passing several values to a template.
 		"dict": func(kv ...any) (map[string]any, error) {
 			if len(kv)%2 != 0 {
@@ -118,14 +129,14 @@ func funcMap(t *Theme, site *model.Site) template.FuncMap {
 	}
 }
 
-func propertyValues(layout string, v any) []string {
+func propertyValues(msg messages, layout string, v any) []string {
 	switch v := v.(type) {
 	case nil:
 		return nil
 	case []any:
 		var out []string
 		for _, x := range v {
-			out = append(out, propertyValues(layout, x)...)
+			out = append(out, propertyValues(msg, layout, x)...)
 		}
 		return out
 	case map[string]any:
@@ -134,12 +145,12 @@ func propertyValues(layout string, v any) []string {
 		if layout == "" {
 			layout = "2006-01-02"
 		}
-		return []string{v.Format(layout)}
+		return []string{msg.FormatDate(layout, v)}
 	case bool:
 		if v {
-			return []string{"yes"}
+			return []string{msg.T("yes")}
 		}
-		return []string{"no"}
+		return []string{msg.T("no")}
 	case string:
 		s := strings.TrimSpace(v)
 		if inner, ok := strings.CutPrefix(s, "[["); ok {

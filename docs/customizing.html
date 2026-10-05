@@ -76,7 +76,7 @@ Settings for my website.
   <tbody>
     <tr><td><code>title</code></td><td>Site name, shown top left and in browser tabs.</td></tr>
     <tr><td><code>description</code></td><td>Shown under the title on the home page and in link previews.</td></tr>
-    <tr><td><code>author</code>, <code>language</code></td><td>Used in page metadata and feeds. <code>language</code> is a code like <code>en</code> or <code>sv</code>.</td></tr>
+    <tr><td><code>author</code>, <code>language</code></td><td>Used in page metadata and feeds. <code>language</code> is a code like <code>en</code> or <code>sv</code>, and it also sets the language of the site's own words (menu, dates, search). The built-in theme speaks English, Swedish (<code>sv</code>), German (<code>de</code>), French (<code>fr</code>) and Spanish (<code>es</code>); other languages show English.</td></tr>
     <tr><td><code>home</code></td><td>A published note to use as the home page, as a link: <code>"[[Welcome]]"</code>. Obsidian keeps it up to date if you rename the note.</td></tr>
     <tr><td><code>groups</code></td><td>Tags that group the menu (<a href="#groups">below</a>).</td></tr>
     <tr><td><code>avatar</code>, <code>bio</code>, <code>profile_links</code></td><td>A profile at the top of the menu (<a href="#profile">below</a>).</td></tr>
@@ -160,7 +160,7 @@ groups: [articles, projects, books]
     <tr><td><code>show_list</code></td><td><code>true</code></td><td>Show the middle list column.</td></tr>
     <tr><td><code>list_max</code></td><td><code>100</code></td><td>Notes in the list before a “more…” link.</td></tr>
     <tr><td><code>home_recent</code></td><td><code>12</code></td><td>Notes in the home page's “Recently tended” list.</td></tr>
-    <tr><td><code>date_format</code></td><td><code>"2 Jan 2006"</code></td><td>How dates look. Write the date 2 January 2006 the way you want dates shown, e.g. <code>"2006-01-02"</code> or <code>"Jan 2, 2006"</code>.</td></tr>
+    <tr><td><code>date_format</code></td><td><code>"2 Jan 2006"</code></td><td>How dates look. Write the date 2 January 2006 the way you want dates shown, e.g. <code>"2006-01-02"</code> or <code>"Jan 2, 2006"</code>. Month and day names follow <code>language</code>.</td></tr>
     <tr><td><code>show_toc</code></td><td><code>true</code></td><td>The “On this page” contents beside notes.</td></tr>
     <tr><td><code>show_backlinks</code></td><td><code>true</code></td><td>“Links to this note” at the bottom of notes.</td></tr>
     <tr><td><code>link_previews</code></td><td><code>true</code></td><td>Hovering a link to another note shows a preview. On a phone, the first tap previews, the second opens the note.</td></tr>

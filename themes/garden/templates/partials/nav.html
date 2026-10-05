@@ -10,25 +10,25 @@
 {{- with .P}}
 {{- $p := .}}
 {{- $cur := .URL -}}
-<aside class="nav-pane" aria-label="Site">
+<aside class="nav-pane" aria-label="{{t "site"}}">
   <div class="nav-head">
     <a class="site-title" href="/">{{.Site.Config.Title}}</a>
-    <button class="icon-button theme-toggle" type="button" aria-label="Switch color theme" hidden>{{template "icon" "theme"}}</button>
-    <button class="icon-button menu-toggle" type="button" aria-label="Menu" aria-expanded="false" hidden>{{template "icon" "menu"}}</button>
+    <button class="icon-button theme-toggle" type="button" aria-label="{{t "switch_theme"}}" hidden>{{template "icon" "theme"}}</button>
+    <button class="icon-button menu-toggle" type="button" aria-label="{{t "menu"}}" aria-expanded="false" hidden>{{template "icon" "menu"}}</button>
   </div>
   <nav class="nav-body">
     {{- if param "show_profile"}}{{with .Site.Config.Profile}}{{template "profile" (dict "Profile" . "Author" $p.Site.Config.Author)}}{{end}}{{end}}
     <ul class="nav-list">
-      <li><a href="/"{{if eq $cur "/"}} aria-current="page"{{end}}>{{template "icon" "home"}}Home</a></li>
-      <li><button class="search-toggle" type="button" title="Search (/)" hidden data-index="/search-index.json" data-lib="{{asset "vendor/minisearch/minisearch.min.js"}}">{{template "icon" "search"}}Search<kbd>/</kbd></button></li>
+      <li><a href="/"{{if eq $cur "/"}} aria-current="page"{{end}}>{{template "icon" "home"}}{{t "home"}}</a></li>
+      <li><button class="search-toggle" type="button" title="{{t "search_shortcut"}}" hidden data-index="/search-index.json" data-lib="{{asset "vendor/minisearch/minisearch.min.js"}}">{{template "icon" "search"}}{{t "search"}}<kbd>/</kbd></button></li>
       {{- if param "show_graph"}}
-      <li><button class="graph-toggle" type="button" hidden>{{template "icon" "graph"}}Graph</button></li>
+      <li><button class="graph-toggle" type="button" hidden>{{template "icon" "graph"}}{{t "graph"}}</button></li>
       {{- end}}
-      <li><a href="/tags/"{{if or (eq $cur "/tags/") (and (hasPrefix $cur "/tags/") (not (param "groups")))}} aria-current="page"{{end}}>{{template "icon" "tag"}}Tags</a></li>
+      <li><a href="/tags/"{{if or (eq $cur "/tags/") (and (hasPrefix $cur "/tags/") (not (param "groups")))}} aria-current="page"{{end}}>{{template "icon" "tag"}}{{t "tags"}}</a></li>
     </ul>
     {{- $root := .Site.Root}}
     {{- if param "groups"}}
-    <h2 class="nav-section">Content</h2>
+    <h2 class="nav-section">{{t "content"}}</h2>
     <ul class="nav-list">
       {{- range $name := param "groups"}}{{range $p.Site.AllTags}}{{if eq (lower .Name) (lower (str $name))}}
       {{- $on := or (hasPrefix $cur .URL) (and $group (eq $group.URL .URL))}}
@@ -39,7 +39,7 @@
       {{- end}}{{end}}
     </ul>
     {{- else if or $root.Children $root.Notes}}
-    <h2 class="nav-section">Content</h2>
+    <h2 class="nav-section">{{t "content"}}</h2>
     <ul class="nav-list nav-tree">
       {{- $only := eq (len $root.Children) 1}}
       {{- range $root.Children}}
@@ -51,7 +51,7 @@
     </ul>
     {{- end}}
     {{- with .Site.Config.Nav}}
-    <h2 class="nav-section">Links</h2>
+    <h2 class="nav-section">{{t "links"}}</h2>
     <ul class="nav-list">
       {{- range .}}
       {{- $ext := or (hasPrefix .URL "https://") (hasPrefix .URL "http://")}}
@@ -62,7 +62,7 @@
   </nav>
   <footer class="nav-foot">
     {{- with param "footer"}}<div class="footer-text">{{markdownify (str .)}}</div>{{end}}
-    <p>Grown with <a href="https://github.com/klppl/kvist">kvist</a> · <a href="/index.xml">RSS</a></p>
+    <p>{{t "grown_with"}} <a href="https://github.com/klppl/kvist">kvist</a> · <a href="/index.xml">{{t "rss"}}</a></p>
   </footer>
 </aside>
 {{- end}}
@@ -92,7 +92,7 @@
 {{/* The site owner's card from the settings note: avatar, author, bio
      and links. rel="me" lets Mastodon and others verify the site. */}}
 {{define "profile" -}}
-<section class="profile" aria-label="About the author">
+<section class="profile" aria-label="{{t "about_author"}}">
   {{- with .Profile.Avatar}}
   <img class="profile-avatar" src="{{.}}" alt="" width="64" height="64">{{end}}
   {{- with .Author}}

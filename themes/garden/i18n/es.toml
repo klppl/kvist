@@ -1,0 +1,86 @@
+# The garden theme's words in Spanish.
+
+skip_to_content = "Saltar al contenido"
+site = "Sitio"
+menu = "Menú"
+switch_theme = "Cambiar tema de color"
+home = "Inicio"
+search = "Buscar"
+search_shortcut = "Buscar (/)"
+graph = "Grafo"
+tags = "Etiquetas"
+content = "Contenido"
+links = "Enlaces"
+grown_with = "Cultivado con"
+rss = "RSS"
+about_author = "Sobre el autor"
+
+explore = "Explorar"
+recently_tended = "Cuidadas recientemente"
+notes = { one = "%d nota", other = "%d notas" }
+folders = { one = "%d carpeta", other = "%d carpetas" }
+tag_count = { one = "%d etiqueta", other = "%d etiquetas" }
+untitled_list = "Notas"
+filter_notes = { one = "Filtrar %d nota", other = "Filtrar %d notas" }
+filter_notes_label = "Filtrar notas"
+more = "%d más…"
+no_matching_notes = "Aquí no hay notas que coincidan."
+search_everywhere = "Buscar en todo"
+
+planted = "Plantada"
+tended = "Cuidada"
+last_tended = "Último cuidado"
+reading_time = "%d min de lectura"
+growth_stage = "Etapa de crecimiento"
+stage_seedling = "plántula"
+stage_budding = "en brote"
+stage_evergreen = "perenne"
+backlinks = "Enlaces a esta nota"
+on_this_page = "En esta página"
+connections = "Conexiones"
+local_graph = "Grafo de notas enlazadas"
+yes = "sí"
+no = "no"
+
+tag_path = "Ruta de la etiqueta"
+tags_lead = "%s en %s. Elige un tema para ver todo lo que contiene."
+filter_tags = "Filtrar etiquetas"
+sort_tags = "Ordenar etiquetas"
+sort_name = "A–Z"
+sort_count = "Más notas"
+all_notes = "Las %d notas →"
+no_tags_match = "Ninguna etiqueta coincide con ese filtro."
+no_tags = "Aún no hay etiquetas."
+no_tags_help = "Las etiquetas de tus notas publicadas, en el texto o en las propiedades de una nota, aparecen aquí."
+
+not_found = "No encontrada"
+not_found_title = "Aquí no crece nada"
+not_found_text = "Esta página no existe. Puede que se haya movido, o que nunca se plantara."
+not_found_back = "Volver al jardín"
+
+months = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
+months_short = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sept", "oct", "nov", "dic"]
+days = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"]
+days_short = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"]
+
+[script]
+theme = "Tema: %s"
+theme_system = "sistema"
+theme_light = "claro"
+theme_dark = "oscuro"
+copy_heading_link = "Copiar enlace a «%s»"
+link_copied = "Enlace copiado"
+copy_code = "Copiar"
+code_copied = "Copiado"
+not_published = "No publicada"
+preview = "Vista previa"
+open_note = "Abrir nota →"
+search = "Buscar"
+search_placeholder = "Buscar notas…"
+search_label = "Buscar notas"
+search_hint = "↑↓ para elegir · Intro para abrir · Esc para cerrar"
+search_empty = "No se encontraron notas."
+search_unavailable = "La búsqueda no está disponible."
+graph_all = "Grafo de todas las notas"
+graph_unavailable = "El grafo no está disponible."
+close = "Cerrar"

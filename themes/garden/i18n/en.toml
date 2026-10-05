@@ -1,0 +1,89 @@
+# The garden theme's words in English. Every other language falls back to
+# these, so add new keys here first. Tables with one/other are plural
+# forms, chosen by the count; %d and %s are filled in by the theme.
+
+skip_to_content = "Skip to content"
+site = "Site"
+menu = "Menu"
+switch_theme = "Switch color theme"
+home = "Home"
+search = "Search"
+search_shortcut = "Search (/)"
+graph = "Graph"
+tags = "Tags"
+content = "Content"
+links = "Links"
+grown_with = "Grown with"
+rss = "RSS"
+about_author = "About the author"
+
+explore = "Explore"
+recently_tended = "Recently tended"
+notes = { one = "%d note", other = "%d notes" }
+folders = { one = "%d folder", other = "%d folders" }
+tag_count = { one = "%d tag", other = "%d tags" }
+untitled_list = "Notes"
+filter_notes = { one = "Filter %d note", other = "Filter %d notes" }
+filter_notes_label = "Filter notes"
+more = "%d more…"
+no_matching_notes = "No matching notes here."
+search_everywhere = "Search everywhere"
+
+planted = "Planted"
+tended = "Tended"
+last_tended = "Last tended"
+reading_time = "%d min read"
+growth_stage = "Growth stage"
+stage_seedling = "seedling"
+stage_budding = "budding"
+stage_evergreen = "evergreen"
+backlinks = "Links to this note"
+on_this_page = "On this page"
+connections = "Connections"
+local_graph = "Graph of linked notes"
+yes = "yes"
+no = "no"
+
+tag_path = "Tag path"
+tags_lead = "%s across %s. Pick a topic to see everything filed under it."
+filter_tags = "Filter tags"
+sort_tags = "Sort tags"
+sort_name = "A–Z"
+sort_count = "Most notes"
+all_notes = "All %d notes →"
+no_tags_match = "No tags match that filter."
+no_tags = "No tags yet."
+no_tags_help = "Tags in your published notes, written in the text or in a note's properties, show up here."
+
+not_found = "Not found"
+not_found_title = "Nothing grows here"
+not_found_text = "This page doesn't exist. It may have moved, or it was never planted."
+not_found_back = "Back to the garden"
+
+months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+months_short = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+days_short = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+
+# Words the script (garden.js) shows. %s is filled in.
+[script]
+theme = "Theme: %s"
+theme_system = "system"
+theme_light = "light"
+theme_dark = "dark"
+copy_heading_link = "Copy link to “%s”"
+link_copied = "Link copied"
+copy_code = "Copy"
+code_copied = "Copied"
+not_published = "Not published"
+preview = "Preview"
+open_note = "Open note →"
+search = "Search"
+search_placeholder = "Search notes…"
+search_label = "Search notes"
+search_hint = "↑↓ to choose · Enter to open · Esc to close"
+search_empty = "No notes found."
+search_unavailable = "Search is not available."
+graph_all = "Graph of all notes"
+graph_unavailable = "The graph is not available."
+close = "Close"

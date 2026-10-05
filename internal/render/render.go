@@ -44,6 +44,7 @@ func Render(site *model.Site, t *Theme, out Output) error {
 		pages[kind] = c.Funcs(funcMap(t, site))
 	}
 	r := &renderer{site: site, theme: t, pages: pages, out: out, written: map[string]string{}}
+	msg := t.Messages(site.Config.Language)
 
 	// Home.
 	home := &Page{Kind: "home", Title: site.Config.Title, URL: "/", Description: site.Config.Description, Note: site.Home}
@@ -67,7 +68,7 @@ func Render(site *model.Site, t *Theme, out Output) error {
 	if err := r.folders(site.Root); err != nil {
 		return err
 	}
-	if err := r.page("/tags/", &Page{Kind: "tags", Title: "Tags", URL: "/tags/"}); err != nil {
+	if err := r.page("/tags/", &Page{Kind: "tags", Title: msg.T("tags"), URL: "/tags/"}); err != nil {
 		return err
 	}
 	for _, tag := range site.AllTags {
@@ -75,7 +76,7 @@ func Render(site *model.Site, t *Theme, out Output) error {
 			return err
 		}
 	}
-	if err := r.file("/404.html", "404", &Page{Kind: "404", Title: "Not found", URL: "/404.html"}); err != nil {
+	if err := r.file("/404.html", "404", &Page{Kind: "404", Title: msg.T("not_found"), URL: "/404.html"}); err != nil {
 		return err
 	}
 	if err := r.generated(); err != nil {

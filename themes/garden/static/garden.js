@@ -11,13 +11,20 @@
       (!root.dataset.theme && window.matchMedia("(prefers-color-scheme: dark)").matches);
   };
   var onThemeChange = [];
+  // The interface's words in the site's language (i18n/*.toml, [script]).
+  var words = {};
+  try { words = JSON.parse(document.body.dataset.i18n || "{}"); } catch (e) {}
+  var tr = function (key, def, arg) {
+    var s = words[key] || def;
+    return arg == null ? s : s.replace("%s", arg);
+  };
 
   // ---- color theme: system → light → dark → system ----
   var toggle = $(".theme-toggle");
   if (toggle) {
     toggle.hidden = false;
     var order = ["", "light", "dark"];
-    var label = function () { toggle.title = "Theme: " + (root.dataset.theme || "system"); };
+    var label = function () { toggle.title = tr("theme", "Theme: %s", tr("theme_" + (root.dataset.theme || "system"), root.dataset.theme || "system")); };
     label();
     toggle.addEventListener("click", function () {
       var next = order[(order.indexOf(root.dataset.theme || "") + 1) % order.length];
@@ -123,7 +130,7 @@
     a.className = "heading-anchor";
     a.href = "#" + encodeURIComponent(h.id);
     a.textContent = "#";
-    a.setAttribute("aria-label", "Copy link to “" + h.textContent + "”");
+    a.setAttribute("aria-label", tr("copy_heading_link", "Copy link to “%s”", h.textContent));
     a.addEventListener("click", function (e) {
       if (!navigator.clipboard) return; // plain jump to the section
       e.preventDefault();
@@ -131,14 +138,14 @@
       history.replaceState(null, "", a.getAttribute("href"));
       navigator.clipboard.writeText(url).then(function () {
         a.classList.add("copied");
-        a.dataset.label = "Link copied";
+        a.dataset.label = tr("link_copied", "Link copied");
         setTimeout(function () { a.classList.remove("copied"); }, 1600);
       }, function () { location.hash = a.getAttribute("href"); });
     });
     h.appendChild(a);
   });
 
-  document.querySelectorAll(".link-unpublished").forEach(function (el) { el.title = "Not published"; });
+  document.querySelectorAll(".link-unpublished").forEach(function (el) { el.title = tr("not_published", "Not published"); });
 
   // ---- math (KaTeX is loaded only on pages that need it) ----
   function renderMath(scope) {
@@ -253,7 +260,7 @@
       if (!popup) {
         popup = el("div", "link-preview");
         popup.setAttribute("role", "dialog");
-        popup.setAttribute("aria-label", "Preview");
+        popup.setAttribute("aria-label", tr("preview", "Preview"));
         popup.hidden = true;
         popup.addEventListener("mouseenter", function () { clearTimeout(hideTimer); });
         popup.addEventListener("mouseleave", function () { if (lastPointer === "mouse") hideTimer = setTimeout(hide, 250); });
@@ -272,7 +279,7 @@
         inner.appendChild(body);
         popup.appendChild(inner);
         if (lastPointer !== "mouse") {
-          var open = el("a", "link-preview-open", "Open note →");
+          var open = el("a", "link-preview-open", tr("open_note", "Open note →"));
           open.href = link.href;
           popup.appendChild(open);
         }
@@ -327,20 +334,20 @@
 
     var build = function () {
       dialog = el("dialog", "search-dialog");
-      dialog.setAttribute("aria-label", "Search");
+      dialog.setAttribute("aria-label", tr("search", "Search"));
       var form = el("form");
       form.method = "dialog";
       input = el("input");
       input.type = "search";
-      input.placeholder = "Search notes…";
-      input.setAttribute("aria-label", "Search notes");
+      input.placeholder = tr("search_placeholder", "Search notes…");
+      input.setAttribute("aria-label", tr("search_label", "Search notes"));
       input.autocomplete = "off";
       list = el("ul", "search-results");
       list.setAttribute("role", "listbox");
       form.appendChild(input);
       dialog.appendChild(form);
       dialog.appendChild(list);
-      dialog.appendChild(el("p", "search-hint", "↑↓ to choose · Enter to open · Esc to close"));
+      dialog.appendChild(el("p", "search-hint", tr("search_hint", "↑↓ to choose · Enter to open · Esc to close")));
       document.body.appendChild(dialog);
       dialog.addEventListener("click", function (e) { if (e.target === dialog) dialog.close(); });
       input.addEventListener("input", run);
@@ -414,7 +421,7 @@
       active = results.length ? 0 : -1;
       if (q && !results.length) {
         list.textContent = "";
-        list.appendChild(el("li", "search-empty", "No notes found."));
+        list.appendChild(el("li", "search-empty", tr("search_empty", "No notes found.")));
         return;
       }
       paint();
@@ -427,7 +434,7 @@
       input.select();
       ready().then(run).catch(function () {
         list.textContent = "";
-        list.appendChild(el("li", "search-empty", "Search is not available."));
+        list.appendChild(el("li", "search-empty", tr("search_unavailable", "Search is not available.")));
       });
     };
     searchBtn.addEventListener("click", function () { open(); });
@@ -688,10 +695,10 @@
     graphBtn.addEventListener("click", function () {
       if (!gdialog) {
         gdialog = el("dialog", "graph-dialog");
-        gdialog.setAttribute("aria-label", "Graph of all notes");
+        gdialog.setAttribute("aria-label", tr("graph_all", "Graph of all notes"));
         var close = el("button", "icon-button graph-close", "×");
         close.type = "button";
-        close.setAttribute("aria-label", "Close");
+        close.setAttribute("aria-label", tr("close", "Close"));
         close.addEventListener("click", function () { gdialog.close(); });
         var area = el("div", "graph-canvas");
         gdialog.appendChild(close);
@@ -702,7 +709,7 @@
         getJSON("/graph.json").then(function (data) {
           data = globalGraph(data);
           new Graph(area, data, { current: noteId, labels: data.nodes.length <= 40 });
-        }).catch(function () { area.textContent = "The graph is not available."; });
+        }).catch(function () { area.textContent = tr("graph_unavailable", "The graph is not available."); });
         return;
       }
       gdialog.showModal();

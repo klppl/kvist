@@ -2,12 +2,12 @@
 {{- $t := .Tag}}{{$n := len .Tag.Notes}}
 <article class="listing tag-page">
   <header class="index-head">
-    <nav class="crumbs" aria-label="Tag path"><a href="/tags/">Tags</a>{{with .Tag.Parent}}{{template "tag-crumbs" .}}{{end}}</nav>
+    <nav class="crumbs" aria-label="{{t "tag_path"}}"><a href="/tags/">{{t "tags"}}</a>{{with .Tag.Parent}}{{template "tag-crumbs" .}}{{end}}</nav>
     <h1><span class="hash" aria-hidden="true">#</span>{{.Tag.Name}}</h1>
     <p class="meta">
-      <span>{{$n}} {{if eq $n 1}}note{{else}}notes{{end}}</span>
+      <span>{{t "notes" $n}}</span>
       {{- range newest 1 .Tag.Notes}}
-      <span>Last tended <time datetime="{{isoDate .Updated}}">{{dateFormat (param "date_format") .Updated}}</time></span>{{end}}
+      <span>{{t "last_tended"}} <time datetime="{{isoDate .Updated}}">{{dateFormat (param "date_format") .Updated}}</time></span>{{end}}
     </p>
     {{- with .Tag.Children}}
     <p class="tags sub-tags">{{range .}}<a class="tag" href="{{.URL}}">#{{slice .Name (add (len $t.Name) 1)}} <span class="count">{{len .Notes}}</span></a> {{end}}</p>

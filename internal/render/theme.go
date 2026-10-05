@@ -6,6 +6,7 @@
 //	templates/            base.html, note.html, folder.html, tag.html,
 //	                      tags.html, home.html, 404.html, partials/*.html
 //	static/               copied to /_kvist/<hash>/
+//	i18n/<language>.toml  the interface's words (i18n.go)
 //
 // Templates are html/template with a small function set (funcs.go) and no
 // file system or network access.
@@ -40,6 +41,7 @@ type Theme struct {
 	Params  map[string]any
 
 	fsys      fs.FS
+	i18n      map[string]map[string]any // language → key → word
 	pages     map[string]*template.Template
 	static    []string // static file paths relative to static/
 	assetBase string   // /_kvist/<hash>/
@@ -89,6 +91,10 @@ func LoadTheme(fsys, overrides fs.FS) (*Theme, error) {
 	t := &Theme{Name: m.Name, Version: m.Version, License: m.License, Models: m.Model, Params: m.Params, fsys: fsx, pages: map[string]*template.Template{}}
 	if t.Params == nil {
 		t.Params = map[string]any{}
+	}
+
+	if t.i18n, err = loadI18n(fsys, overrides); err != nil {
+		return nil, err
 	}
 
 	statics, err := listFiles(fsys, overrides, "static")

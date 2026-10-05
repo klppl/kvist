@@ -54,6 +54,7 @@ mytheme/
     404.html           /404.html
     partials/*.html    shared {{define}} blocks
   static/              copied to /_kvist/<hash>/
+  i18n/<lang>.toml     the theme's words per language (optional)
 ```
 
 ```toml
@@ -93,8 +94,10 @@ a `Page`:
 | Function | Example | |
 |---|---|---|
 | `asset` | `{{asset "style.css"}}` | URL of a file in `static/`, content-hashed |
+| `t` | `{{t "search"}}`, `{{t "notes" (len .Notes)}}` | a word in the site's language (below) |
+| `i18n` | `<body data-i18n="{{json (i18n "script")}}">` | a table of words, e.g. for a script |
 | `absURL` | `{{absURL .URL}}` | absolute URL with the site's base URL |
-| `dateFormat` | `{{dateFormat "2 Jan 2006" .Note.Updated}}` | Go time layout |
+| `dateFormat` | `{{dateFormat "2 Jan 2006" .Note.Updated}}` | Go time layout; month and day names in the site's language |
 | `isoDate` | `{{isoDate .Note.Created}}` | RFC 3339 |
 | `param` | `{{param "accent"}}` | site `theme_params` over theme defaults |
 | `recent` | `{{range recent 10}}` | most recently updated notes |
@@ -110,6 +113,30 @@ a `Page`:
 Code highlighting styles come from the `code_style_light` and
 `code_style_dark` params ([chroma style names](https://xyproto.github.io/splash/docs/)).
 They are written to `syntax.css` (`{{asset "syntax.css"}}`).
+
+## Translations
+
+A theme's words live in `i18n/<lang>.toml`, one file per language code,
+and templates show them with `t`. The site's `language` picks the file:
+`sv-SE` tries `sv-se.toml`, then `sv.toml`, then `en.toml`; a word that is
+still missing shows as its key.
+
+```toml
+# i18n/sv.toml
+search = "Sök"
+notes  = { one = "%d anteckning", other = "%d anteckningar" }  # {{t "notes" 3}}
+months = ["januari", "februari", …]   # also months_short, days, days_short (Sunday first)
+
+[script]                              # words for the theme's script
+close = "Stäng"
+```
+
+A table with `one` and `other` is a plural: the first argument picks
+`one` for 1 and `other` for anything else, and arguments fill `%d` and
+`%s`. A file in `theme_overrides` adds to the theme's file of the same
+name key by key, so a site can change one word or add a language without
+copying the rest. The garden theme ships `en`, `sv`, `de`, `fr` and `es`;
+a test keeps their keys in step with `en.toml`.
 
 ## Output and caching
 

@@ -58,6 +58,7 @@
   <tbody>
     <tr><td>Tweak styles: fonts, spacing, colors beyond <code>accent</code></td><td><a href="#custom-css">Add a CSS file</a> with an overrides folder</td></tr>
     <tr><td>Change one part of the page, like the note header or the footer</td><td><a href="#overrides">Override that template</a></td></tr>
+    <tr><td>Change a word, or translate the theme to another language</td><td><a href="#words">Add a word file</a></td></tr>
     <tr><td>A completely different look</td><td><a href="#new-theme">Write a new theme</a></td></tr>
   </tbody>
 </table>
@@ -107,6 +108,12 @@ theme_overrides = "/etc/kvist/theme"   <span class="c"># a folder on the server<
 {{- end}}</code></pre>
 <p>The theme includes <code>head-extra</code> at the very end of <code>&lt;head&gt;</code> and leaves it empty, just for this. Your stylesheet loads after the theme's, so your rules win. <code>{{asset "custom.css"}}</code> gives the file's address, with a fingerprint that changes when the file does, so browsers never use an old copy. The same file is the place for extra meta tags or a script.</p>
 <p>Useful variables to change: <code>--bg</code>, <code>--fg</code>, <code>--muted</code>, <code>--border</code>, <code>--pane</code>, <code>--font</code>, <code>--font-mono</code> and <code>--radius</code>. For dark mode, set them again under <code>:root[data-theme="dark"]</code> and in a <code>@media (prefers-color-scheme: dark)</code> block, as <code>style.css</code> does.</p>
+
+<h2 id="words">Changing the theme's words</h2>
+<p>The menu, dates and search speak the site's <code>language</code>. The theme keeps its words in <code>i18n/&lt;language&gt;.toml</code>, one file per language; the built-in garden theme has English, Swedish, German, French and Spanish. To change a word, or to add a language, put a file with the same name in your overrides folder. It only needs the words you change, the rest still comes from the theme:</p>
+<pre data-label="theme/i18n/sv.toml"><code>planted = "Sådd"
+tended  = "Ompysslad"</code></pre>
+<p>For a language the theme doesn't have, start from a copy of <code>themes/garden/i18n/en.toml</code> in the repository, name it after the language code (<code>nb.toml</code>, <code>pt.toml</code>, …) and translate it. Words you leave out stay in English.</p>
 
 <h2 id="preview">Previewing while you work</h2>
 <p>Run the preview server on your computer with a copy of your server's config, pointing <code>theme_overrides</code> (or <code>theme</code>) at your local folder:</p>

@@ -1,0 +1,86 @@
+# The garden theme's words in Swedish.
+
+skip_to_content = "Hoppa till innehållet"
+site = "Webbplats"
+menu = "Meny"
+switch_theme = "Byt färgtema"
+home = "Hem"
+search = "Sök"
+search_shortcut = "Sök (/)"
+graph = "Graf"
+tags = "Taggar"
+content = "Innehåll"
+links = "Länkar"
+grown_with = "Odlad med"
+rss = "RSS"
+about_author = "Om författaren"
+
+explore = "Utforska"
+recently_tended = "Nyligen skötta"
+notes = { one = "%d anteckning", other = "%d anteckningar" }
+folders = { one = "%d mapp", other = "%d mappar" }
+tag_count = { one = "%d tagg", other = "%d taggar" }
+untitled_list = "Anteckningar"
+filter_notes = { one = "Filtrera %d anteckning", other = "Filtrera %d anteckningar" }
+filter_notes_label = "Filtrera anteckningar"
+more = "%d till…"
+no_matching_notes = "Inga anteckningar här matchar."
+search_everywhere = "Sök överallt"
+
+planted = "Planterad"
+tended = "Skött"
+last_tended = "Senast skött"
+reading_time = "%d min läsning"
+growth_stage = "Växtstadium"
+stage_seedling = "grodd"
+stage_budding = "knoppande"
+stage_evergreen = "vintergrön"
+backlinks = "Länkar hit"
+on_this_page = "På den här sidan"
+connections = "Kopplingar"
+local_graph = "Graf över länkade anteckningar"
+yes = "ja"
+no = "nej"
+
+tag_path = "Taggsökväg"
+tags_lead = "%s i %s. Välj ett ämne för att se allt som hör dit."
+filter_tags = "Filtrera taggar"
+sort_tags = "Sortera taggar"
+sort_name = "A–Ö"
+sort_count = "Flest anteckningar"
+all_notes = "Alla %d anteckningar →"
+no_tags_match = "Inga taggar matchar filtret."
+no_tags = "Inga taggar än."
+no_tags_help = "Taggar i dina publicerade anteckningar, i texten eller i en antecknings egenskaper, visas här."
+
+not_found = "Hittades inte"
+not_found_title = "Här växer ingenting"
+not_found_text = "Sidan finns inte. Den kan ha flyttats, eller så planterades den aldrig."
+not_found_back = "Tillbaka till trädgården"
+
+months = ["januari", "februari", "mars", "april", "maj", "juni", "juli", "augusti", "september", "oktober", "november", "december"]
+months_short = ["jan", "feb", "mar", "apr", "maj", "jun", "jul", "aug", "sep", "okt", "nov", "dec"]
+days = ["söndag", "måndag", "tisdag", "onsdag", "torsdag", "fredag", "lördag"]
+days_short = ["sön", "mån", "tis", "ons", "tor", "fre", "lör"]
+
+[script]
+theme = "Tema: %s"
+theme_system = "system"
+theme_light = "ljust"
+theme_dark = "mörkt"
+copy_heading_link = "Kopiera länk till ”%s”"
+link_copied = "Länken kopierad"
+copy_code = "Kopiera"
+code_copied = "Kopierad"
+not_published = "Inte publicerad"
+preview = "Förhandsvisning"
+open_note = "Öppna anteckningen →"
+search = "Sök"
+search_placeholder = "Sök anteckningar…"
+search_label = "Sök anteckningar"
+search_hint = "↑↓ för att välja · Enter för att öppna · Esc för att stänga"
+search_empty = "Inga anteckningar hittades."
+search_unavailable = "Sökningen är inte tillgänglig."
+graph_all = "Graf över alla anteckningar"
+graph_unavailable = "Grafen är inte tillgänglig."
+close = "Stäng"

@@ -1,0 +1,86 @@
+# The garden theme's words in French.
+
+skip_to_content = "Aller au contenu"
+site = "Site"
+menu = "Menu"
+switch_theme = "Changer de thème de couleur"
+home = "Accueil"
+search = "Recherche"
+search_shortcut = "Recherche (/)"
+graph = "Graphe"
+tags = "Étiquettes"
+content = "Contenu"
+links = "Liens"
+grown_with = "Cultivé avec"
+rss = "RSS"
+about_author = "À propos de l'auteur"
+
+explore = "Explorer"
+recently_tended = "Récemment entretenues"
+notes = { one = "%d note", other = "%d notes" }
+folders = { one = "%d dossier", other = "%d dossiers" }
+tag_count = { one = "%d étiquette", other = "%d étiquettes" }
+untitled_list = "Notes"
+filter_notes = { one = "Filtrer %d note", other = "Filtrer %d notes" }
+filter_notes_label = "Filtrer les notes"
+more = "%d de plus…"
+no_matching_notes = "Aucune note ne correspond ici."
+search_everywhere = "Chercher partout"
+
+planted = "Plantée le"
+tended = "Entretenue le"
+last_tended = "Dernier entretien le"
+reading_time = "%d min de lecture"
+growth_stage = "Stade de croissance"
+stage_seedling = "semis"
+stage_budding = "en bourgeon"
+stage_evergreen = "persistante"
+backlinks = "Liens vers cette note"
+on_this_page = "Sur cette page"
+connections = "Connexions"
+local_graph = "Graphe des notes liées"
+yes = "oui"
+no = "non"
+
+tag_path = "Chemin de l'étiquette"
+tags_lead = "%s dans %s. Choisissez un sujet pour voir tout ce qui s'y rapporte."
+filter_tags = "Filtrer les étiquettes"
+sort_tags = "Trier les étiquettes"
+sort_name = "A–Z"
+sort_count = "Plus de notes"
+all_notes = "Les %d notes →"
+no_tags_match = "Aucune étiquette ne correspond à ce filtre."
+no_tags = "Pas encore d'étiquettes."
+no_tags_help = "Les étiquettes de vos notes publiées, dans le texte ou dans les propriétés d'une note, apparaissent ici."
+
+not_found = "Introuvable"
+not_found_title = "Rien ne pousse ici"
+not_found_text = "Cette page n'existe pas. Elle a peut-être été déplacée, ou n'a jamais été plantée."
+not_found_back = "Retour au jardin"
+
+months = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"]
+months_short = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."]
+days = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"]
+days_short = ["dim.", "lun.", "mar.", "mer.", "jeu.", "ven.", "sam."]
+
+[script]
+theme = "Thème : %s"
+theme_system = "système"
+theme_light = "clair"
+theme_dark = "sombre"
+copy_heading_link = "Copier le lien vers « %s »"
+link_copied = "Lien copié"
+copy_code = "Copier"
+code_copied = "Copié"
+not_published = "Non publiée"
+preview = "Aperçu"
+open_note = "Ouvrir la note →"
+search = "Recherche"
+search_placeholder = "Rechercher des notes…"
+search_label = "Rechercher des notes"
+search_hint = "↑↓ pour choisir · Entrée pour ouvrir · Échap pour fermer"
+search_empty = "Aucune note trouvée."
+search_unavailable = "La recherche n'est pas disponible."
+graph_all = "Graphe de toutes les notes"
+graph_unavailable = "Le graphe n'est pas disponible."
+close = "Fermer"

@@ -6,18 +6,18 @@
 {{define "main" -}}
 <article class="listing tags-index">
   <header class="index-head">
-    <h1>Tags</h1>
+    <h1>{{t "tags"}}</h1>
     {{- with .Site.AllTags}}
-    <p class="lead">{{len .}} {{if eq (len .) 1}}tag{{else}}tags{{end}} across {{len $.Site.Notes}} {{if eq (len $.Site.Notes) 1}}note{{else}}notes{{end}}. Pick a topic to see everything filed under it.</p>
+    <p class="lead">{{t "tags_lead" (t "tag_count" (len .)) (t "notes" (len $.Site.Notes))}}</p>
     {{- end}}
   </header>
   {{- with .Site.Tags}}
   {{- $max := 1}}{{range .}}{{if gt (len .Notes) $max}}{{$max = len .Notes}}{{end}}{{end}}
   <div class="tag-tools" hidden>
-    <input class="tag-filter" type="search" placeholder="Filter tags" aria-label="Filter tags" autocomplete="off">
-    <div class="segmented" role="group" aria-label="Sort tags">
-      <button type="button" data-sort="name" aria-pressed="true">A–Z</button>
-      <button type="button" data-sort="count" aria-pressed="false">Most notes</button>
+    <input class="tag-filter" type="search" placeholder="{{t "filter_tags"}}" aria-label="{{t "filter_tags"}}" autocomplete="off">
+    <div class="segmented" role="group" aria-label="{{t "sort_tags"}}">
+      <button type="button" data-sort="name" aria-pressed="true">{{t "sort_name"}}</button>
+      <button type="button" data-sort="count" aria-pressed="false">{{t "sort_count"}}</button>
     </div>
   </div>
   <ul class="tag-grid">
@@ -26,7 +26,7 @@
     <li class="tag-card" data-name="{{.Name}}" data-count="{{$n}}" data-search="{{.Name}}{{range .Children}} {{.Name}}{{end}}">
       <a class="tag-card-head" href="{{.URL}}">
         <span class="tag-card-name"><span class="hash" aria-hidden="true">#</span>{{.Name}}</span>
-        <span class="tag-card-count">{{$n}} {{if eq $n 1}}note{{else}}notes{{end}}</span>
+        <span class="tag-card-count">{{t "notes" $n}}</span>
       </a>
       <span class="tag-meter" style="--n: {{$n}}; --max: {{$max}}" aria-hidden="true"></span>
       <ul class="tag-card-notes">
@@ -37,17 +37,17 @@
       {{- if or .Children (gt $n 3)}}
       <div class="tag-card-foot">
         {{- range .Children}}<a class="tag" href="{{.URL}}">#{{slice .Name (add (len $t.Name) 1)}} <span class="count">{{len .Notes}}</span></a>{{end}}
-        {{- if gt $n 3}}<a class="tag-card-more" href="{{.URL}}">All {{$n}} notes →</a>{{end}}
+        {{- if gt $n 3}}<a class="tag-card-more" href="{{.URL}}">{{t "all_notes" $n}}</a>{{end}}
       </div>
       {{- end}}
     </li>
     {{- end}}
   </ul>
-  <p class="tag-empty muted" hidden>No tags match that filter.</p>
+  <p class="tag-empty muted" hidden>{{t "no_tags_match"}}</p>
   {{- else}}
   <div class="empty-state">
-    <p><strong>No tags yet.</strong></p>
-    <p class="muted">Tags in your published notes, like <code>#ideas</code> or <code>tags: [books]</code> in a note's properties, show up here.</p>
+    <p><strong>{{t "no_tags"}}</strong></p>
+    <p class="muted">{{t "no_tags_help"}}</p>
   </div>
   {{- end}}
 </article>

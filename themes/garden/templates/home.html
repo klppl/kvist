@@ -11,24 +11,24 @@
 {{- end}}
 {{- if param "groups"}}
 <section class="explore" aria-labelledby="explore-title">
-  <h2 id="explore-title" class="section-label">Explore</h2>
+  <h2 id="explore-title" class="section-label">{{t "explore"}}</h2>
   <ul class="cards">
     {{- range $name := param "groups"}}{{range $.Site.AllTags}}{{if eq (lower .Name) (lower (str $name))}}
     <li class="card"><a class="card-link" href="{{.URL}}">
       <span class="card-title">{{title (str $name)}}</span>
-      <span class="card-meta">{{len .Notes}} {{if eq (len .Notes) 1}}note{{else}}notes{{end}}</span>
+      <span class="card-meta">{{t "notes" (len .Notes)}}</span>
     </a></li>
     {{- end}}{{end}}{{end}}
   </ul>
 </section>
 {{- else}}{{with .Site.Root.Children}}
 <section class="explore" aria-labelledby="explore-title">
-  <h2 id="explore-title" class="section-label">Explore</h2>
+  <h2 id="explore-title" class="section-label">{{t "explore"}}</h2>
   <ul class="cards">
     {{- range .}}
     <li class="card"><a class="card-link" href="{{.URL}}">
       <span class="card-title">{{.Name}}</span>
-      <span class="card-meta">{{len .Notes}} {{if eq (len .Notes) 1}}note{{else}}notes{{end}}{{with .Children}} · {{len .}} {{if eq (len .) 1}}folder{{else}}folders{{end}}{{end}}</span>
+      <span class="card-meta">{{t "notes" (len .Notes)}}{{with .Children}} · {{t "folders" (len .)}}{{end}}</span>
     </a></li>
     {{- end}}
   </ul>
@@ -36,7 +36,7 @@
 {{- end}}{{end}}
 {{- if not (param "show_list")}}{{with recent (param "home_recent")}}
 <section class="recent" aria-labelledby="recent-title">
-  <h2 id="recent-title" class="section-label">Recently tended</h2>
+  <h2 id="recent-title" class="section-label">{{t "recently_tended"}}</h2>
   <ul class="cards">{{range .}}{{template "card" .}}{{end}}</ul>
 </section>
 {{- end}}{{end}}

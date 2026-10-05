@@ -12,7 +12,7 @@
 {{- $max := param "list_max"}}
 <section class="list-pane" aria-labelledby="list-title">
   {{- if eq .Kind "home"}}
-  {{template "list-body" (dict "Title" "Recently tended" "URL" "" "Notes" (recent (param "home_recent")) "Cur" $cur "Max" $max)}}
+  {{template "list-body" (dict "Title" (t "recently_tended") "URL" "" "Notes" (recent (param "home_recent")) "Cur" $cur "Max" $max)}}
   {{- else if eq .Kind "tag"}}
   {{- $t := .Tag}}{{$label := print "#" $t.Name}}
   {{- range param "groups"}}{{if eq (lower (str .)) (lower $t.Name)}}{{$label = title (str .)}}{{end}}{{end}}
@@ -23,7 +23,7 @@
   {{template "list-body" (dict "Title" $label "URL" $group.URL "Notes" (newest 0 $group.Notes) "Cur" $cur "Max" $max)}}
   {{- else}}
   {{- $f := .Folder}}{{with .Note}}{{$f = .Folder}}{{end}}
-  {{template "list-body" (dict "Title" (default "Notes" $f.Name) "URL" $f.URL "Notes" $f.Notes "Folders" $f.Children "Parent" $f.Parent "Cur" $cur "Max" $max)}}
+  {{template "list-body" (dict "Title" (default (t "untitled_list") $f.Name) "URL" $f.URL "Notes" $f.Notes "Folders" $f.Children "Parent" $f.Parent "Cur" $cur "Max" $max)}}
   {{- end}}
 </section>
 {{- end}}
@@ -32,7 +32,7 @@
 {{define "list-body" -}}
 <header class="list-head">
   <h2 id="list-title">{{if and .URL (ne .URL .Cur)}}<a href="{{.URL}}">{{.Title}}</a>{{else}}{{.Title}}{{end}}</h2>
-  <input class="list-filter" type="search" placeholder="Filter {{len .Notes}} notes" aria-label="Filter notes" autocomplete="off" hidden>
+  <input class="list-filter" type="search" placeholder="{{t "filter_notes" (len .Notes)}}" aria-label="{{t "filter_notes_label"}}" autocomplete="off" hidden>
 </header>
 <ul class="list-items">
   {{- with .Parent}}{{if ne .URL "/"}}
@@ -54,8 +54,8 @@
   </li>
   {{- end}}{{end}}
   {{- if and .URL (gt (len .Notes) .Max)}}
-  <li class="list-more"><a href="{{.URL}}">{{sub (len .Notes) .Max}} more…</a></li>
+  <li class="list-more"><a href="{{.URL}}">{{t "more" (sub (len .Notes) .Max)}}</a></li>
   {{- end}}
 </ul>
-<p class="list-empty" hidden>No matching notes here. <button class="link-button list-search" type="button">Search everywhere</button></p>
+<p class="list-empty" hidden>{{t "no_matching_notes"}} <button class="link-button list-search" type="button">{{t "search_everywhere"}}</button></p>
 {{- end}}

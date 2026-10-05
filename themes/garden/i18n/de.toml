@@ -1,0 +1,86 @@
+# The garden theme's words in German.
+
+skip_to_content = "Zum Inhalt springen"
+site = "Website"
+menu = "Menü"
+switch_theme = "Farbschema wechseln"
+home = "Start"
+search = "Suche"
+search_shortcut = "Suche (/)"
+graph = "Graph"
+tags = "Tags"
+content = "Inhalt"
+links = "Links"
+grown_with = "Gewachsen mit"
+rss = "RSS"
+about_author = "Über den Autor"
+
+explore = "Entdecken"
+recently_tended = "Zuletzt gepflegt"
+notes = { one = "%d Notiz", other = "%d Notizen" }
+folders = { one = "%d Ordner", other = "%d Ordner" }
+tag_count = { one = "%d Tag", other = "%d Tags" }
+untitled_list = "Notizen"
+filter_notes = { one = "%d Notiz filtern", other = "%d Notizen filtern" }
+filter_notes_label = "Notizen filtern"
+more = "%d weitere…"
+no_matching_notes = "Hier passen keine Notizen."
+search_everywhere = "Überall suchen"
+
+planted = "Gepflanzt"
+tended = "Gepflegt"
+last_tended = "Zuletzt gepflegt"
+reading_time = "%d Min. Lesezeit"
+growth_stage = "Wachstumsstadium"
+stage_seedling = "Keimling"
+stage_budding = "knospend"
+stage_evergreen = "immergrün"
+backlinks = "Links zu dieser Notiz"
+on_this_page = "Auf dieser Seite"
+connections = "Verbindungen"
+local_graph = "Graph der verlinkten Notizen"
+yes = "ja"
+no = "nein"
+
+tag_path = "Tag-Pfad"
+tags_lead = "%s in %s. Wähle ein Thema, um alles dazu zu sehen."
+filter_tags = "Tags filtern"
+sort_tags = "Tags sortieren"
+sort_name = "A–Z"
+sort_count = "Meiste Notizen"
+all_notes = "Alle %d Notizen →"
+no_tags_match = "Keine Tags passen zu diesem Filter."
+no_tags = "Noch keine Tags."
+no_tags_help = "Tags in deinen veröffentlichten Notizen, im Text oder in den Eigenschaften einer Notiz, erscheinen hier."
+
+not_found = "Nicht gefunden"
+not_found_title = "Hier wächst nichts"
+not_found_text = "Diese Seite gibt es nicht. Vielleicht wurde sie verschoben, oder sie wurde nie gepflanzt."
+not_found_back = "Zurück zum Garten"
+
+months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"]
+months_short = ["Jan.", "Feb.", "März", "Apr.", "Mai", "Juni", "Juli", "Aug.", "Sept.", "Okt.", "Nov.", "Dez."]
+days = ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"]
+days_short = ["So.", "Mo.", "Di.", "Mi.", "Do.", "Fr.", "Sa."]
+
+[script]
+theme = "Farbschema: %s"
+theme_system = "System"
+theme_light = "hell"
+theme_dark = "dunkel"
+copy_heading_link = "Link zu „%s“ kopieren"
+link_copied = "Link kopiert"
+copy_code = "Kopieren"
+code_copied = "Kopiert"
+not_published = "Nicht veröffentlicht"
+preview = "Vorschau"
+open_note = "Notiz öffnen →"
+search = "Suche"
+search_placeholder = "Notizen durchsuchen…"
+search_label = "Notizen durchsuchen"
+search_hint = "↑↓ zum Auswählen · Enter zum Öffnen · Esc zum Schließen"
+search_empty = "Keine Notizen gefunden."
+search_unavailable = "Die Suche ist nicht verfügbar."
+graph_all = "Graph aller Notizen"
+graph_unavailable = "Der Graph ist nicht verfügbar."
+close = "Schließen"
