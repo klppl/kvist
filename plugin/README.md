@@ -6,27 +6,19 @@ as a website. Works on desktop and mobile.
 
 ## Install (until it is in the community plugin list)
 
-Download `kvist-plugin-<version>.zip` from the
-[releases](https://github.com/klppl/kvist/releases) and unzip it into
-`<vault>/.obsidian/plugins/`, so the files end up in
-`<vault>/.obsidian/plugins/kvist/`. Then enable **kvist** under
-*Settings → Community plugins*.
+1. Download **[kvist-plugin.zip](https://github.com/klppl/kvist/releases/latest/download/kvist-plugin.zip)** (always the newest version).
+2. Unzip it into your vault's `.obsidian/plugins/` folder, so you get
+   `<vault>/.obsidian/plugins/kvist/`.
+3. In Obsidian, enable **kvist** under *Settings → Community plugins*.
 
-Or build it yourself:
+To update, download the zip again and replace the folder.
 
-```sh
-cd plugin
-npm install
-npm run build
-```
+## Releasing
 
-and copy `main.js`, `manifest.json` and `styles.css` to
-`<vault>/.obsidian/plugins/kvist/`.
-
-Releases are made by the *Plugin release* workflow: pushing a tag like
-`v0.2.0` builds the plugin and attaches the zip and the three loose files
-to that tag's release. It can also be run by hand from the Actions tab.
-Bump `version` in `manifest.json` (and `package.json`) before tagging.
+The *Plugin release* workflow builds the plugin and attaches
+`kvist-plugin.zip` to the release of a tag. Pushing a tag like `v0.2.0`
+runs it; it can also be run by hand from the Actions tab. Bump `version` in
+`manifest.json` (and `package.json`) before tagging.
 
 ## Set up
 

@@ -31,8 +31,10 @@ Publish, and your site updates. Private notes never leave your device.
 - [Customizing the site](https://klppl.github.io/kvist/customizing.html):
   title, home page, menu groups and colors.
 
-The server runs from the Docker image `ghcr.io/klppl/kvist`; the
-[Obsidian plugin](plugin/README.md) works on desktop and mobile.
+The server runs from the Docker image `ghcr.io/klppl/kvist`. The Obsidian
+plugin works on desktop and mobile: download
+**[kvist-plugin.zip](https://github.com/klppl/kvist/releases/latest/download/kvist-plugin.zip)** and unzip it into your vault's
+`.obsidian/plugins/` folder ([details](plugin/README.md)).
 
 ## Development
 

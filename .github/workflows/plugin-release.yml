@@ -1,6 +1,9 @@
-# Builds the Obsidian plugin and attaches it to a GitHub release:
-#   kvist-plugin-<version>.zip   a kvist/ folder to drop into .obsidian/plugins/
-#   main.js, manifest.json, styles.css   loose, as Obsidian and BRAT expect
+# Builds the Obsidian plugin and attaches it to a GitHub release as
+# kvist-plugin.zip: a kvist/ folder to drop into .obsidian/plugins/. The name
+# never changes, so the newest version is always at
+#   https://github.com/klppl/kvist/releases/latest/download/kvist-plugin.zip
+# (When the plugin goes on Obsidian's community list, also upload main.js,
+# manifest.json and styles.css loose: Obsidian downloads those.)
 #
 # Runs for tags like v1.2.3, and by hand (Actions → Plugin release → Run
 # workflow) for any tag; a tag that doesn't exist yet is created at the
@@ -53,17 +56,15 @@ jobs:
             tag="${INPUT_TAG:-v$version}"
           fi
           if [ "${tag#v}" != "$version" ]; then
-            echo "::warning::tag $tag does not match plugin/manifest.json version $version; the zip is named after the manifest"
+            echo "::warning::tag $tag does not match plugin/manifest.json version $version"
           fi
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
-          echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Package
         run: |
           mkdir -p dist/kvist
           cp main.js manifest.json styles.css dist/kvist/
-          (cd dist && zip -r "kvist-plugin-${{ steps.tag.outputs.version }}.zip" kvist)
-          cp main.js manifest.json styles.css dist/
+          (cd dist && zip -r kvist-plugin.zip kvist)
 
       - name: Upload to the release
         env:
@@ -73,6 +74,8 @@ jobs:
           if ! gh release view "$TAG" >/dev/null 2>&1; then
             gh release create "$TAG" --target "$GITHUB_SHA" --title "$TAG" --generate-notes
           fi
-          gh release upload "$TAG" --clobber \
-            "dist/kvist-plugin-${{ steps.tag.outputs.version }}.zip" \
-            dist/main.js dist/manifest.json dist/styles.css
+          # Remove what earlier versions of this workflow uploaded.
+          gh release view "$TAG" --json assets --jq '.assets[].name' |
+            { grep -E '^(kvist-plugin-.+\.zip|main\.js|manifest\.json|styles\.css)$' || true; } |
+            while read -r old; do gh release delete-asset "$TAG" "$old" --yes; done
+          gh release upload "$TAG" --clobber dist/kvist-plugin.zip
