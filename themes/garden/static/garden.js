@@ -1,6 +1,7 @@
 // kvist garden theme: progressive enhancements. Every page works without
-// this script; it adds the theme toggle, search, the graph, math and
-// diagrams.
+// this script; it adds the theme toggle, search, the graph, math,
+// diagrams and instant navigation. Parts that belong to the page run in
+// initPage, again after every instant navigation; the rest runs once.
 (function () {
   "use strict";
   var root = document.documentElement;
@@ -10,7 +11,14 @@
     return root.dataset.theme === "dark" ||
       (!root.dataset.theme && window.matchMedia("(prefers-color-scheme: dark)").matches);
   };
-  var onThemeChange = [];
+  var onThemeChange = []; // for the whole visit
+  var onNavigate = [];    // after instant navigation
+  var pageHooks = [];     // theme changes for the current page only
+  var noteId = null;      // the current page's note, if it is one
+  var openSearch = null;  // set by search
+  // go opens a page of the site: in place with instant navigation, else
+  // by loading it.
+  var go = function (url) { location.href = url; };
   // The interface's words in the site's language (i18n/*.toml, [script]).
   var words = {};
   try { words = JSON.parse(document.body.dataset.i18n || "{}"); } catch (e) {}
@@ -18,6 +26,31 @@
     var s = words[key] || def;
     return arg == null ? s : s.replace("%s", arg);
   };
+
+  // ---- data loading ----
+  var cache = {};
+  function getJSON(url) {
+    if (!cache[url]) {
+      cache[url] = fetch(url, { credentials: "same-origin" }).then(function (r) {
+        if (!r.ok) throw new Error(r.status);
+        return r.json();
+      });
+    }
+    return cache[url];
+  }
+  function loadScript(src) {
+    return new Promise(function (resolve, reject) {
+      var s = document.createElement("script");
+      s.src = src; s.onload = resolve; s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
 
   // ---- color theme: system → light → dark → system ----
   var toggle = $(".theme-toggle");
@@ -31,7 +64,7 @@
       if (next) root.dataset.theme = next; else delete root.dataset.theme;
       try { next ? localStorage.setItem("kvist-theme", next) : localStorage.removeItem("kvist-theme"); } catch (e) {}
       label();
-      onThemeChange.forEach(function (f) { f(); });
+      onThemeChange.concat(pageHooks).forEach(function (f) { f(); });
     });
   }
 
@@ -74,8 +107,11 @@
   }
 
   // ---- list pane: keep the current note in view, filter the list ----
-  var listPane = $(".list-pane");
-  if (listPane) {
+  // A pane that instant navigation kept is set up already.
+  function initList() {
+    var listPane = $(".list-pane");
+    if (!listPane || listPane.dataset.ready) return;
+    listPane.dataset.ready = "1";
     var current = $('.list-items [aria-current="page"]', listPane);
     if (current && listPane.scrollHeight > listPane.clientHeight) {
       listPane.scrollTop = current.offsetTop - listPane.clientHeight / 3; // the pane is the offset parent
@@ -98,15 +134,18 @@
       filter.addEventListener("keydown", function (e) {
         if (e.key !== "Enter") return;
         var first = listPane.querySelector(".list-items > li:not([hidden]) a");
-        if (first) location.href = first.href;
+        if (first) go(first.href);
       });
     }
+    var listSearch = $(".list-search", listPane);
+    if (listSearch) listSearch.addEventListener("click", function () { if (openSearch) openSearch(filter.value); });
   }
 
   // ---- tag index: filter and sort the tag cards ----
-  var tagTools = $(".tag-tools");
-  var tagGrid = $(".tag-grid");
-  if (tagTools && tagGrid) {
+  function initTagTools() {
+    var tagTools = $(".tag-tools");
+    var tagGrid = $(".tag-grid");
+    if (!tagTools || !tagGrid) return;
     tagTools.hidden = false;
     var cards = Array.prototype.slice.call(tagGrid.children);
     var tagFilter = $(".tag-filter", tagTools);
@@ -138,30 +177,33 @@
   }
 
   // ---- heading anchors: copy a link to the section ----
-  document.querySelectorAll(".content :is(h1, h2, h3, h4, h5, h6)[id]").forEach(function (h) {
-    if (h.closest(".embed")) return; // ids of embedded notes belong to their own page
-    var a = document.createElement("a");
-    a.className = "heading-anchor";
-    a.href = "#" + encodeURIComponent(h.id);
-    a.textContent = "#";
-    a.setAttribute("aria-label", tr("copy_heading_link", "Copy link to “%s”", h.textContent));
-    a.addEventListener("click", function (e) {
-      if (!navigator.clipboard) return; // plain jump to the section
-      e.preventDefault();
-      var url = location.origin + location.pathname + a.getAttribute("href");
-      history.replaceState(null, "", a.getAttribute("href"));
-      navigator.clipboard.writeText(url).then(function () {
-        a.classList.add("copied");
-        a.dataset.label = tr("link_copied", "Link copied");
-        setTimeout(function () { a.classList.remove("copied"); }, 1600);
-      }, function () { location.hash = a.getAttribute("href"); });
+  function initAnchors(page) {
+    page.querySelectorAll(".content :is(h1, h2, h3, h4, h5, h6)[id]").forEach(function (h) {
+      if (h.closest(".embed")) return; // ids of embedded notes belong to their own page
+      var a = document.createElement("a");
+      a.className = "heading-anchor";
+      a.href = "#" + encodeURIComponent(h.id);
+      a.textContent = "#";
+      a.setAttribute("aria-label", tr("copy_heading_link", "Copy link to “%s”", h.textContent));
+      a.addEventListener("click", function (e) {
+        if (!navigator.clipboard) return; // plain jump to the section
+        e.preventDefault();
+        var url = location.origin + location.pathname + a.getAttribute("href");
+        history.replaceState(history.state, "", a.getAttribute("href"));
+        navigator.clipboard.writeText(url).then(function () {
+          a.classList.add("copied");
+          a.dataset.label = tr("link_copied", "Link copied");
+          setTimeout(function () { a.classList.remove("copied"); }, 1600);
+        }, function () { location.hash = a.getAttribute("href"); });
+      });
+      h.appendChild(a);
     });
-    h.appendChild(a);
-  });
+  }
 
   // ---- code blocks: a copy button ----
-  if (navigator.clipboard) {
-    document.querySelectorAll("main .content pre:not(.mermaid)").forEach(function (pre) {
+  function initCode(page) {
+    if (!navigator.clipboard) return;
+    page.querySelectorAll(".content pre:not(.mermaid)").forEach(function (pre) {
       var wrap = pre.parentNode.classList.contains("code-block") ? pre.parentNode : null;
       if (!wrap) { // plain blocks without a language aren't wrapped yet
         wrap = el("div", "code-block");
@@ -183,59 +225,35 @@
     });
   }
 
-  document.querySelectorAll(".link-unpublished").forEach(function (el) { el.title = tr("not_published", "Not published"); });
-
   // ---- math (KaTeX is loaded only on pages that need it) ----
   function renderMath(scope) {
     if (!window.katex) return;
-    scope.querySelectorAll(".math").forEach(function (el) {
+    scope.querySelectorAll(".math:not([data-rendered])").forEach(function (el) {
       var tex = el.textContent.replace(/^\\[([]/, "").replace(/\\[)\]]$/, "");
       try {
         window.katex.render(tex, el, { displayMode: el.classList.contains("math-display"), throwOnError: false });
+        el.dataset.rendered = "";
       } catch (e) { /* leave the source visible */ }
     });
   }
-  renderMath(document);
 
   // ---- diagrams (Mermaid is loaded only on pages that need it) ----
-  if (window.mermaid) {
+  function initDiagrams(page) {
+    if (!window.mermaid) return;
     var sources = [];
-    document.querySelectorAll("pre.mermaid").forEach(function (el) { sources.push([el, el.textContent]); });
+    page.querySelectorAll("pre.mermaid:not([data-processed])").forEach(function (el) { sources.push([el, el.textContent]); });
+    if (!sources.length) return;
     var drawDiagrams = function () {
       sources.forEach(function (s) { s[0].removeAttribute("data-processed"); s[0].textContent = s[1]; });
       window.mermaid.initialize({ startOnLoad: false, theme: isDark() ? "dark" : "default", securityLevel: "strict" });
       window.mermaid.run({ nodes: sources.map(function (s) { return s[0]; }) }).catch(function () {});
     };
     drawDiagrams();
-    onThemeChange.push(drawDiagrams);
-  }
-
-  // ---- data loading ----
-  var cache = {};
-  function getJSON(url) {
-    if (!cache[url]) {
-      cache[url] = fetch(url, { credentials: "same-origin" }).then(function (r) {
-        if (!r.ok) throw new Error(r.status);
-        return r.json();
-      });
-    }
-    return cache[url];
-  }
-  function loadScript(src) {
-    return new Promise(function (resolve, reject) {
-      var s = document.createElement("script");
-      s.src = src; s.onload = resolve; s.onerror = reject;
-      document.head.appendChild(s);
-    });
-  }
-  function el(tag, cls, text) {
-    var e = document.createElement(tag);
-    if (cls) e.className = cls;
-    if (text != null) e.textContent = text;
-    return e;
+    pageHooks.push(drawDiagrams);
   }
 
   // ---- link previews: hover a link to a note (tap on touch screens) ----
+  var hidePreview = function () {};
   if (document.body.hasAttribute("data-previews") && window.fetch && window.DOMParser) {
     var pages = {}, popup = null, popupFor = null, showTimer = 0, hideTimer = 0, lastPointer = "mouse";
     var fetchPage = function (url) {
@@ -274,7 +292,7 @@
       out.querySelectorAll("[id]").forEach(function (x) { x.removeAttribute("id"); });
       return out;
     };
-    var hide = function () {
+    var hide = hidePreview = function () {
       clearTimeout(showTimer); clearTimeout(hideTimer);
       if (popup) popup.hidden = true;
       popupFor = null;
@@ -398,7 +416,7 @@
         } else if (e.key === "Enter") {
           e.preventDefault();
           var r = results[active >= 0 ? active : 0];
-          if (r) location.href = docs[r.id].url;
+          if (r) go(docs[r.id].url);
         }
       });
     };
@@ -498,9 +516,8 @@
         list.appendChild(el("li", "search-empty", tr("search_unavailable", "Search is not available.")));
       });
     };
+    openSearch = open;
     searchBtn.addEventListener("click", function () { open(); });
-    var listSearch = $(".list-search");
-    if (listSearch) listSearch.addEventListener("click", function () { open($(".list-filter").value); });
     document.addEventListener("keydown", function (e) {
       var t = e.target;
       var typing = t && (t.isContentEditable || /^(input|textarea|select)$/i.test(t.tagName));
@@ -644,7 +661,7 @@
     canvas.addEventListener("pointerup", function (ev) {
       var n = dragging;
       dragging = null; panStart = null;
-      if (!moved) { var t = pick(ev); if (t && t !== current) location.href = t.url; }
+      if (!moved) { var t = pick(ev); if (t && t !== current) go(t.url); }
       else if (n) kick(0.1);
     });
     canvas.addEventListener("pointerleave", function () { if (hover) { hover = null; draw(); } });
@@ -672,7 +689,9 @@
     var settle = nodes.length > 600 ? 40 : 300;
     for (var s = 0; s < settle; s++) tick();
     if (window.ResizeObserver) new ResizeObserver(function () { resize(); }).observe(container);
-    onThemeChange.push(draw);
+    (opts.page ? pageHooks : onThemeChange).push(draw);
+    // The note to highlight, after instant navigation.
+    this.setCurrent = function (id) { current = byId[id]; draw(); };
     resize();
     fit();
     kick(Math.min(alpha, 0.05));
@@ -738,21 +757,23 @@
     };
   }
 
-  var noteId = document.body.dataset.note;
-  var local = $(".local-graph");
-  if (local && noteId && window.fetch && window.HTMLCanvasElement) {
+  function initLocalGraph(page) {
+    var local = $(".local-graph", page);
+    if (!local || !noteId || !window.fetch || !window.HTMLCanvasElement) return;
+    var id = noteId;
     getJSON("/graph.json").then(function (data) {
-      var sub = neighborhood(data, noteId, 2);
-      if (sub.nodes.length < 2) return;
+      var sub = neighborhood(data, id, 2);
+      if (sub.nodes.length < 2 || !local.isConnected) return;
       local.hidden = false;
-      new Graph($(".graph-canvas", local), sub, { current: noteId, labels: sub.nodes.length <= 6 });
+      new Graph($(".graph-canvas", local), sub, { current: id, labels: sub.nodes.length <= 6, page: true });
     }).catch(function () {});
   }
 
   var graphBtn = $(".graph-toggle");
   if (graphBtn && window.fetch && window.HTMLDialogElement && window.HTMLCanvasElement) {
     graphBtn.hidden = false;
-    var gdialog = null;
+    var gdialog = null, allGraph = null;
+    onNavigate.push(function () { if (allGraph) allGraph.setCurrent(noteId); });
     graphBtn.addEventListener("click", function () {
       if (!gdialog) {
         gdialog = el("dialog", "graph-dialog");
@@ -769,11 +790,192 @@
         gdialog.showModal();
         getJSON("/graph.json").then(function (data) {
           data = globalGraph(data);
-          new Graph(area, data, { current: noteId, labels: data.nodes.length <= 40 });
+          allGraph = new Graph(area, data, { current: noteId, labels: data.nodes.length <= 40 });
         }).catch(function () { area.textContent = tr("graph_unavailable", "The graph is not available."); });
         return;
       }
       gdialog.showModal();
     });
   }
+  // ---- the parts of a page ----
+  function initPage() {
+    var page = $(".page") || document;
+    noteId = document.body.dataset.note || null;
+    pageHooks = [];
+    initList();
+    initTagTools();
+    initAnchors(page);
+    initCode(page);
+    page.querySelectorAll(".link-unpublished").forEach(function (el) { el.title = tr("not_published", "Not published"); });
+    renderMath(page);
+    initDiagrams(page);
+    initLocalGraph(page);
+  }
+
+  // ---- instant navigation ----
+  // Links to pages of the site load in place: the page, the list (unless
+  // it shows the same notes) and the head's metadata are swapped, the
+  // menu keeps its scroll position and open folders, and search and the
+  // graph stay loaded. Anything unexpected falls back to a normal load.
+  if (document.body.hasAttribute("data-instant") && window.fetch && window.DOMParser && history.pushState) {
+    var navToken = 0, here = location.pathname, progress = null, progressTimer = 0;
+    var live = el("p", "visually-hidden");
+    live.setAttribute("aria-live", "polite");
+    document.body.appendChild(live);
+    history.scrollRestoration = "manual";
+    history.replaceState({ y: window.scrollY }, "");
+    // Remember the scroll position, for going back.
+    var saveTimer = 0;
+    window.addEventListener("scroll", function () {
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(function () { history.replaceState({ y: window.scrollY }, ""); }, 120);
+    }, { passive: true });
+
+    var headSel = 'meta[name="description"], meta[name="robots"], link[rel="canonical"], meta[property^="og:"], meta[property^="article:"], meta[name^="twitter:"]';
+    var sameNode = function (a, b) {
+      return a.tagName === b.tagName && (a.getAttribute("href") || a.getAttribute("src")) === (b.getAttribute("href") || b.getAttribute("src"));
+    };
+    // Stylesheets and scripts the new page needs (KaTeX, Mermaid, code
+    // styles) and this one lacks. Resolves when the scripts have loaded.
+    var addAssets = function (doc) {
+      var waits = [];
+      doc.head.querySelectorAll('link[rel="stylesheet"], script[src]').forEach(function (n) {
+        var have = Array.prototype.some.call(document.head.querySelectorAll(n.tagName), function (o) { return sameNode(o, n); });
+        if (have) return;
+        if (n.tagName === "LINK") { document.head.appendChild(document.importNode(n, true)); return; }
+        var s = document.createElement("script");
+        Array.prototype.forEach.call(n.attributes, function (a) { if (a.name !== "defer") s.setAttribute(a.name, a.value); });
+        waits.push(new Promise(function (resolve) { s.onload = s.onerror = resolve; }));
+        document.head.appendChild(s);
+      });
+      return Promise.all(waits);
+    };
+    // Mark the current page in the menu as the new page does, and open
+    // the folders it opens. Folders the reader opened stay open.
+    var syncNav = function (doc) {
+      var nav = $(".nav-pane"), next = $(".nav-pane", doc);
+      if (!nav || !next) return;
+      var marks = {}, open = {};
+      next.querySelectorAll("a[href]").forEach(function (a) { marks[a.getAttribute("href")] = a.getAttribute("aria-current"); });
+      next.querySelectorAll("details[open] > summary > a").forEach(function (a) { open[a.getAttribute("href")] = true; });
+      nav.querySelectorAll("a[href]").forEach(function (a) {
+        var m = marks[a.getAttribute("href")];
+        if (m) a.setAttribute("aria-current", m); else a.removeAttribute("aria-current");
+      });
+      nav.querySelectorAll("details > summary > a").forEach(function (a) { if (open[a.getAttribute("href")]) a.parentNode.parentNode.open = true; });
+    };
+    // Keep the list pane if it lists the same notes, so it keeps its
+    // scroll position and filter; else take the new one.
+    var swapList = function (doc) {
+      var list = $(".list-pane"), next = $(".list-pane", doc);
+      var key = function (p) { return Array.prototype.map.call(p.querySelectorAll("#list-title, .list-items a"), function (a) { return a.getAttribute("href") || a.textContent; }).join("\n"); };
+      if (list && next && key(list) === key(next)) {
+        var marks = {};
+        next.querySelectorAll(".list-items a").forEach(function (a) { marks[a.getAttribute("href")] = a.getAttribute("aria-current"); });
+        list.querySelectorAll(".list-items a").forEach(function (a) {
+          var m = marks[a.getAttribute("href")];
+          if (m) a.setAttribute("aria-current", m); else a.removeAttribute("aria-current");
+        });
+        return;
+      }
+      if (list) list.remove();
+      if (next) $(".shell").insertBefore(document.importNode(next, true), $("main"));
+    };
+    // Scripts in a note's own HTML run as they would on a normal load.
+    var runScripts = function (scope) {
+      scope.querySelectorAll("script").forEach(function (old) {
+        var s = document.createElement("script");
+        Array.prototype.forEach.call(old.attributes, function (a) { s.setAttribute(a.name, a.value); });
+        s.textContent = old.textContent;
+        old.replaceWith(s);
+      });
+    };
+    var swap = function (doc) {
+      document.title = doc.title;
+      document.head.querySelectorAll(headSel).forEach(function (n) { n.remove(); });
+      var anchor = document.head.querySelector('meta[name="color-scheme"]');
+      doc.head.querySelectorAll(headSel).forEach(function (n) { document.head.insertBefore(document.importNode(n, true), anchor); });
+      var loaded = addAssets(doc);
+      var nav = document.body.classList.contains("nav-open");
+      document.body.className = doc.body.className;
+      if (doc.body.dataset.note) document.body.dataset.note = doc.body.dataset.note; else delete document.body.dataset.note;
+      if (nav && menuToggle) menuToggle.setAttribute("aria-expanded", "false");
+      syncNav(doc);
+      swapList(doc);
+      var page = $(".page"), next = $("main .page", doc);
+      var fresh = document.importNode(next, true);
+      page.replaceWith(fresh);
+      runScripts(fresh);
+      initPage();
+      loaded.then(function () { if ($(".page") === fresh) { renderMath(fresh); initDiagrams(fresh); } });
+      onNavigate.forEach(function (f) { f(); });
+      live.textContent = doc.title;
+    };
+    var showProgress = function (on) {
+      clearTimeout(progressTimer);
+      if (on) {
+        progressTimer = setTimeout(function () {
+          if (!progress) { progress = el("div", "nav-progress"); document.body.appendChild(progress); }
+          progress.hidden = false;
+        }, 150);
+      } else if (progress) {
+        progress.hidden = true;
+      }
+    };
+    var scrollTo = function (hash, y) {
+      var target = null;
+      if (hash) { try { target = document.getElementById(decodeURIComponent(hash.slice(1))); } catch (e) {} }
+      if (target) target.scrollIntoView();
+      else window.scrollTo(0, y || 0);
+    };
+    var navigate = function (href, push, y) {
+      var url = new URL(href, location.href);
+      var token = ++navToken;
+      hidePreview();
+      document.querySelectorAll("dialog[open]").forEach(function (d) { d.close(); });
+      showProgress(true);
+      fetch(url.pathname + url.search, { credentials: "same-origin" }).then(function (r) {
+        var type = r.headers.get("content-type") || "";
+        if ((!r.ok && r.status !== 404) || type.indexOf("text/html") !== 0) throw new Error(r.status);
+        return r.text().then(function (html) { return { html: html, url: r.url }; });
+      }).then(function (res) {
+        if (token !== navToken) return;
+        var doc = new DOMParser().parseFromString(res.html, "text/html");
+        if (!$("main .page", doc) || !$(".page")) throw new Error("not a page");
+        var final = new URL(res.url || url.href);
+        final.hash = url.hash;
+        if (push) history.pushState({ y: 0 }, "", final.href);
+        else if (final.pathname !== location.pathname) history.replaceState(history.state, "", final.href);
+        here = location.pathname;
+        swap(doc);
+        showProgress(false);
+        scrollTo(url.hash, y);
+        var main = $("main");
+        main.setAttribute("tabindex", "-1");
+        main.focus({ preventScroll: true });
+        if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: location.pathname + location.search });
+      }).catch(function () {
+        if (token === navToken) location.href = url.href;
+      });
+    };
+    go = function (href) { navigate(href, true); };
+
+    document.addEventListener("click", function (e) {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      var a = e.target.closest && e.target.closest("a[href]");
+      if (!a || (a.target && a.target !== "_self") || a.hasAttribute("download")) return;
+      var url = new URL(a.href, location.href);
+      if (url.origin !== location.origin || /^\/_(assets|kvist)\//.test(url.pathname) || /\.(?!html?$)[a-z0-9]+$/i.test(url.pathname)) return;
+      if (url.pathname === location.pathname && url.search === location.search && url.hash) return; // a section of this page
+      e.preventDefault();
+      if (url.href === location.href) { scrollTo("", 0); return; }
+      navigate(url.href, true);
+    });
+    window.addEventListener("popstate", function (e) {
+      if (location.pathname === here) return; // only the #section changed
+      navigate(location.href, false, e.state && e.state.y);
+    });
+  }
+
+  initPage();
 })();

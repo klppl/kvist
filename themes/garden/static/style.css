@@ -70,6 +70,14 @@ img.align-right { float: right; margin: .3rem 0 .8rem 1.4rem; max-width: 50%; }
 .skip { position: absolute; left: -9999px; }
 .skip:focus { left: 1rem; top: 1rem; z-index: 10; background: var(--bg); padding: .5rem 1rem; }
 [hidden] { display: none !important; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+main:focus { outline: none; }
+/* instant navigation: a bar along the top while a page loads */
+.nav-progress {
+  position: fixed; top: 0; left: 0; z-index: 30; height: 2px; width: 100%; background: var(--accent);
+  transform-origin: left; animation: nav-progress 2s ease-out forwards;
+}
+@keyframes nav-progress { from { transform: scaleX(.05); } to { transform: scaleX(.85); } }
 .icon { flex: none; }
 .icon-button {
   border: 1px solid var(--border); background: var(--bg); color: var(--fg);

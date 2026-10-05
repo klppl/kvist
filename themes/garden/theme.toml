@@ -13,6 +13,7 @@ groups           = []          # tags that group the sidebar, e.g. ["articles", 
 show_toc         = true
 show_breadcrumbs = true        # the folders above a note's title, and a folder's
 show_backlinks   = true
+instant_navigation = true      # open pages in place: the menu keeps its scroll, search and the graph stay loaded
 link_previews    = true        # hover a link to a note to preview it (tap on touch screens)
 show_properties  = false       # the note's properties under its title (only keys in expose_frontmatter)
 reader_mode      = true        # a button that hides the menu, the list and the side panels
