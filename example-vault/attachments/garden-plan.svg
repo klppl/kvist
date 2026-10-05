@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" width="640" height="400" font-family="system-ui, sans-serif" font-size="15">
+<rect width="640" height="400" rx="14" fill="#f4efe1"/>
+<g stroke="#8a5634" stroke-width="3">
+<rect x="30" y="30" width="270" height="150" rx="6" fill="#d9c3a0"/>
+<rect x="340" y="30" width="270" height="150" rx="6" fill="#d9c3a0"/>
+<rect x="30" y="220" width="270" height="150" rx="6" fill="#d9c3a0"/>
+<rect x="340" y="220" width="270" height="150" rx="6" fill="#d9c3a0"/>
+</g>
+<g fill="#c0392b"><circle cx="80" cy="90" r="16"/><circle cx="140" cy="90" r="16"/><circle cx="200" cy="90" r="16"/><circle cx="260" cy="90" r="16"/></g>
+<g fill="#3f7d4e"><circle cx="80" cy="140" r="9"/><circle cx="140" cy="140" r="9"/><circle cx="200" cy="140" r="9"/><circle cx="260" cy="140" r="9"/></g>
+<g fill="#e6b800"><circle cx="390" cy="80" r="20"/><circle cx="470" cy="80" r="20"/><circle cx="550" cy="80" r="20"/></g>
+<g fill="#6aa84f"><rect x="370" y="125" width="210" height="12" rx="6"/><rect x="370" y="150" width="210" height="12" rx="6"/></g>
+<g fill="#8e7cc3"><circle cx="80" cy="280" r="12"/><circle cx="120" cy="300" r="12"/><circle cx="160" cy="280" r="12"/><circle cx="200" cy="300" r="12"/><circle cx="240" cy="280" r="12"/></g>
+<g fill="#93c47d"><path d="M380 330q20-60 40 0zM440 330q20-60 40 0zM500 330q20-60 40 0zM560 330q20-60 40 0z"/></g>
+<g fill="#1d2b20" font-weight="600">
+<text x="40" y="54">Bed 1 · tomatoes + basil</text>
+<text x="350" y="54">Bed 2 · squash, beans</text>
+<text x="40" y="244">Bed 3 · garlic</text>
+<text x="350" y="244">Bed 4 · leeks</text>
+</g></svg>

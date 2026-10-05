@@ -11,6 +11,7 @@ Ideas that are just starting. Back to [[Welcome]].
 ## Half-formed thoughts
 
 - A garden grows by links, not by folders. #ideas/linking
+- Could a compost heap be modelled like a queue? Things go in the top and come out the bottom months later. #ideas
 - Notes can be embedded: see below.
 
 ![[How publishing works#The rules]]
