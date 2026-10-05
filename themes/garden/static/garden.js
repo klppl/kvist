@@ -354,7 +354,7 @@
   var searchBtn = $(".search-toggle");
   if (searchBtn && window.fetch && window.HTMLDialogElement) {
     searchBtn.hidden = false;
-    var dialog, input, list, engine, docs = {}, results = [], active = -1;
+    var dialog, input, list, engine, docs = {}, results = [], active = -1, filtering = false;
 
     var build = function () {
       dialog = el("dialog", "search-dialog");
@@ -431,6 +431,9 @@
         a.href = d.url;
         a.appendChild(el("span", "search-title", d.title));
         a.appendChild(el("span", "search-snippet", snippet(d, r.terms)));
+        if (filtering && d.tags && d.tags.length) {
+          a.appendChild(el("span", "search-tags", d.tags.map(function (t) { return "#" + t; }).join(" ")));
+        }
         li.appendChild(a);
         list.appendChild(li);
       });
@@ -438,10 +441,30 @@
       if (sel) sel.scrollIntoView({ block: "nearest" });
     };
 
+    // "#tag" words filter the results to notes with a tag starting with
+    // them (so #garden also finds #garden/soil); the other words search.
+    // Tags alone list every note that has them.
     var run = function () {
       if (!engine) return; // still loading; ready() runs the query when done
       var q = input.value.trim();
-      results = q ? engine.search(q).slice(0, 12) : [];
+      var tags = [], words = [];
+      q.split(/\s+/).forEach(function (w) {
+        if (/^#[^#]/.test(w)) tags.push(w.slice(1).toLowerCase()); else if (w && w !== "#") words.push(w);
+      });
+      var tagged = function (id) {
+        var have = (docs[id].tags || []).map(function (t) { return t.toLowerCase(); });
+        return tags.every(function (t) { return have.some(function (h) { return h.indexOf(t) === 0; }); });
+      };
+      filtering = tags.length > 0;
+      if (words.length) {
+        results = engine.search(words.join(" "), filtering ? { filter: function (r) { return tagged(r.id); } } : undefined).slice(0, 12);
+      } else if (filtering) {
+        results = Object.keys(docs).filter(tagged).sort(function (a, b) {
+          return docs[a].title.localeCompare(docs[b].title);
+        }).slice(0, 50).map(function (id) { return { id: id, terms: [] }; });
+      } else {
+        results = [];
+      }
       active = results.length ? 0 : -1;
       if (q && !results.length) {
         list.textContent = "";

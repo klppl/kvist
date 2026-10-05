@@ -319,6 +319,7 @@ pre.mermaid { background: none; text-align: center; }
 .search-results [aria-selected="true"] a, .search-results a:hover { background: var(--hover); }
 .search-title { display: block; font-weight: 600; }
 .search-snippet { display: block; color: var(--muted); font-size: .88rem; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.search-tags { display: block; margin-top: .2rem; color: var(--accent); font-size: .78rem; }
 .search-empty { padding: .8rem; color: var(--muted); }
 .search-hint { margin: 0; padding: .5rem 1.2rem .8rem; color: var(--muted); font-size: .78rem; border-top: 1px solid var(--border); }
 

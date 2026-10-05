@@ -217,7 +217,9 @@ table of contents, the graph and backlinks are left out, folded callouts
 are opened, and external links show their address.
 
 Search (press <kbd>/</kbd>) loads MiniSearch and `/search-index.json` the first time
-it opens. The graph (the Graph item in the menu, and the "Connections" box on note pages)
+it opens. Words starting with `#` filter the results to notes with a tag
+that starts with them (`#garden` also matches `#garden/soil`); with only
+tags, it lists every such note. The graph (the Graph item in the menu, and the "Connections" box on note pages)
 reads `/graph.json` and draws on a canvas. KaTeX is vendored and loads only
 on pages with math.
 
