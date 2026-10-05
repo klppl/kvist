@@ -61,7 +61,7 @@ Properties other than the site fields become theme parameters; empty ones
 are ignored. Obsidian's own properties (`tags`, `aliases`, `cssclasses`,
 `publish`) are skipped, and server-only keys (`base_url`, publish rules, …)
 are ignored with a warning. `Nav` comes from the list items in the body that
-are a single link: URLs are kept, `[[wikilinks]]` resolve to published notes
+are a single link: URLs are kept, `[[wikilinks]]` and links to `.md` files resolve to published notes
 (links to anything else are dropped with a warning). Links in comments and
 code blocks don't count.
 
@@ -81,7 +81,7 @@ note wins where both set a value. The theme parameter `nav_tags` is read as
 | `Title` | string | Frontmatter `title`, else the first `# Heading`, else the file name. |
 | `Aliases` | []string | Frontmatter `aliases`. |
 | `Tags` | []*Tag | Frontmatter tags plus tags in the body, without the control tags and without tags inside comments. |
-| `Created`, `Updated` | time | Frontmatter `created`/`date` and `updated`/`modified`/`lastmod`, else the file's modification time. |
+| `Created`, `Updated` | time | `Updated`: frontmatter `updated`/`modified`/`lastmod`, else the file's modification time. `Created`: `created`/`date`, else `Updated`. |
 | `Description` | string | Frontmatter `description`/`summary`, else the first paragraph (≤ 200 characters). |
 | `Params` | map | Only the frontmatter keys listed in `expose_frontmatter`. Other keys never reach a theme. |
 | `Image` | string | Social preview image from the `image` or `cover` property: the URL of a published image (`/_assets/…`), or an http(s) URL; empty if unset or not a published image. The value may be `"[[cover.png]]"`, a vault path, or a URL. |
@@ -105,7 +105,11 @@ or a note would take a reserved URL (`/tags/…`, `/_assets/…`,
 
 ### Rendered content
 
-- Links to published notes: `<a class="internal-link" href="…">`.
+- Links to published notes, written as `[[wikilinks]]` or Markdown links
+  (`[text](Note.md)`, resolved from the linking note's folder first):
+  `<a class="internal-link" href="…">`. Links to websites:
+  `<a class="external-link">`, with dangerous schemes (`javascript:`, …)
+  replaced by `#`.
 - Links to anything else, private or missing, render the same way:
   `<span class="link-unpublished">text</span>`, so a visitor can't tell a
   private note from a missing one. The text is the alias if there is one,
@@ -133,6 +137,10 @@ or a note would take a reserved URL (`/tags/…`, `/_assets/…`,
 - Mermaid: `<pre class="mermaid">`, drawn in the browser.
 - Code: chroma, with CSS classes (`<div class="code-block" data-lang="go"><pre class="chroma">`).
 - `%% comments %%` and `<!-- comments -->` are removed before parsing.
+- Other HTML written in a note is passed through as written, scripts
+  included; links and images inside it are not resolved, so it can't pull
+  an unpublished attachment onto the site. It is left out of search text
+  and descriptions.
 
 ## Asset
 

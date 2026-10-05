@@ -174,6 +174,7 @@ Params (set them in `theme_params`):
 | `code_style_light`, `code_style_dark` | `github`, `github-dark` | highlighting |
 | `footer` | `""` | Markdown at the bottom of the menu |
 | `mermaid_url`, `mermaid_integrity` | jsDelivr, pinned with an SRI hash | see below |
+| `analytics`, `analytics_id`, `analytics_url` | none | visitor statistics; kvist checks them and themes get `Site.Config.Analytics` ([content model](content-model.md#siteconfig)) |
 
 Pages have three panes: the nav pane (main links, the folder tree or
 `groups`, and the menu links from the settings note), the list pane, and

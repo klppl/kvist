@@ -17,8 +17,13 @@ Publish, and your site updates. Private notes never leave your device.
   dark mode.
 - **Settings in a note:** the site's title, menu and colors live in
   `_site.md`, so you change them from Obsidian on any device.
+- **Links keep working:** a renamed or moved note's old address redirects
+  to the new one.
+- **In your language:** the theme's menus, dates and search speak English,
+  Swedish, German, French or Spanish.
 - **Self-hosted:** one small Go server in Docker, with HTTPS by Caddy. RSS,
-  a sitemap and photo metadata stripping included.
+  a sitemap, photo metadata stripping and optional cookie-free analytics
+  included.
 
 ## Get started
 

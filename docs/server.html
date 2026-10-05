@@ -79,7 +79,7 @@ docker compose exec kvist kvist token revoke 3f9a1c2e</code></pre>
 <p>If you give an id that's no longer kept, kvist lists the ones that are. A rollback is undone by the next publish from your vault, so fix the vault first (or turn off automatic publishing for a while).</p>
 
 <h2 id="backups">Backups</h2>
-<p>Everything kvist stores is in the <code>kvist-data</code> Docker volume: what you published, the built site and the token fingerprints. Your vault is the real original, so losing the server only means setting it up again and publishing. To keep a copy anyway:</p>
+<p>Everything kvist stores is in the <code>kvist-data</code> Docker volume: what you published, the built site, the token fingerprints and the old addresses of moved notes. Your vault is the real original, so losing the server only means setting it up again and publishing; only the redirects from old addresses would start over. To keep a copy anyway:</p>
 <pre><code>docker run --rm -v kvist_kvist-data:/data -v "$PWD":/backup alpine \
   tar czf /backup/kvist-data.tar.gz -C /data .</code></pre>
 <p>The volume's name starts with the folder name; check it with <code>docker volume ls</code>.</p>

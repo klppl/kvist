@@ -145,6 +145,12 @@ server {
 }
 ```
 
+Served this way, the old address of a renamed note gets a small page that
+forwards the browser to the new address, instead of the `301` kvist's own
+server sends. `/_kvist/redirects.json` is kvist's map of those redirects;
+it holds only published addresses, but nothing needs to fetch it, so you
+may `deny` it.
+
 Never point a web server at `sites/<id>/` or `data_dir` itself: older builds
 and stored revisions live there. Only `public/` is meant to be served.
 

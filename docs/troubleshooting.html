@@ -82,7 +82,7 @@
     <tr><td><em>invalid token</em></td><td>The token is mistyped or revoked, or the <strong>Site</strong> doesn't match the site the token was made for. Tokens belong to one site. Create a new one if unsure.</td></tr>
     <tr><td><em>must use https://</em></td><td>Enter the address with <code>https://</code>. Plain <code>http://</code> only works for <code>localhost</code>.</td></tr>
     <tr><td><em>could not reach the server</em> or a network error</td><td>The address is wrong or the site isn't up yet. Open <code>https://your-domain/api/v1/info</code> in a browser; it should show a short JSON text.</td></tr>
-    <tr><td>Something about the protocol version</td><td>The plugin and server are too far apart. Update both: <code>docker compose pull &amp;&amp; docker compose up -d</code>, and rebuild the plugin.</td></tr>
+    <tr><td>Something about the protocol version</td><td>The plugin and server are too far apart. Update both: <code>docker compose pull &amp;&amp; docker compose up -d</code>, and download <a href="https://github.com/klppl/kvist/releases/latest/download/kvist-plugin.zip">kvist-plugin.zip</a> again.</td></tr>
   </tbody>
 </table>
 
@@ -96,7 +96,7 @@
 </ul>
 
 <h3 id="plain-links">Some links are plain text on the site</h3>
-<p>The note they point to isn't published, or doesn't exist. That's by design: it keeps private notes hidden. The publish report lists them. Also make sure links between notes are <code>[[wikilinks]]</code>; Markdown-style links to <code>.md</code> files don't work on the site (see <a href="writing.html#supported">Writing notes</a>).</p>
+<p>The note they point to isn't published, or doesn't exist. That's by design: it keeps private notes hidden. The publish report lists them. Markdown-style links work too, but their path is read from the linking note's folder: <code>[text](Bread.md)</code> from <code>Kvist/Ideas/</code> looks for <code>Kvist/Ideas/Bread.md</code> first, then any note called <code>Bread</code> (see <a href="writing.html#supported">Writing notes</a>).</p>
 
 <h3 id="images-missing">An image or file is missing</h3>
 <ul>
@@ -113,6 +113,12 @@
 
 <h3 id="newer-content">“The server has newer content than this device” (◆)</h3>
 <p>Another device published changes this device hasn't received yet, and publishing now would put older notes back. Let your vault finish syncing, then run <strong>Publish now</strong>. It shows which notes are affected and asks before going ahead. See <a href="publishing.html#devices">More than one device</a>.</p>
+
+<h3 id="old-link">An old link to a renamed note shows “Nothing grows here”</h3>
+<p>The server redirects a renamed or moved note's old address when it can tell which note it became: the same file at a new place, the same text, or the only new note with the same file name. It can't when the note was renamed <em>and</em> edited <em>and</em> another new note has its new file name, or when the note was renamed while it was private. Publishing after each rename, rather than many renames at once, gives it the best chance. Redirects start with the first publish after you update the server; renames before that aren't known.</p>
+
+<h3 id="favicon">The site's icon didn't change</h3>
+<p>Browsers keep site icons for a long time. Check the icon in a private window, or open the page's address with <code>?</code> at the end. The <code>favicon</code> must be an image the server publishes: a PNG or SVG in a folder that isn't excluded.</p>
 
 <h3 id="still-visible">A page is still visible after I unpublished it</h3>
 <p>Browsers and CDNs may keep a page for up to 60 seconds. With Cloudflare, set up the <a href="server.html#purge">cache purge</a> so it disappears immediately. If a search engine already indexed it, it can take that search engine some time to notice.</p>

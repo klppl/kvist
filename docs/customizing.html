@@ -82,11 +82,12 @@ Settings for my website.
     <tr><td><code>avatar</code>, <code>bio</code>, <code>profile_links</code></td><td>A profile at the top of the menu (<a href="#profile">below</a>).</td></tr>
     <tr><td><code>image</code></td><td>The picture shown when a page is shared on social media or in chats, unless the note has its own <code>image</code> or <code>cover</code>: <code>"[[preview.png]]"</code> or a web address. About 1200×630 pixels works everywhere.</td></tr>
     <tr><td><code>favicon</code></td><td>The small icon in browser tabs and bookmarks: <code>"[[icon.png]]"</code> or a web address. A square PNG or SVG of at least 64×64 pixels. Without it, the theme shows a green sprout.</td></tr>
+    <tr><td><code>analytics</code>, <code>analytics_id</code>, <code>analytics_url</code></td><td>Visitor statistics with Plausible, Umami or GoatCounter (<a href="#analytics">below</a>).</td></tr>
     <tr><td><code>strict_line_breaks</code></td><td><code>true</code> to treat a single line break as a space, like Obsidian's <em>Strict line breaks</em>. By default it is kept as a line break.</td></tr>
     <tr><td>Anything else</td><td>A theme setting, such as <code>accent</code> or <code>footer</code>. See <a href="#theme">Theme settings</a>.</td></tr>
   </tbody>
 </table>
-<p><strong>Menu links</strong> come from the note's text: each list item that is a single link becomes a link under <em>Links</em> in the menu, in order. Links can go to other websites (they get an arrow), to addresses on your site like <code>/about/</code>, or to published notes with <code>[[wikilinks]]</code>. A link to a note that isn't published is left out, with a warning in the publish report. Other text in the note is ignored, so you can keep notes to yourself there.</p>
+<p><strong>Menu links</strong> come from the note's text: each list item that is a single link becomes a link under <em>Links</em> in the menu, in order. Links can go to other websites (they get an arrow), to addresses on your site like <code>/about/</code>, or to published notes with <code>[[wikilinks]]</code> or <code>[text](Note.md)</code>. A link to a note that isn't published is left out, with a warning in the publish report. Other text in the note is ignored, so you can keep notes to yourself there.</p>
 <p>Publish rules, the theme and the site's address can only be set on the server, so a synced vault can't change what's public. If the settings note tries, the publish report shows a warning.</p>
 <div class="callout">
   <p class="callout-title">Only one settings note</p>
@@ -173,6 +174,7 @@ groups: [articles, projects, books]
     <tr><td><code>show_graph</code></td><td><code>true</code></td><td>The Graph button and the small graph beside notes.</td></tr>
     <tr><td><code>footer</code></td><td><code>""</code></td><td>Text at the bottom of the menu. Markdown works.</td></tr>
     <tr><td><code>code_style_light</code>, <code>code_style_dark</code></td><td><code>"github"</code>, <code>"github-dark"</code></td><td>Code highlighting <a href="https://xyproto.github.io/splash/docs/">styles</a>.</td></tr>
+    <tr><td><code>mermaid_url</code></td><td>jsDelivr</td><td>Where diagrams' Mermaid script comes from. It's large, so it isn't bundled and loads only on pages with a diagram. To serve it yourself, put a copy in the theme overrides folder and give its name, like <code>"vendor/mermaid.min.js"</code>, and set <code>mermaid_integrity</code> to its hash or to <code>""</code>.</td></tr>
   </tbody>
 </table>
 

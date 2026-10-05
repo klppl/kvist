@@ -56,10 +56,10 @@
 <table>
   <thead><tr><th>Feature</th><th>Write</th><th>On the site</th></tr></thead>
   <tbody>
-    <tr><td>Links</td><td><code>[[Note]]</code>, <code>[[Note|text]]</code></td><td>A link to the note, or plain text if it isn't published</td></tr>
+    <tr><td>Links</td><td><code>[[Note]]</code>, <code>[[Note|text]]</code>, <code>[text](Note.md)</code></td><td>A link to the note, or plain text if it isn't published</td></tr>
     <tr><td>Heading links</td><td><code>[[Note#Heading]]</code></td><td>Jumps to the heading</td></tr>
     <tr><td>Block links</td><td><code>[[Note#^id]]</code></td><td>Jumps to the block marked <code>^id</code></td></tr>
-    <tr><td>Embeds</td><td><code>![[Note]]</code>, <code>![[Note#Heading]]</code></td><td>The note or section shown inline, in a box</td></tr>
+    <tr><td>Embeds</td><td><code>![[Note]]</code>, <code>![[Note#Heading]]</code>, <code>![[Note#^id]]</code></td><td>The note, section or block shown inline, in a box</td></tr>
     <tr><td>Images</td><td><code>![[photo.jpg]]</code>, <code>![[photo.jpg|300]]</code>, <code>![[photo.jpg|300x200]]</code></td><td>The image, optionally resized</td></tr>
     <tr><td>Image placement</td><td><code>![[photo.jpg|center]]</code>, <code>![[photo.jpg|right|200]]</code>, <code>![[photo.jpg|A harbor at dusk|100]]</code></td><td>Centered, or floated left or right with the text flowing around it (stacked on phones). Other text is the image's description for screen readers</td></tr>
     <tr><td>YouTube, Vimeo</td><td><code>![Title](https://www.youtube.com/watch?v=…)</code>, <code>![Title](https://vimeo.com/…)</code></td><td>An embedded player. YouTube plays from <code>youtube-nocookie.com</code> and Vimeo with “do not track”, and nothing loads until the player scrolls into view</td></tr>
@@ -73,16 +73,25 @@
     <tr><td>Code</td><td>Fenced code with a language, e.g. <code>```python</code></td><td>Syntax highlighting, light and dark, and a Copy button</td></tr>
     <tr><td>Math</td><td><code>$e^{i\pi}+1=0$</code>, <code>$$ … $$</code></td><td>Typeset with KaTeX</td></tr>
     <tr><td>Diagrams</td><td>A <code>```mermaid</code> code block</td><td>A Mermaid diagram</td></tr>
+    <tr><td>HTML</td><td><code>&lt;details&gt;</code>, <code>&lt;kbd&gt;</code>, <code>&lt;iframe&gt;</code>, …</td><td>Kept as written. Links and images inside HTML aren't converted, so point them at web addresses</td></tr>
     <tr><td>Comments</td><td><code>%% hidden %%</code>, <code>&lt;!-- hidden --&gt;</code></td><td>Removed before publishing</td></tr>
   </tbody>
 </table>
 <p>Single line breaks are kept as line breaks, as in Obsidian's reading view. If you turned on <strong>Strict line breaks</strong> in Obsidian, set <code>strict_line_breaks: true</code> in the <a href="customizing.html#settings-note">settings note</a> and a single line break becomes a space, as there; an empty line still starts a new paragraph.</p>
 <figure class="shot narrow"><img src="assets/screens/showcase.webp" width="1408" height="2200" alt="Callouts, a task list, a table, highlighted code, math and a Mermaid diagram as they appear on the site." loading="lazy"><figcaption>Callouts, tasks, tables, code, math and diagrams on a published page.</figcaption></figure>
 
-<div class="callout warn">
-  <p class="callout-title">Use wikilinks between notes</p>
-  <p>kvist resolves <code>[[wikilinks]]</code>. Markdown-style links to other notes, like <code>[text](Other%20note.md)</code>, are not converted and won't work on the site. Links to websites (<code>[text](https://…)</code>) work normally. Obsidian uses wikilinks by default; check <strong>Settings → Files and links → Use [[Wikilinks]]</strong>.</p>
+<div class="callout">
+  <p class="callout-title">Wikilinks or Markdown links</p>
+  <p>Both kinds of links between notes work, whichever Obsidian writes for you (<strong>Settings → Files and links → Use [[Wikilinks]]</strong>). A Markdown link may give the path from the note, like <code>[text](Recipes/Bread.md)</code> or <code>[text](../Other%20note.md)</code>, with or without <code>.md</code> and with a <code>#Heading</code>. Embedding another note works only as a wikilink, <code>![[Note]]</code>; Markdown-style images, <code>![text](photo.jpg)</code>, work too. Links to websites (<code>[text](https://…)</code>) work as usual.</p>
 </div>
+
+<h3 id="not-supported">What doesn't work (yet)</h3>
+<ul>
+  <li><strong>Canvas</strong> files (<code>.canvas</code>) aren't published; links to them are plain text.</li>
+  <li><strong>Queries</strong> from plugins such as Dataview or Bases show as code blocks, not as their results. Excalidraw drawings show only if you embed an exported SVG or PNG.</li>
+  <li><strong>Markdown-style embeds of notes</strong>, <code>![text](Note.md)</code>, are left out. Use <code>![[Note]]</code>.</li>
+  <li>Other plugins' own syntax is shown as written.</li>
+</ul>
 
 <h2 id="properties">Note properties</h2>
 <p>Properties (frontmatter) at the top of a note control how it appears. All are optional.</p>
@@ -102,10 +111,10 @@ stage: budding
   <tbody>
     <tr><td><code>title</code></td><td>The page title. Without it, kvist uses the first <code># Heading</code>, then the file name.</td></tr>
     <tr><td><code>description</code> or <code>summary</code></td><td>Shown in lists, search results and link previews. Without it, kvist uses the first paragraph.</td></tr>
-    <tr><td><code>created</code> or <code>date</code></td><td>The “Planted” date. Without it, the file's modification time.</td></tr>
-    <tr><td><code>updated</code>, <code>modified</code> or <code>lastmod</code></td><td>The “Tended” date, and the order of “Recently tended”.</td></tr>
+    <tr><td><code>created</code> or <code>date</code></td><td>The “Planted” date. Without it, the “Tended” date.</td></tr>
+    <tr><td><code>updated</code>, <code>modified</code> or <code>lastmod</code></td><td>The “Tended” date, and the order of “Recently tended”. Without it, the time the file was last changed.</td></tr>
     <tr><td><code>tags</code></td><td>Tags, in addition to the ones written in the text.</td></tr>
-    <tr><td><code>aliases</code></td><td>Other names for the note. Search finds the note by them. (Links still need the note’s file name: <code>[[Real name|alias]]</code>.)</td></tr>
+    <tr><td><code>aliases</code></td><td>Other names for the note. Search finds the note by them, and a link to an alias, <code>[[Another name]]</code>, goes to the note, even where Obsidian shows it as unresolved.</td></tr>
     <tr><td><code>permalink</code></td><td>A custom address, such as <code>/about/</code>.</td></tr>
     <tr><td><code>publish</code></td><td><code>true</code> or <code>false</code>; see <a href="publishing.html">Publishing notes</a>.</td></tr>
     <tr><td><code>image</code> or <code>cover</code></td><td>The picture shown when the page is shared on social media or in chats: <code>"[[cover.jpg]]"</code>, a vault path, or a web address. The image is published even if the note doesn't show it. Without it, the site's <code>image</code> is used.</td></tr>

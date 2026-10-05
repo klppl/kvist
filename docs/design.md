@@ -24,7 +24,8 @@ the site and serves it.
 - Themes are plain folders consuming a documented, versioned content model.
 
 **Non-goals (v1)** — designed for, not built: a watched-folder content source,
-Dataview snapshots, Canvas, multilingual sites, multiple sites per vault,
+Dataview snapshots, Canvas, multilingual sites (one site in several
+languages; the theme's own words do follow `language`), multiple sites per vault,
 Cloudflare/GitHub Pages publishing (Phase 7 bonus), Hugo export, comments,
 server-side math rendering, an admin web UI.
 
@@ -369,6 +370,9 @@ Trusted: the server operator, the theme, the plugin (but verified).
 | Old builds | Only `public/` is served; config docs point web servers at it, never at the site dir. |
 | CDN caches | After unpublish, Cloudflare may serve a stale page until TTL. Defaults: HTML `Cache-Control: max-age=60`; hashed assets immutable. Optional Cloudflare cache purge after build (Phase 7). **Residual risk, documented.** |
 | Search engines / archives | Out of our control once published. Documented. |
+| Redirects for moved notes | Old URL → new URL only when the target is a published note in the new build; an old URL whose note became private gets no redirect (a 404, like any missing page). The history file (`redirects.json`, published paths and hashes only) is never served. |
+| Raw HTML in notes | Passed through as the author wrote it (goldmark `WithUnsafe`). Links and images inside it are not resolved, so it cannot publish an attachment; a hard-coded private path in it is the author's own text. Excluded from search text and descriptions. |
+| Analytics | Opt-in from the vault or server config; only known providers, `https://` script URLs and IDs of the expected shape (see `docs/content-model.md`). The script runs on every page, as raw HTML could. |
 | Future features | Dataview snapshots and Canvas must go through the same filter (results referencing non-published notes are dropped). Noted in the model contract. |
 
 **Leak tests** are first-class: `testdata/leaks/` contains vaults where every
@@ -446,9 +450,10 @@ themes/garden/
   overrides folder, so users customize without forking.
 - Default theme **garden**: digital-garden look ("planted/tended" dates,
   growth-stage badge from frontmatter `stage`), three panes (a nav pane with
-  folders or tag groups, a list of the notes around the page, the page),
+  a folder tree or tag groups, a list of the notes around the page, the page),
   backlinks panel, local + global graph, TOC, search modal, dark/light with
-  system default + toggle, OpenGraph tags.
+  system default + toggle, OpenGraph tags. Its words come from
+  `i18n/<lang>.toml` (en, sv, de, fr, es), picked by the site's `language`.
 - Client-side JS is progressive enhancement: pages read fine without JS
   (except math/Mermaid/graph/search).
 - Vendored, MIT-licensed libraries: MiniSearch (search) and KaTeX (math).
@@ -478,8 +483,8 @@ Uses `requestUrl` (avoids CORS on mobile) and `crypto.subtle` for SHA-256.
   (`getAllTags`, frontmatter, folder) → attachments via resolved links/embeds →
   hints file. Hash cache keyed by (path, mtime, size) to avoid rehashing.
 - **Commands:** "Publish now", "Toggle publish for current note" (writes
-  frontmatter via `processFrontMatter`, also in file menu), "Open leak report",
-  "Open published page".
+  frontmatter via `processFrontMatter`, also in file menu), "Open publish
+  report", "Open site settings note", "Open published page".
 - **Auto-publish:** debounced after modify/rename/delete/metadata change of
   any file that was or would become published; never forces through a
   stale-state warning.
@@ -541,7 +546,7 @@ scope at "content" while letting you edit the site from Obsidian.
 
 ```
 kvist/
-  cmd/kvist/              CLI: serve, build, dev, push, token, rollback, version
+  cmd/kvist/              CLI: serve, build, dev, push, token, rollback, gc, version
   internal/
     config/               load + validate TOML
     protocol/             wire types, version constants (shared with test client)
@@ -567,7 +572,8 @@ kvist/
 
 `internal/` keeps the Go API surface small; the public contracts are the
 protocol and the content model, specified in docs and JSON. Dependencies kept
-minimal: goldmark (+ highlighting/chroma), yaml.v3, BurntSushi/toml, fsnotify.
+minimal: goldmark, chroma, yaml.v3, BurntSushi/toml and x/text. (The dev
+server polls the vault instead of using fsnotify.)
 HTTP via stdlib (`net/http` routing).
 
 The **`kvist push --dir <vault>`** reference client (Phase 1) implements the

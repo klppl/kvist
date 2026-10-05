@@ -106,7 +106,7 @@ frontmatter_key       = "publish"   <span class="c"># the property: publish: tru
 
 <h2 id="attachments">Images and attachments</h2>
 <p>An image, PDF or other file is published only if a published note links to or embeds it, and never if the file itself sits in an excluded folder. You don't need to make attachments public separately.</p>
-<p>An image a published note names in its <code>image</code> or <code>cover</code> property counts as embedded, and so do the <code>image</code> and <code>avatar</code> of the <a href="customizing.html#settings-note">settings note</a>. The excluded-folder rule still applies to them.</p>
+<p>An image a published note names in its <code>image</code> or <code>cover</code> property counts as embedded, and so do the <code>image</code>, <code>avatar</code> and <code>favicon</code> of the <a href="customizing.html#settings-note">settings note</a>. The excluded-folder rule still applies to them.</p>
 <p>Before publishing, kvist removes metadata from <strong>JPEG, PNG and WebP</strong> images: GPS location, camera details, author and comments. The image itself isn't re-compressed. <strong>SVG, GIF, AVIF and PDF files are published as they are</strong>, so check those for anything personal.</p>
 <p>The allowed file types are png, jpg, jpeg, gif, webp, svg, avif, pdf, mp3, m4a, ogg, wav, mp4 and webm. Files can be up to 50 MiB each. Both can be changed in the <a href="configuration.html#server-publish">configuration</a>.</p>
 

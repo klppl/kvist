@@ -133,7 +133,8 @@ tended  = "Ompysslad"</code></pre>
     tags.html          /tags/
     404.html           the "not found" page
     partials/*.html    shared {{define}} blocks
-  static/              CSS, JavaScript, fonts, images</code></pre>
+  static/              CSS, JavaScript, fonts, images
+  i18n/                the theme's words, one file per language (optional)</code></pre>
 <pre data-label="theme.toml"><code>name    = "mytheme"
 version = "1.0.0"
 license = "MIT"
@@ -189,8 +190,8 @@ accent = "#3f7d4e"</code></pre>
   <thead><tr><th>Object</th><th>Fields</th></tr></thead>
   <tbody>
     <tr><td><code>.Site</code></td><td><code>Notes</code> (every published note, sorted by address; private notes are never included, so there's nothing to filter), <code>Root</code> (the top folder), <code>AllTags</code>, <code>Tags</code> (top-level), <code>Home</code>, <code>Graph</code>, <code>Config</code></td></tr>
-    <tr><td><code>.Site.Config</code></td><td><code>Title</code>, <code>Description</code>, <code>BaseURL</code>, <code>Language</code>, <code>Author</code>, <code>Nav</code> (list of <code>Title</code>, <code>URL</code>), <code>Params</code></td></tr>
-    <tr><td>A note</td><td><code>Title</code>, <code>URL</code>, <code>Description</code>, <code>Content</code> (HTML), <code>Created</code>, <code>Updated</code>, <code>Tags</code>, <code>Aliases</code>, <code>TOC</code>, <code>Links</code>, <code>Backlinks</code> (<code>Source</code>, <code>Context</code>), <code>Folder</code>, <code>Params</code>, <code>WordCount</code>, <code>ReadingTime</code></td></tr>
+    <tr><td><code>.Site.Config</code></td><td><code>Title</code>, <code>Description</code>, <code>BaseURL</code>, <code>Language</code>, <code>Author</code>, <code>Nav</code> (list of <code>Title</code>, <code>URL</code>), <code>Params</code>, <code>Image</code>, <code>Favicon</code>, <code>Profile</code> (<code>Avatar</code>, <code>Bio</code>, <code>Links</code>), <code>Analytics</code> (<code>Provider</code>, <code>ID</code>, <code>Script</code>, <code>Endpoint</code>)</td></tr>
+    <tr><td>A note</td><td><code>Title</code>, <code>URL</code>, <code>Description</code>, <code>Content</code> (HTML), <code>Created</code>, <code>Updated</code>, <code>Tags</code>, <code>Aliases</code>, <code>TOC</code>, <code>Links</code>, <code>Backlinks</code> (<code>Source</code>, <code>Context</code>), <code>Folder</code>, <code>Params</code>, <code>Image</code>, <code>WordCount</code>, <code>ReadingTime</code></td></tr>
     <tr><td>A folder</td><td><code>Name</code>, <code>URL</code>, <code>Notes</code>, <code>Children</code>, <code>Index</code> (its folder note), <code>Parent</code></td></tr>
     <tr><td>A tag</td><td><code>Name</code> (e.g. <code>projects/kvist</code>), <code>URL</code>, <code>Notes</code> (including child tags' notes), <code>Children</code>, <code>Parent</code></td></tr>
     <tr><td>A heading (<code>TOC</code>)</td><td><code>Level</code>, <code>Text</code>, <code>ID</code>, <code>Children</code></td></tr>
@@ -216,7 +217,10 @@ accent = "#3f7d4e"</code></pre>
     <tr><td><code>default</code></td><td><code>{{default "Untitled" .Title}}</code></td><td>A fallback for empty values</td></tr>
     <tr><td><code>dict</code></td><td><code>{{template "card" (dict "Note" . "Big" true)}}</code></td><td>Pass several values to a template</td></tr>
     <tr><td><code>json</code></td><td><code>{{json .Site.Graph}}</code></td><td>A value as JSON</td></tr>
-    <tr><td>Text helpers</td><td><code>lower</code>, <code>upper</code>, <code>title</code>, <code>join</code>, <code>contains</code>, <code>hasPrefix</code>, <code>str</code></td><td></td></tr>
+    <tr><td><code>t</code></td><td><code>{{t "search"}}</code>, <code>{{t "notes" 3}}</code></td><td>A word in the site's language, from <code>i18n/</code> (<a href="#words">above</a>); plural forms pick by the count</td></tr>
+    <tr><td><code>i18n</code></td><td><code>{{json (i18n "script")}}</code></td><td>A table of words, for a script</td></tr>
+    <tr><td><code>propertyValues</code></td><td><code>{{range propertyValues "2 Jan 2006" .Note.Params.authors}}</code></td><td>A property as text: one per list item, dates formatted, <code>[[links]]</code> as their text</td></tr>
+    <tr><td>Text helpers</td><td><code>lower</code>, <code>upper</code>, <code>title</code>, <code>join</code>, <code>replace</code>, <code>contains</code>, <code>hasPrefix</code>, <code>str</code></td><td></td></tr>
     <tr><td>Numbers</td><td><code>add</code>, <code>sub</code></td><td></td></tr>
   </tbody>
 </table>
@@ -227,7 +231,7 @@ accent = "#3f7d4e"</code></pre>
 <table>
   <thead><tr><th>Class</th><th>What</th></tr></thead>
   <tbody>
-    <tr><td><code>a.internal-link</code></td><td>A link to another published note</td></tr>
+    <tr><td><code>a.internal-link</code>, <code>a.external-link</code></td><td>A link to another published note, or to another website</td></tr>
     <tr><td><code>span.link-unpublished</code></td><td>A link to a private or missing note. <strong>Style it as plain text</strong>, so visitors can't tell that a private note exists.</td></tr>
     <tr><td><code>div.embed</code>, <code>.embed-title</code>, <code>.embed-content</code></td><td>An embedded note or section</td></tr>
     <tr><td><code>div.callout[data-callout="tip"]</code>, <code>.callout-title</code>, <code>.callout-content</code></td><td>Callouts; foldable ones use <code>&lt;details&gt;</code></td></tr>
@@ -235,10 +239,11 @@ accent = "#3f7d4e"</code></pre>
     <tr><td><code>div.code-block[data-lang]</code>, <code>pre.chroma</code></td><td>Highlighted code; colors come from <code>syntax.css</code></td></tr>
     <tr><td><code>.math-inline</code>, <code>.math-display</code></td><td>Math, for KaTeX to render in the browser</td></tr>
     <tr><td><code>pre.mermaid</code></td><td>A diagram, for Mermaid to draw</td></tr>
-    <tr><td><code>mark</code>, <code>iframe.embed-pdf</code>, <code>audio</code>, <code>video</code></td><td>Highlights and embedded files</td></tr>
+    <tr><td><code>img.align-left</code>, <code>.align-right</code>, <code>.align-center</code></td><td>Images placed with <code>|left</code>, <code>|right</code> or <code>|center</code></td></tr>
+    <tr><td><code>mark</code>, <code>iframe.embed-pdf</code>, <code>iframe.embed-video</code>, <code>audio</code>, <code>video</code></td><td>Highlights, embedded files and YouTube or Vimeo players</td></tr>
   </tbody>
 </table>
-<p>Every build also writes <code>/search-index.json</code> and <code>/graph.json</code>, which a theme's scripts can load for search and graphs, plus <code>/index.xml</code> (RSS) and <code>/sitemap.xml</code>.</p>
+<p>Every build also writes <code>/search-index.json</code> and <code>/graph.json</code>, which a theme's scripts can load for search and graphs, plus <code>/index.xml</code> (RSS), <code>/sitemap.xml</code> and <code>/robots.txt</code>. Redirects for moved notes (pages at the old addresses, and <code>/_kvist/redirects.json</code>) are added by the server, whatever the theme.</p>
 
 <h2 id="rules">Good theme manners</h2>
 <ul>

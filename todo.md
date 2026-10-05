@@ -63,12 +63,32 @@ of them has it today.
 
 ## Fixes found along the way
 
-- [ ] **Docs: Markdown links work.** `docs/writing.html` says links like
+- [x] **Docs: Markdown links work.** `docs/writing.html` says links like
   `[text](Other%20note.md)` aren't converted, but they resolve fine,
   including `#Heading`.
-- [ ] **Docs: aliases work as link targets.** `[[Another name]]` links to
+- [x] **Docs: aliases work as link targets.** `[[Another name]]` links to
   the note with that alias; the docs say it doesn't.
-- [ ] **Docs: block embeds.** `![[Note#^id]]` works but isn't in the table
+- [x] **Docs: block embeds.** `![[Note#^id]]` works but isn't in the table
   of what works.
-- [ ] **theme.toml comment.** The comment for `show_properties` ended up at
+- [x] **theme.toml comment.** The comment for `show_properties` ended up at
   the end of the `show_profile` line in `themes/garden/theme.toml`.
+
+## Found going through the README and docs
+
+- [ ] **Markdown-style note embeds.** `![text](Note.md)` renders as an empty
+  paragraph, without a warning, where `![[Note]]` embeds the note. Embed it
+  the same way, or at least warn. (The docs now say it doesn't work.)
+- [ ] **Release the plugin.** The favicon is only uploaded by the new
+  plugin (it decides which images leave the vault), and the settings note
+  template gained `language`, `image` and `favicon`. Tag a version so
+  `kvist-plugin.zip` has them.
+- [ ] **Refresh the screenshots.** `docs/assets/screens/` and the README
+  image show the old menu with only top-level folders.
+- [ ] **Release binaries.** `kvist dev` and `kvist build` on your own
+  computer need Go and a checkout (`make build`). Attach Linux, macOS and
+  Windows binaries to releases, like the plugin zip.
+- [ ] **`redirect_from` property.** Automatic redirects can't follow a note
+  that was renamed, edited and given a common file name at once; a
+  property listing old addresses would cover that, and links from before
+  the server kept a redirect history.
+
