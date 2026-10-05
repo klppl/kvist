@@ -225,7 +225,18 @@ mark { background: var(--mark); color: inherit; padding: 0 .15em; border-radius:
 code { font-family: var(--font-mono); font-size: .88em; background: var(--code-bg); padding: .1em .35em; border-radius: 5px; }
 pre { font-family: var(--font-mono); font-size: .86rem; line-height: 1.5; background: var(--code-bg); padding: 1rem; border-radius: var(--radius); overflow-x: auto; }
 pre code { background: none; padding: 0; font-size: inherit; }
-.code-block pre.chroma { margin: 1rem 0; }
+.code-block { position: relative; margin: 1rem 0; }
+.code-block > pre { margin: 0; }
+.code-copy {
+  position: absolute; top: .45rem; right: .45rem; padding: .15rem .55rem;
+  font: 500 .74rem var(--font); color: var(--muted); cursor: pointer;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+  opacity: 0; transition: opacity .15s;
+}
+.code-block:hover .code-copy, .code-copy:focus-visible, .code-copy.copied { opacity: 1; }
+.code-copy:hover { color: var(--fg); }
+.code-copy.copied { color: var(--accent); border-color: var(--accent); }
+@media (hover: none) { .code-copy { opacity: 1; } }
 
 /* heading anchors (added by garden.js) */
 .heading-anchor {
@@ -442,7 +453,7 @@ pre.mermaid { background: none; text-align: center; }
   body { font-size: 11pt; }
   .shell, .has-list .shell { display: block; min-height: 0; }
   .nav-pane, .list-pane, .page-aside, .skip, .backlinks, .icon-button,
-  .search-dialog, .graph-dialog, .heading-anchor, .link-preview, iframe.embed-video { display: none !important; }
+  .search-dialog, .graph-dialog, .heading-anchor, .code-copy, .link-preview, iframe.embed-video { display: none !important; }
   .page { max-width: none; padding: 0; }
   .note-header h1, .intro h1, .listing h1 { font-size: 22pt; }
   .content { margin-top: 1.2rem; font-size: 11pt; }

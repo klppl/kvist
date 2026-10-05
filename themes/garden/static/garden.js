@@ -145,6 +145,30 @@
     h.appendChild(a);
   });
 
+  // ---- code blocks: a copy button ----
+  if (navigator.clipboard) {
+    document.querySelectorAll("main .content pre:not(.mermaid)").forEach(function (pre) {
+      var wrap = pre.parentNode.classList.contains("code-block") ? pre.parentNode : null;
+      if (!wrap) { // plain blocks without a language aren't wrapped yet
+        wrap = el("div", "code-block");
+        pre.parentNode.insertBefore(wrap, pre);
+        wrap.appendChild(pre);
+      }
+      var copy = tr("copy_code", "Copy");
+      var b = el("button", "code-copy", copy);
+      b.type = "button";
+      b.addEventListener("click", function () {
+        var code = pre.querySelector("code") || pre;
+        navigator.clipboard.writeText(code.textContent.replace(/\n$/, "")).then(function () {
+          b.textContent = tr("code_copied", "Copied");
+          b.classList.add("copied");
+          setTimeout(function () { b.textContent = copy; b.classList.remove("copied"); }, 1600);
+        });
+      });
+      wrap.appendChild(b);
+    });
+  }
+
   document.querySelectorAll(".link-unpublished").forEach(function (el) { el.title = tr("not_published", "Not published"); });
 
   // ---- math (KaTeX is loaded only on pages that need it) ----
