@@ -19,7 +19,7 @@ const (
 
 // generated writes the theme-independent files: the search index, the
 // graph, the RSS feed, the sitemap and robots.txt. All of them derive from
-// the model, which only holds published notes.
+// the model, which only holds published notes, and leave out unlisted ones.
 func (r *renderer) generated() error {
 	for _, g := range []struct {
 		path string
@@ -55,6 +55,9 @@ type searchDoc struct {
 func searchIndex(s *model.Site) ([]byte, error) {
 	docs := make([]searchDoc, 0, len(s.Notes))
 	for _, n := range s.Notes {
+		if n.Unlisted {
+			continue
+		}
 		text := n.Text
 		if utf8.RuneCountInString(text) > searchTextLimit {
 			text = string([]rune(text)[:searchTextLimit])
@@ -114,9 +117,9 @@ type rssGUID struct {
 	IsPermaLink bool   `xml:"isPermaLink,attr"`
 }
 
-// newest returns notes sorted by creation time, newest first.
+// newest returns the listed notes sorted by creation time, newest first.
 func newest(s *model.Site) []*model.Note {
-	notes := append([]*model.Note(nil), s.Notes...)
+	notes := listed(s.Notes)
 	sort.SliceStable(notes, func(i, j int) bool {
 		if !notes[i].Created.Equal(notes[j].Created) {
 			return notes[i].Created.After(notes[j].Created)
@@ -194,7 +197,7 @@ func sitemap(s *model.Site) ([]byte, error) {
 		homeTime = s.Home.Updated
 	}
 	add("/", homeTime)
-	for _, n := range s.Notes {
+	for _, n := range listed(s.Notes) {
 		add(n.URL, n.Updated)
 	}
 	var folders func(f *model.Folder)
@@ -219,6 +222,17 @@ func sitemap(s *model.Site) ([]byte, error) {
 		return nil, err
 	}
 	return append([]byte(xml.Header), append(b, '\n')...), nil
+}
+
+// listed returns a copy of notes without the unlisted ones.
+func listed(notes []*model.Note) []*model.Note {
+	out := make([]*model.Note, 0, len(notes))
+	for _, n := range notes {
+		if !n.Unlisted {
+			out = append(out, n)
+		}
+	}
+	return out
 }
 
 func robots(s *model.Site) ([]byte, error) {

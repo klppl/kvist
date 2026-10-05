@@ -82,19 +82,22 @@ type NavItem struct {
 
 // Note is a published note.
 type Note struct {
-	ID          string            `json:"id"`
-	Path        string            `json:"path"`
-	URL         string            `json:"url"`
-	Slug        string            `json:"slug"`
-	Title       string            `json:"title"`
-	Aliases     []string          `json:"aliases,omitempty"`
-	Tags        []*Tag            `json:"-"`
-	TagNames    []string          `json:"tags"`
-	Created     time.Time         `json:"created"`
-	Updated     time.Time         `json:"updated"`
-	Description string            `json:"description,omitempty"`
-	Params      map[string]any    `json:"params,omitempty"`
-	Image       string            `json:"image,omitempty"` // social preview image, like SiteConfig.Image
+	ID          string         `json:"id"`
+	Path        string         `json:"path"`
+	URL         string         `json:"url"`
+	Slug        string         `json:"slug"`
+	Title       string         `json:"title"`
+	Aliases     []string       `json:"aliases,omitempty"`
+	Tags        []*Tag         `json:"-"`
+	TagNames    []string       `json:"tags"`
+	Created     time.Time      `json:"created"`
+	Updated     time.Time      `json:"updated"`
+	Description string         `json:"description,omitempty"`
+	Params      map[string]any `json:"params,omitempty"`
+	Image       string         `json:"image,omitempty"` // social preview image, like SiteConfig.Image
+	// Unlisted: published, but left out of folders, tags, the graph,
+	// backlinks, search, the feed and the sitemap (frontmatter unlisted).
+	Unlisted    bool              `json:"unlisted,omitempty"`
 	Content     template.HTML     `json:"content"`
 	TOC         []*Heading        `json:"toc,omitempty"`
 	Links       []*Link           `json:"links,omitempty"`
@@ -144,7 +147,7 @@ type Tag struct {
 	Name     string   `json:"name"` // full name, e.g. "a/b"
 	Slug     string   `json:"slug"`
 	URL      string   `json:"url"`
-	Notes    []*Note  `json:"-"` // notes tagged exactly this tag or a child, sorted by URL
+	Notes    []*Note  `json:"-"` // listed notes tagged exactly this tag or a child, sorted by URL
 	NoteIDs  []string `json:"notes"`
 	Children []*Tag   `json:"children,omitempty"`
 	Parent   *Tag     `json:"-"`
@@ -155,16 +158,20 @@ type Folder struct {
 	Name     string    `json:"name"`
 	Path     string    `json:"path"`
 	URL      string    `json:"url"`
-	Notes    []*Note   `json:"-"`
+	Notes    []*Note   `json:"-"` // listed notes only
 	NoteIDs  []string  `json:"notes"`
 	Children []*Folder `json:"children,omitempty"`
 	Index    *Note     `json:"-"` // folder note, if any
 	IndexID  string    `json:"index,omitempty"`
 	Parent   *Folder   `json:"-"`
+	// Unlisted: the folder holds only unlisted notes. It is not among its
+	// parent's Children and has no page; its notes' Folder still points
+	// to it.
+	Unlisted bool `json:"unlisted,omitempty"`
 }
 
-// Graph holds published notes and the links between them. There are no
-// nodes for unresolved links.
+// Graph holds listed notes and the links between them. There are no
+// nodes for unresolved links or unlisted notes.
 type Graph struct {
 	Nodes []GraphNode `json:"nodes"`
 	Edges []GraphEdge `json:"edges"`
@@ -177,7 +184,7 @@ type GraphTag struct {
 	URL  string `json:"url"`
 }
 
-// GraphNode is a note in the graph.
+// GraphNode is a listed note in the graph.
 type GraphNode struct {
 	ID    string   `json:"id"`
 	Title string   `json:"title"`

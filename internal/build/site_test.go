@@ -175,3 +175,63 @@ func TestIncrementalLinksUnchangedFiles(t *testing.T) {
 		t.Error("second build broken after removing the first")
 	}
 }
+
+// writeVault builds a site from the given files with the fixture config
+// and returns the output directory.
+func writeVault(t *testing.T, files map[string]string) string {
+	t.Helper()
+	src := t.TempDir()
+	for p, c := range files {
+		full := filepath.Join(src, filepath.FromSlash(p))
+		if err := os.MkdirAll(filepath.Dir(full), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(full, []byte(c), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	cfg, err := config.Parse([]byte(fixtureConfig))
+	if err != nil {
+		t.Fatal(err)
+	}
+	sc := cfg.Sites[0]
+	theme, err := LoadTheme("", sc)
+	if err != nil {
+		t.Fatal(err)
+	}
+	snap, err := dir.New(src).Snapshot(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	out := filepath.Join(t.TempDir(), "site")
+	if _, err := WriteSite(context.Background(), sc, theme, snap, out); err != nil {
+		t.Fatal(err)
+	}
+	return out
+}
+
+func TestUnlistedOutput(t *testing.T) {
+	out := writeVault(t, map[string]string{
+		"Garden/Listed.md": "Listed text. See [[Hidden]].",
+		"Garden/Hidden.md": "---\nunlisted: true\n---\nHiddenword text.",
+	})
+	read := func(p string) string {
+		b, err := os.ReadFile(filepath.Join(out, p))
+		if err != nil {
+			t.Fatalf("missing %s", p)
+		}
+		return string(b)
+	}
+	hidden := read("garden/hidden/index.html")
+	if !strings.Contains(hidden, `<meta name="robots" content="noindex">`) {
+		t.Error("unlisted page lacks noindex")
+	}
+	if strings.Contains(read("garden/listed/index.html"), "noindex") {
+		t.Error("listed page has noindex")
+	}
+	for _, p := range []string{"search-index.json", "graph.json", "index.xml", "sitemap.xml", "garden/index.html", "index.html", "tags/index.html"} {
+		if s := read(p); strings.Contains(s, "garden/hidden") || strings.Contains(s, "Hiddenword") {
+			t.Errorf("%s lists the unlisted note", p)
+		}
+	}
+}

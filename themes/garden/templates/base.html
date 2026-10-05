@@ -6,6 +6,8 @@
 <title>{{if eq .Kind "home"}}{{.Site.Config.Title}}{{else}}{{.Title}} · {{.Site.Config.Title}}{{end}}</title>
 {{- with .Description}}
 <meta name="description" content="{{.}}">{{end}}
+{{- with .Note}}{{if .Unlisted}}
+<meta name="robots" content="noindex">{{end}}{{end}}
 {{- if ne .Kind "404"}}
 <link rel="canonical" href="{{absURL .URL}}">{{end}}
 {{template "head-meta" .}}

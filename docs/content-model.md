@@ -85,6 +85,7 @@ note wins where both set a value. The theme parameter `nav_tags` is read as
 | `Description` | string | Frontmatter `description`/`summary`, else the first paragraph (≤ 200 characters). |
 | `Params` | map | Only the frontmatter keys listed in `expose_frontmatter`. Other keys never reach a theme. |
 | `Image` | string | Social preview image from the `image` or `cover` property: the URL of a published image (`/_assets/…`), or an http(s) URL; empty if unset or not a published image. The value may be `"[[cover.png]]"`, a vault path, or a URL. |
+| `Unlisted` | bool | Frontmatter `unlisted: true`. The note has its page, but no folder, tag, graph, backlink, search index, feed or sitemap lists it; a theme should add `<meta name="robots" content="noindex">`. Its `Tags` are only the ones listed notes carry too. |
 | `Content` | HTML | The rendered body. |
 | `TOC` | []*Heading | Nested `{Level, Text, ID, Children}`. |
 | `Links` | []*Link | Outgoing links to published notes (`Target`, `Embed`), in order, without duplicates. |
@@ -153,17 +154,20 @@ it is in an `exclude_folders` folder.
 ## Tag
 
 `Name` (full, e.g. `projects/kvist`), `Slug`, `URL` (`/tags/projects/kvist/`),
-`Notes` (notes tagged with it or with one of its children, sorted by URL),
+`Notes` (listed notes tagged with it or with one of its children, sorted by URL),
 `Children`, `Parent`.
 
 ## Folder
 
-`Name`, `Path`, `URL`, `Notes`, `Children`, `Index` (the folder note, if any),
-`Parent`. Only folders that contain published notes exist.
+`Name`, `Path`, `URL`, `Notes` (listed notes only), `Children`, `Index` (the
+folder note, if any), `Parent`. Only folders that contain published notes
+exist. A folder with only unlisted notes, in it and below it, has
+`Unlisted` set: it is not among its parent's `Children` and gets no page,
+but its notes' `Folder` points to it.
 
 ## Graph
 
-`Nodes`: `{ID, Title, URL, Tags}` for every published note. `Edges`:
+`Nodes`: `{ID, Title, URL, Tags}` for every listed note. `Edges`:
 `{Source, Target}` for every resolved link between published notes. There
 are no nodes for unresolved links. `Tags`: `{Name, URL}` for every tag (as
 in `AllTags`), so a theme can draw tags as nodes.
@@ -171,7 +175,7 @@ in `AllTags`), so a theme can draw tags as nodes.
 ## Generated files
 
 Besides the pages, every build writes these files, all from the model
-(published notes only):
+(published notes only, without unlisted ones):
 
 | File | |
 |---|---|

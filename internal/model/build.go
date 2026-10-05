@@ -239,6 +239,7 @@ func (b *builder) makeNotes(s *Site) {
 				n.Params[k] = v
 			}
 		}
+		n.Unlisted = firstBool(fm, "unlisted")
 		if ref, ok := vault.ImageProperty(fm, vault.NoteImageKeys); ok {
 			n.Image = b.imageURL(p, p, ref)
 		}
@@ -317,6 +318,20 @@ func firstString(fm map[string]any, keys ...string) string {
 		}
 	}
 	return ""
+}
+
+// firstBool reads a yes/no property: YAML true, or the text "true" or "yes".
+func firstBool(fm map[string]any, key string) bool {
+	for _, v := range vault.FrontmatterValue(fm, key) {
+		switch v := v.(type) {
+		case bool:
+			return v
+		case string:
+			s := strings.ToLower(strings.TrimSpace(v))
+			return s == "true" || s == "yes"
+		}
+	}
+	return false
 }
 
 var dateLayouts = []string{time.RFC3339, "2006-01-02T15:04:05", "2006-01-02T15:04", "2006-01-02 15:04:05", "2006-01-02 15:04", "2006-01-02"}
@@ -404,6 +419,9 @@ func (b *builder) render(s *Site) {
 			}
 			seen[t.Path] = true
 			n.Links = append(n.Links, &Link{Target: t, TargetID: t.ID, Embed: ref.Embed})
+			if n.Unlisted {
+				continue // an unlisted note is not listed among the backlinks either
+			}
 			backlinks[t.Path] = append(backlinks[t.Path], &Backlink{Source: n, SourceID: n.ID, Context: ref.Context})
 		}
 	}
@@ -674,11 +692,28 @@ func (b *builder) makeFolders(s *Site) {
 	for _, n := range s.Notes {
 		f := get(dirOf(n.Path))
 		n.Folder, n.FolderPath = f, f.Path
-		f.Notes = append(f.Notes, n)
+		if !n.Unlisted {
+			f.Notes = append(f.Notes, n)
+		}
 		if n.URL == f.URL {
 			f.Index, f.IndexID = n, n.ID
 		}
 	}
+	// A folder with nothing listed in it or below it is unlisted too: it
+	// leaves the tree, so no menu, list or sitemap shows it.
+	var prune func(f *Folder) bool
+	prune = func(f *Folder) bool {
+		kept := f.Children[:0]
+		for _, c := range f.Children {
+			if prune(c) {
+				kept = append(kept, c)
+			}
+		}
+		f.Children = kept
+		f.Unlisted = len(f.Notes) == 0 && len(f.Children) == 0 && f.Parent != nil
+		return !f.Unlisted
+	}
+	prune(s.Root)
 	var finish func(f *Folder)
 	finish = func(f *Folder) {
 		sort.Slice(f.Children, func(i, j int) bool { return strings.ToLower(f.Children[i].Name) < strings.ToLower(f.Children[j].Name) })
@@ -721,6 +756,9 @@ func (b *builder) makeTags(s *Site) {
 		return t
 	}
 	for _, n := range s.Notes {
+		if n.Unlisted {
+			continue
+		}
 		for _, name := range n.TagNames {
 			t := get(name)
 			n.Tags = append(n.Tags, t)
@@ -728,6 +766,18 @@ func (b *builder) makeTags(s *Site) {
 				if len(x.Notes) == 0 || x.Notes[len(x.Notes)-1] != n {
 					x.Notes = append(x.Notes, n)
 				}
+			}
+		}
+	}
+	// Unlisted notes link to the tags listed notes have; a tag only they
+	// carry gets no page.
+	for _, n := range s.Notes {
+		if !n.Unlisted {
+			continue
+		}
+		for _, name := range n.TagNames {
+			if t, ok := byKey[strings.ToLower(name)]; ok {
+				n.Tags = append(n.Tags, t)
 			}
 		}
 	}
@@ -753,8 +803,14 @@ func (b *builder) makeGraph(s *Site) {
 		s.Graph.Tags = append(s.Graph.Tags, GraphTag{Name: t.Name, URL: t.URL})
 	}
 	for _, n := range s.Notes {
+		if n.Unlisted {
+			continue
+		}
 		s.Graph.Nodes = append(s.Graph.Nodes, GraphNode{ID: n.ID, Title: n.Title, URL: n.URL, Tags: n.TagNames})
 		for _, l := range n.Links {
+			if l.Target.Unlisted {
+				continue
+			}
 			s.Graph.Edges = append(s.Graph.Edges, GraphEdge{Source: n.ID, Target: l.TargetID})
 		}
 	}

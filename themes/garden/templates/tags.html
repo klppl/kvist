@@ -8,7 +8,7 @@
   <header class="index-head">
     <h1>{{t "tags"}}</h1>
     {{- with .Site.AllTags}}
-    <p class="lead">{{t "tags_lead" (t "tag_count" (len .)) (t "notes" (len $.Site.Notes))}}</p>
+    <p class="lead">{{t "tags_lead" (t "tag_count" (len .)) (t "notes" (len (recent 0)))}}</p>
     {{- end}}
   </header>
   {{- with .Site.Tags}}

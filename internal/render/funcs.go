@@ -78,12 +78,13 @@ func funcMap(t *Theme, site *model.Site) template.FuncMap {
 			}
 			return v
 		},
-		// recent returns the n most recently updated notes.
+		// recent returns the n most recently updated notes, without
+		// unlisted ones.
 		"recent": func(nv any) []*model.Note {
 			if site == nil {
 				return nil
 			}
-			return byUpdated(toInt(nv), site.Notes)
+			return byUpdated(toInt(nv), listed(site.Notes))
 		},
 		// newest returns the n most recently updated of the given notes
 		// (all of them for n <= 0): {{range newest 3 .Tag.Notes}}.
