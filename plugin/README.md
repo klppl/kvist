@@ -55,9 +55,12 @@ them. Use one token per device, so you can revoke one without the others.
 
 ## What gets published
 
-The server decides the rules (see the main README). The plugin fetches them
+The server decides the rules (see
+[Publishing notes](https://klppl.github.io/kvist/publishing.html)). The plugin fetches them
 and applies them before uploading anything; the server checks every note
-again. Only published notes, the attachments they reference, a hints file
+again. Only published notes, the attachments they reference (including images
+named in their `image`/`cover` properties, and the settings note's
+`image`, `avatar` and `favicon`), a hints file
 that names published notes only, the settings note `_site.md` and
 `.kvist/site.toml` (if present) leave your device.
 

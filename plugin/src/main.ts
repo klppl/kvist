@@ -21,18 +21,26 @@ const SETTINGS_TEMPLATE = `---
 title:
 description:
 author:
+language:
 home:
 groups: []
 accent:
 footer:
+image:
+favicon:
 ---
 Settings for your kvist website. This note is never published as a page. Fill in the properties above, then publish. Empty ones keep their default.
 
 - **title** and **description**: the site's name and tagline.
+- **language**: a code such as \`en\` or \`sv\`, for the site's own words and dates.
 - **home**: a note to use as the home page, written as a link: \`[[Welcome]]\`. Empty: a generated home page.
 - **groups**: tags that group the menu, such as \`articles\` and \`projects\`. Empty: your folders.
 - **accent**: the color of links, such as \`#3f7d4e\`.
 - **footer**: text at the bottom of the menu. Markdown works.
+- **image**: the picture shown when a page is shared, as a link: \`[[preview.png]]\`.
+- **favicon**: the icon in browser tabs, as a link: \`[[icon.png]]\`.
+
+More settings, such as a profile with your picture and links, or visitor statistics, are in the documentation: https://klppl.github.io/kvist/customizing.html
 
 ## Links
 
