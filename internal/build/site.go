@@ -122,40 +122,56 @@ func (o *dirOutput) copy(p string, r io.Reader) error {
 // WriteSite builds the site from a snapshot into dir, which must be empty
 // or absent. It returns the build's warnings.
 func WriteSite(ctx context.Context, site *config.Site, theme *render.Theme, snap source.Snapshot, dir string) ([]protocol.Warning, error) {
-	return writeSite(ctx, site, theme, snap, dir, "")
+	w, _, err := writeSite(ctx, site, theme, snap, dir, "", nil)
+	return w, err
 }
 
 // WriteSiteIncremental is WriteSite, hard-linking unchanged files from the
-// previous build in prev.
-func WriteSiteIncremental(ctx context.Context, site *config.Site, theme *render.Theme, snap source.Snapshot, dir, prev string) ([]protocol.Warning, error) {
-	return writeSite(ctx, site, theme, snap, dir, prev)
+// previous build in prev. With hist (the site's redirect history), old
+// addresses of moved notes redirect to their new ones; it returns the
+// history to save once the build is published.
+func WriteSiteIncremental(ctx context.Context, site *config.Site, theme *render.Theme, snap source.Snapshot, dir, prev string, hist *History) ([]protocol.Warning, *History, error) {
+	return writeSite(ctx, site, theme, snap, dir, prev, hist)
 }
 
-func writeSite(ctx context.Context, site *config.Site, theme *render.Theme, snap source.Snapshot, dir, prev string) ([]protocol.Warning, error) {
+func writeSite(ctx context.Context, site *config.Site, theme *render.Theme, snap source.Snapshot, dir, prev string, hist *History) ([]protocol.Warning, *History, error) {
 	m, err := model.Build(site, snap)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if err := ctx.Err(); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if err := os.MkdirAll(dir, 0o755); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	out := &dirOutput{root: dir, prev: prev}
 	if err := render.Render(m, theme, out); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	files := map[string]source.File{}
 	for _, f := range snap.Files() {
 		files[f.Path] = f
+	}
+	if hist != nil {
+		pages := make(map[string]Page, len(m.Notes))
+		for _, n := range m.Notes {
+			pages[n.Path] = Page{URL: n.URL, Hash: files[n.Path].Hash}
+		}
+		hist = hist.next(pages, func(u string) bool {
+			_, err := os.Stat(filepath.Join(dir, filepath.FromSlash(strings.TrimPrefix(u, "/")), "index.html"))
+			return err == nil
+		})
+		if err := writeRedirects(out, hist.Redirects, site.BaseURL); err != nil {
+			return nil, nil, err
+		}
 	}
 	warnings := m.Warnings
 	strip := site.Publish.StripImageMetadata != nil && *site.Publish.StripImageMetadata
 	for _, a := range m.Assets {
 		f, ok := files[a.Path]
 		if !ok {
-			return nil, fmt.Errorf("asset %s is missing from the snapshot", a.Path)
+			return nil, nil, fmt.Errorf("asset %s is missing from the snapshot", a.Path)
 		}
 		dst := strings.TrimPrefix(a.URL, "/")
 		if out.reuse(dst) {
@@ -163,13 +179,13 @@ func writeSite(ctx context.Context, site *config.Site, theme *render.Theme, snap
 		}
 		r, err := snap.Open(f)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		if strip && imagemeta.Supported(path.Ext(a.Path)) {
 			data, err := io.ReadAll(r)
 			r.Close()
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
 			clean, err := imagemeta.Strip(path.Ext(a.Path), data)
 			if err != nil {
@@ -179,17 +195,17 @@ func writeSite(ctx context.Context, site *config.Site, theme *render.Theme, snap
 				continue
 			}
 			if err := out.WriteFile(dst, clean); err != nil {
-				return nil, err
+				return nil, nil, err
 			}
 			continue
 		}
 		err = out.copy(dst, r)
 		r.Close()
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 	}
-	return warnings, nil
+	return warnings, hist, nil
 }
 
 // SiteBuilder builds sites from the content store. It implements Builder
@@ -228,7 +244,11 @@ func (b *SiteBuilder) Build(ctx context.Context, siteID, revision, buildID strin
 	if target, err := os.Readlink(filepath.Join(ss.Dir(), "public")); err == nil {
 		prev = filepath.Join(ss.Dir(), target)
 	}
-	warnings, err := WriteSiteIncremental(ctx, sc, theme, snap, tmp, prev)
+	hist, err := LoadHistory(ss.Dir())
+	if err != nil {
+		return nil, fmt.Errorf("redirect history: %w", err)
+	}
+	warnings, hist, err := WriteSiteIncremental(ctx, sc, theme, snap, tmp, prev, hist)
 	if err != nil {
 		_ = os.RemoveAll(tmp)
 		return warnings, err
@@ -239,6 +259,9 @@ func (b *SiteBuilder) Build(ctx context.Context, siteID, revision, buildID strin
 	}
 	if err := swapSymlink(filepath.Join(ss.Dir(), "public"), filepath.Join("builds", buildID)); err != nil {
 		return warnings, err
+	}
+	if err := hist.Save(ss.Dir()); err != nil {
+		warnings = append(warnings, protocol.Warning{Code: protocol.WarnBuild, Message: "redirect history not saved: " + err.Error()})
 	}
 	if token, err := sc.Cloudflare.Token(); err != nil {
 		warnings = append(warnings, protocol.Warning{Code: protocol.WarnBuild, Message: "CDN cache not purged: " + err.Error()})

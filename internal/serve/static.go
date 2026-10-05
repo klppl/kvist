@@ -4,6 +4,7 @@
 package serve
 
 import (
+	"encoding/json"
 	"errors"
 	"io"
 	"io/fs"
@@ -15,6 +16,7 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"sync"
 )
 
 // Site is one served site.
@@ -27,12 +29,25 @@ type Site struct {
 type Static struct {
 	sites    map[string]string // host → public dir
 	fallback string            // public dir when only one site is served
+
+	mu        sync.Mutex
+	redirects map[string]redirectMap // public dir → its current build's redirects
 }
+
+// redirectMap is a build's redirects (old URL → new URL), read once per
+// build.
+type redirectMap struct {
+	build string // the public dir's resolved target
+	to    map[string]string
+}
+
+// redirectsFile is build.RedirectsFile; serve doesn't import build.
+const redirectsFile = "_kvist/redirects.json"
 
 // New returns a handler for sites. With a single site, requests for an
 // unknown host get that site too (handy for http://localhost:8080).
 func New(sites []Site) *Static {
-	s := &Static{sites: map[string]string{}}
+	s := &Static{sites: map[string]string{}, redirects: map[string]redirectMap{}}
 	for _, site := range sites {
 		s.sites[strings.ToLower(site.Host)] = site.PublicDir
 	}
@@ -88,6 +103,15 @@ func (s *Static) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.Set("Referrer-Policy", "strict-origin-when-cross-origin")
 
 	clean := path.Clean("/" + r.URL.Path)
+	// A moved note's old address: a permanent redirect to the new one.
+	if to, ok := s.redirect(dir, clean+"/"); ok {
+		if r.URL.RawQuery != "" {
+			to += "?" + r.URL.RawQuery
+		}
+		h.Set("Cache-Control", cacheShort)
+		http.Redirect(w, r, to, http.StatusMovedPermanently)
+		return
+	}
 	rel := strings.TrimPrefix(clean, "/")
 	if strings.HasSuffix(r.URL.Path, "/") || rel == "" {
 		rel = path.Join(rel, "index.html")
@@ -120,6 +144,28 @@ func (s *Static) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		h.Set("Content-Type", ct)
 	}
 	http.ServeContent(w, r, "", fi.ModTime(), f)
+}
+
+// redirect looks up a page URL in the redirects of dir's current build.
+func (s *Static) redirect(dir, u string) (string, bool) {
+	build, err := filepath.EvalSymlinks(dir)
+	if err != nil {
+		return "", false
+	}
+	s.mu.Lock()
+	rm, ok := s.redirects[dir]
+	s.mu.Unlock()
+	if !ok || rm.build != build {
+		rm = redirectMap{build: build}
+		if b, err := os.ReadFile(filepath.Join(build, filepath.FromSlash(redirectsFile))); err == nil {
+			_ = json.Unmarshal(b, &rm.to)
+		}
+		s.mu.Lock()
+		s.redirects[dir] = rm
+		s.mu.Unlock()
+	}
+	to, ok := rm.to[u]
+	return to, ok
 }
 
 func (s *Static) notFound(w http.ResponseWriter, r *http.Request, dir string) {

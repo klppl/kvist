@@ -36,6 +36,7 @@ type Server struct {
 
 	work    string // temp folder holding builds and the current symlink
 	n       int
+	hist    *build.History // redirects for notes renamed while running
 	mu      sync.Mutex
 	clients map[chan string]bool
 	lastErr string
@@ -168,11 +169,15 @@ func (s *Server) build(ctx context.Context) error {
 	out := filepath.Join(s.work, "b"+strconv.Itoa(s.n))
 	current := filepath.Join(s.work, "current")
 	prev, _ := filepath.EvalSymlinks(current)
-	warnings, err := build.WriteSiteIncremental(ctx, s.Site, theme, snap, out, prev)
+	if s.hist == nil {
+		s.hist = &build.History{Pages: map[string]build.Page{}, Redirects: map[string]string{}}
+	}
+	warnings, hist, err := build.WriteSiteIncremental(ctx, s.Site, theme, snap, out, prev, s.hist)
 	if err != nil {
 		_ = os.RemoveAll(out)
 		return err
 	}
+	s.hist = hist
 	for _, w := range warnings {
 		logWarning(s.Log, w)
 	}

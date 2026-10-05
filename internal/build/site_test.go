@@ -152,7 +152,7 @@ func TestIncrementalLinksUnchangedFiles(t *testing.T) {
 	if _, err := WriteSite(context.Background(), sc, theme, snap, first); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := WriteSiteIncremental(context.Background(), sc, theme, snap, second, first); err != nil {
+	if _, _, err := WriteSiteIncremental(context.Background(), sc, theme, snap, second, first, nil); err != nil {
 		t.Fatal(err)
 	}
 	same := func(p string) bool {

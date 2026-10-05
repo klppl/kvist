@@ -215,6 +215,7 @@ acceptable.
     public -> builds/…             # the only directory ever served
     cache/                         # incremental build cache
     status.json                    # last build result + warnings
+    redirects.json                 # old URLs of moved notes → current URLs
 ```
 
 Retention: keep the last N revisions (default 10) and last M builds
@@ -269,6 +270,7 @@ Snapshot ─► Parse ─► Publish filter ─► Resolve ─► Model ─► R
 | Model | `model` | everything → `content model v1` (§6) | Backlinks, tags, folder tree, graph, search docs derived here, from published data only. |
 | Render | `render` | model + theme → files | `html/template`, chroma highlighting, theme static assets. |
 | Output | `build` | files → `builds/<id>` → swap `public` | Atomic; unchanged files hard-linked from the previous build. |
+| Redirects | `build` | previous pages + new pages → `redirects.json` | A note page whose URL is gone redirects to the note's new URL, found by vault path, then content hash, then a unique file name. Targets are published notes only; a URL with a page again stops redirecting. Written as `_kvist/redirects.json` (301s from the built-in server) and as refresh pages at the old URLs (for plain file servers). |
 
 **Incremental builds (as built in Phase 5).** Each build still renders every
 page: a 5 000-note vault builds in about 7 s. A full render is simple and always
