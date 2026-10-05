@@ -83,7 +83,7 @@ function device(vault: MemVault) {
 
 async function page(path: string) {
   const r = await fetch(base + path, { redirect: "manual" });
-  return { status: r.status, text: await r.text() };
+  return { status: r.status, text: await r.text(), location: r.headers.get("location") };
 }
 
 test("publish, rename, unpublish and stale state against the server", async (t) => {
@@ -113,12 +113,16 @@ test("publish, rename, unpublish and stale state against the server", async (t) 
   const r3 = await laptop.publish({ waitForBuild: true });
   assert.ok(r3.uploaded <= 2, `rename uploaded ${r3.uploaded} blobs`);
   assert.equal((await page("/garden/renamed/")).status, 200);
-  assert.equal((await page("/garden/second/")).status, 404);
+  // The old address redirects to the new one.
+  p = await page("/garden/second/");
+  assert.equal(p.status, 301);
+  assert.equal(p.location, "/garden/renamed/");
 
-  // Unpublish.
+  // Unpublish: the page and the redirect to it are gone.
   v.write("Garden/Renamed.md", "---\npublish: false\n---\nnow private", t0 + 2000);
   await laptop.publish({ waitForBuild: true });
   assert.equal((await page("/garden/renamed/")).status, 404);
+  assert.equal((await page("/garden/second/")).status, 404);
 
   // A phone that hasn't synced holds an older Hello: it must ask first.
   const old = new MemVault();

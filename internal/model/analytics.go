@@ -19,9 +19,9 @@ import (
 
 // Analytics is a privacy-friendly analytics service to load on every page.
 type Analytics struct {
-	Provider string `json:"provider"`     // plausible, umami or goatcounter
-	ID       string `json:"id,omitempty"` // domain, website ID or code
-	Script   string `json:"script"`       // https URL of the script
+	Provider string `json:"provider"`           // plausible, umami or goatcounter
+	ID       string `json:"id,omitempty"`       // domain, website ID or code
+	Script   string `json:"script"`             // https URL of the script
 	Endpoint string `json:"endpoint,omitempty"` // GoatCounter's count address
 }
 
