@@ -95,6 +95,8 @@ frontmatter_key       = "publish"   <span class="c"># the property: publish: tru
   </tbody>
 </table>
 <p>The command <strong>kvist: Toggle publish for current note</strong> (also in a note's file menu) sets <code>publish: true</code> or <code>publish: false</code> for you. If a stronger rule wins anyway, for example the note is in an excluded folder, it tells you why.</p>
+<h3 id="unlisted">Published, but not listed</h3>
+<p>Some pages should be reachable by their address without being advertised: a draft to show a friend, a page you link to from elsewhere. Add <code>unlisted: true</code> to a published note's properties. It keeps its page and every link to it, but it's left out of the menu, lists, tag pages, search, the graph, backlinks, the RSS feed and the sitemap, and the page asks search engines not to index it. Anyone with the address can still open it, so this isn't a way to keep something private.</p>
 
 <h2 id="links">Links to private notes</h2>
 <p>Public notes often link to notes that stay private. On the site, those links turn into <strong>plain text</strong>, looking exactly like a link to a note that doesn't exist. A visitor can't tell whether a private note is behind it.</p>

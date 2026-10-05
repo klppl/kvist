@@ -98,6 +98,9 @@
   <li>Pages can be cached for up to a minute; reload after that.</li>
 </ul>
 
+<h3 id="note-not-listed">A note is on the site, but not in the menu, lists or search</h3>
+<p>Check its properties for <code>unlisted: true</code>. An <a href="publishing.html#unlisted">unlisted</a> note has its page, but nothing lists it. Remove the property and publish to list it again.</p>
+
 <h3 id="plain-links">Some links are plain text on the site</h3>
 <p>The note they point to isn't published, or doesn't exist. That's by design: it keeps private notes hidden. The publish report lists them. Markdown-style links work too, but their path is read from the linking note's folder: <code>[text](Bread.md)</code> from <code>Kvist/Ideas/</code> looks for <code>Kvist/Ideas/Bread.md</code> first, then any note called <code>Bread</code> (see <a href="writing.html#supported">Writing notes</a>).</p>
 
@@ -111,6 +114,7 @@
 <p>The live site keeps showing the last good version. The message says what's wrong. The most common causes:</p>
 <ul>
   <li><strong>Two notes would get the same address</strong>, for example <code>My note.md</code> and <code>My Note!.md</code>, or a note's <code>permalink</code> clashes with another. The message names both; rename one.</li>
+  <li><strong>A note would take an address the site uses itself</strong>, such as a note called <em>Tags</em> right in your published folder, which would be <code>/tags/</code>. Rename it or give it a <code>permalink</code>.</li>
   <li><strong>A link or embed to a private note</strong>, when <code>unpublished_links</code> or <code>unpublished_embeds</code> is set to <code>"error"</code>.</li>
 </ul>
 
@@ -118,7 +122,7 @@
 <p>Another device published changes this device hasn't received yet, and publishing now would put older notes back. Let your vault finish syncing, then run <strong>Publish now</strong>. It shows which notes are affected and asks before going ahead. See <a href="publishing.html#devices">More than one device</a>.</p>
 
 <h3 id="old-link">An old link to a renamed note shows “Nothing grows here”</h3>
-<p>The server redirects a renamed or moved note's old address when it can tell which note it became: the same file at a new place, the same text, or the only new note with the same file name. It can't when the note was renamed <em>and</em> edited <em>and</em> another new note has its new file name, or when the note was renamed while it was private. Publishing after each rename, rather than many renames at once, gives it the best chance. Redirects start with the first publish after you update the server; renames before that aren't known.</p>
+<p>The server redirects a renamed or moved note's old address when it can tell which note it became: the same file at a new place, the same text, or the only new note with the same file name. It can't when the note was renamed <em>and</em> edited <em>and</em> another new note has its new file name, or when the note was renamed while it was private. Publishing after each rename, rather than many renames at once, gives it the best chance.</p>
 
 <h3 id="favicon">The site's icon didn't change</h3>
 <p>Browsers keep site icons for a long time. Check the icon in a private window, or open the page's address with <code>?</code> at the end. The <code>favicon</code> must be an image the server publishes: a PNG or SVG in a folder that isn't excluded.</p>

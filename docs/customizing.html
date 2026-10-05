@@ -79,7 +79,7 @@ Settings for my website.
     <tr><td><code>title</code></td><td>Site name, shown top left and in browser tabs.</td></tr>
     <tr><td><code>description</code></td><td>Shown under the title on the home page and in link previews.</td></tr>
     <tr><td><code>author</code>, <code>language</code></td><td>Used in page metadata and feeds. <code>language</code> is a code like <code>en</code> or <code>sv</code>, and it also sets the language of the site's own words (menu, dates, search). The built-in theme speaks English, Swedish (<code>sv</code>), German (<code>de</code>), French (<code>fr</code>) and Spanish (<code>es</code>); other languages show English.</td></tr>
-    <tr><td><code>home</code></td><td>A published note to use as the home page, as a link: <code>"[[Welcome]]"</code>. Obsidian keeps it up to date if you rename the note.</td></tr>
+    <tr><td><code>home</code></td><td>A published note to use as the home page, as a link: <code>"[[Welcome]]"</code>. Obsidian keeps it up to date if you rename the note. Without it, the published folder's own note is the home page, if it has one (<a href="writing.html#home">The home page</a>).</td></tr>
     <tr><td><code>groups</code></td><td>Tags that group the menu (<a href="#groups">below</a>).</td></tr>
     <tr><td><code>avatar</code>, <code>bio</code>, <code>profile_links</code></td><td>A profile at the top of the menu (<a href="#profile">below</a>).</td></tr>
     <tr><td><code>image</code></td><td>The picture shown when a page is shared on social media or in chats, unless the note has its own <code>image</code> or <code>cover</code>: <code>"[[preview.png]]"</code> or a web address. About 1200×630 pixels works everywhere. Notes get a generated picture instead (see <code>social_images</code> below), so this one shows for the home page, folders and tags.</td></tr>
@@ -144,7 +144,7 @@ groups: [articles, projects, books]
 <ul>
   <li><strong>Menu</strong>: Home, Search, Graph, Tags, your folder tree or groups, and your links.</li>
   <li><strong>List</strong>: the notes around the current page, with a filter box. On the home page, the most recently updated notes.</li>
-  <li><strong>Note</strong>: the page itself, with backlinks at the bottom. On wide screens, the table of contents and a small graph of connected notes sit beside it.</li>
+  <li><strong>Note</strong>: the page itself, with its folders above the title (breadcrumbs) and backlinks at the bottom. On wide screens, the table of contents and a small graph of connected notes sit beside it. The book button in the top corner (reader mode) hides the menu and the list, for reading.</li>
 </ul>
 <p>Search (press <kbd>/</kbd>) looks through titles, tags and text. Words starting with <code>#</code> filter by tag: <code>#recipes soup</code> finds soups among the notes tagged <code>#recipes</code> or one of its child tags, and <code>#recipes</code> alone lists them all.</p>
 <p>On a phone, the menu folds into a button at the top, and the list moves below the note. Visitors can switch between light and dark with the button next to the title; by default the site follows their system setting.</p>

@@ -138,7 +138,7 @@ stage: budding
 <p>Renaming or moving a note changes its address. The server remembers the old one and sends visitors on to the new address, so links from elsewhere keep working. It finds the note again by its path (when only a <code>permalink</code> or a folder changed), by its unchanged text, or by its file name if no other new note has that name. A note that is no longer published isn't redirected to, and writing a new note at an old address replaces the redirect. If two notes would get the same address, the build stops and names both, and your site keeps showing the previous version until you fix it.</p>
 
 <h2 id="home">The home page</h2>
-<p>By default the home page shows your site's title and description, cards for your folders or <a href="customizing.html#groups">menu groups</a>, and a list of recently updated notes. To use one of your notes instead, either publish a note named <code>index.md</code> at the top of your vault, or set <code>home</code> in the <a href="customizing.html#settings-note">settings note</a>:</p>
+<p>By default the home page shows your site's title and description, cards for your folders or <a href="customizing.html#groups">menu groups</a>, and a list of recently updated notes. To use one of your notes instead, put a note named <code>index.md</code> at the top of your published folder (<code>Kvist/index.md</code>, or <code>Kvist/Kvist.md</code>, named like the folder), or set <code>home</code> in the <a href="customizing.html#settings-note">settings note</a>:</p>
 <pre data-label="Kvist/_site.md"><code>---
 home: "[[Welcome]]"
 ---</code></pre>

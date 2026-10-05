@@ -22,9 +22,9 @@ folder, note ↔ tag, backlinks) are written as note ids.
 | `Assets` | []*Asset | Attachments referenced by rendered content or by an image property (below), sorted by URL. |
 | `Tags` | []*Tag | Top-level tags; nested tags are `Children`. |
 | `AllTags` | []*Tag | Every tag, sorted by name (templates only). |
-| `Root` | *Folder | Folder tree of published notes. |
+| `Root` | *Folder | The site's root folder and the tree below it (published notes only). |
 | `Graph` | Graph | Nodes and edges between published notes. |
-| `Home` | *Note | The root `index.md`, or `home` from the settings note; nil means the theme generates an index. |
+| `Home` | *Note | `home` from the settings note, else the root folder's own note (`index.md`, or named like the folder); nil means the theme generates an index. |
 
 ## SiteConfig
 

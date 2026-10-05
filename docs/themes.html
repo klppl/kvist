@@ -158,6 +158,7 @@ accent = "#3f7d4e"</code></pre>
     <tr><td><code>.Folder</code>, <code>.Tag</code></td><td>The folder or tag, on their pages</td></tr>
     <tr><td><code>.Site</code></td><td>Everything published (below)</td></tr>
     <tr><td><code>.Features</code></td><td><code>.Math</code>, <code>.Mermaid</code>, <code>.Code</code>: load KaTeX, Mermaid and highlighting styles only when the page needs them</td></tr>
+    <tr><td><code>.SocialImage</code></td><td>On note pages without an <code>image</code>: the address of a generated preview picture, if the theme turns on <code>social_images</code> in its <code>[params]</code></td></tr>
   </tbody>
 </table>
 <p>A minimal <code>base.html</code> and <code>note.html</code>:</p>
@@ -191,10 +192,10 @@ accent = "#3f7d4e"</code></pre>
 <table>
   <thead><tr><th>Object</th><th>Fields</th></tr></thead>
   <tbody>
-    <tr><td><code>.Site</code></td><td><code>Notes</code> (every published note, sorted by address; private notes are never included, so there's nothing to filter), <code>Root</code> (the top folder), <code>AllTags</code>, <code>Tags</code> (top-level), <code>Home</code>, <code>Graph</code>, <code>Config</code></td></tr>
+    <tr><td><code>.Site</code></td><td><code>Notes</code> (every published note, sorted by address; private notes are never included, so there's nothing to filter), <code>Root</code> (the site's root folder; its subfolders are the top-level folders), <code>AllTags</code>, <code>Tags</code> (top-level), <code>Home</code>, <code>Graph</code>, <code>Config</code></td></tr>
     <tr><td><code>.Site.Config</code></td><td><code>Title</code>, <code>Description</code>, <code>BaseURL</code>, <code>Language</code>, <code>Author</code>, <code>Nav</code> (list of <code>Title</code>, <code>URL</code>), <code>Params</code>, <code>Image</code>, <code>Favicon</code>, <code>Profile</code> (<code>Avatar</code>, <code>Bio</code>, <code>Links</code>), <code>Analytics</code> (<code>Provider</code>, <code>ID</code>, <code>Script</code>, <code>Endpoint</code>)</td></tr>
-    <tr><td>A note</td><td><code>Title</code>, <code>URL</code>, <code>Description</code>, <code>Content</code> (HTML), <code>Created</code>, <code>Updated</code>, <code>Tags</code>, <code>Aliases</code>, <code>TOC</code>, <code>Links</code>, <code>Backlinks</code> (<code>Source</code>, <code>Context</code>), <code>Folder</code>, <code>Params</code>, <code>Image</code>, <code>WordCount</code>, <code>ReadingTime</code></td></tr>
-    <tr><td>A folder</td><td><code>Name</code>, <code>URL</code>, <code>Notes</code>, <code>Children</code>, <code>Index</code> (its folder note), <code>Parent</code></td></tr>
+    <tr><td>A note</td><td><code>Title</code>, <code>URL</code>, <code>Description</code>, <code>Content</code> (HTML), <code>Created</code>, <code>Updated</code>, <code>Tags</code>, <code>Aliases</code>, <code>TOC</code>, <code>Links</code>, <code>Backlinks</code> (<code>Source</code>, <code>Context</code>), <code>Folder</code>, <code>Params</code>, <code>Image</code>, <code>Unlisted</code>, <code>WordCount</code>, <code>ReadingTime</code></td></tr>
+    <tr><td>A folder</td><td><code>Name</code>, <code>Path</code>, <code>URL</code>, <code>Notes</code> (without unlisted notes), <code>Children</code>, <code>Index</code> (its folder note), <code>Parent</code></td></tr>
     <tr><td>A tag</td><td><code>Name</code> (e.g. <code>projects/kvist</code>), <code>URL</code>, <code>Notes</code> (including child tags' notes), <code>Children</code>, <code>Parent</code></td></tr>
     <tr><td>A heading (<code>TOC</code>)</td><td><code>Level</code>, <code>Text</code>, <code>ID</code>, <code>Children</code></td></tr>
   </tbody>
@@ -245,12 +246,13 @@ accent = "#3f7d4e"</code></pre>
     <tr><td><code>mark</code>, <code>iframe.embed-pdf</code>, <code>iframe.embed-video</code>, <code>audio</code>, <code>video</code></td><td>Highlights, embedded files and YouTube or Vimeo players</td></tr>
   </tbody>
 </table>
-<p>Every build also writes <code>/search-index.json</code> and <code>/graph.json</code>, which a theme's scripts can load for search and graphs, plus <code>/index.xml</code> (RSS), <code>/sitemap.xml</code> and <code>/robots.txt</code>. Redirects for moved notes (pages at the old addresses, and <code>/_kvist/redirects.json</code>) are added by the server, whatever the theme.</p>
+<p>Every build also writes <code>/search-index.json</code> and <code>/graph.json</code>, which a theme's scripts can load for search and graphs, plus <code>/index.xml</code> (RSS), <code>/sitemap.xml</code> and <code>/robots.txt</code>. None of them include unlisted notes. Redirects for moved notes are added by the server, whatever the theme: a small page at each old address, and a map the built-in server reads from disk (<code>_kvist/redirects.json</code>, not served).</p>
 
 <h2 id="rules">Good theme manners</h2>
 <ul>
   <li><strong>Work without JavaScript.</strong> Use scripts for extras like search, the graph and the theme toggle.</li>
   <li><strong>Keep private notes invisible.</strong> Style <code>.link-unpublished</code> like normal text, with no “locked” icons or hints.</li>
+  <li><strong>Respect unlisted notes.</strong> The site's lists leave them out already; on their own page, add <code>&lt;meta name="robots" content="noindex"&gt;</code> when <code>.Note.Unlisted</code> is true.</li>
   <li><strong>Load heavy things only when needed.</strong> Check <code>.Features.Math</code> and <code>.Features.Mermaid</code> before loading KaTeX or Mermaid.</li>
   <li><strong>Don't load from other websites.</strong> Put fonts and libraries in <code>static/</code>, so visitors aren't tracked and the site keeps working.</li>
   <li><strong>Keep pages small.</strong> Don't list every note on every page; big gardens have thousands. The built-in theme shows only the current folder or group.</li>

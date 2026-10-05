@@ -172,7 +172,7 @@ it. See [Customizing the site](https://klppl.github.io/kvist/customizing.html).
 
 With the DNS record proxied (orange cloud):
 
-- **SSL/TLS mode:** Full (strict). Caddy already has a valid certificate.
+- **SSL/TLS mode:** Full (strict). The server already has a valid certificate, from Caddy or your own proxy.
 - **Caching:** kvist sends `Cache-Control: public, max-age=60` for pages and
   `max-age=31536000, immutable` for `/_assets/` and `/_kvist/` (their URLs
   contain a content hash). Leave Cloudflare's cache settings on "respect
