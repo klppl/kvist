@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 	"text/tabwriter"
 	"time"
 
@@ -19,8 +20,8 @@ func cmdToken(args []string) error {
 	}
 	sub, args := args[0], args[1:]
 	fs := flag.NewFlagSet("token "+sub, flag.ExitOnError)
-	site := fs.String("site", "", "site id (create)")
-	name := fs.String("name", "", "token name, e.g. the device (create)")
+	site := fs.String("site", "", "site id (create; default: the only site)")
+	name := fs.String("name", "", "a label for the token, e.g. the device (create; default: token-<date>)")
 	cfg, err := loadConfig(fs, args)
 	if err != nil {
 		return err
@@ -28,11 +29,21 @@ func cmdToken(args []string) error {
 	toks := auth.Open(cfg.DataDir)
 	switch sub {
 	case "create":
+		if *site == "" && len(cfg.Sites) == 1 {
+			*site = cfg.Sites[0].ID
+		}
 		if cfg.Site(*site) == nil {
-			return fmt.Errorf("unknown site %q (configured sites must be given with --site)", *site)
+			ids := make([]string, len(cfg.Sites))
+			for i, s := range cfg.Sites {
+				ids[i] = s.ID
+			}
+			if *site == "" {
+				return fmt.Errorf("this server has several sites (%s); choose one with --site", strings.Join(ids, ", "))
+			}
+			return fmt.Errorf("unknown site %q (sites: %s)", *site, strings.Join(ids, ", "))
 		}
 		if *name == "" {
-			return errors.New("--name is required")
+			*name = "token-" + time.Now().Format("2006-01-02")
 		}
 		if err := os.MkdirAll(cfg.DataDir, 0o700); err != nil {
 			return err
