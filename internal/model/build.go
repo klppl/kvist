@@ -195,6 +195,7 @@ func (b *builder) siteConfig(st siteSettings) SiteConfig {
 	}
 	renameGroups(c.Params)
 	applySettings(&c, st)
+	c.Analytics = b.analytics(&c)
 	return c
 }
 

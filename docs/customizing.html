@@ -179,6 +179,22 @@ groups: [articles, projects, books]
 <h2 id="growth-stages">Growth stages</h2>
 <p>Digital gardens often mark how finished a note is. Add <code>stage: seedling</code>, <code>budding</code> or <code>evergreen</code> to a note's properties, and the site shows 🌱, 🌿 or 🌳 next to it. This needs <code>expose_frontmatter = ["stage"]</code> in the server's <code>[site.publish]</code>, which the default config already has.</p>
 
+<h2 id="analytics">Visitor statistics</h2>
+<p>To count visitors, choose one of three privacy-friendly services in the settings note. None of them set cookies, so no cookie banner is needed.</p>
+<pre data-label="_site.md"><code>---
+analytics: plausible
+analytics_id: garden.example.com
+---</code></pre>
+<table>
+  <thead><tr><th><code>analytics</code></th><th><code>analytics_id</code></th></tr></thead>
+  <tbody>
+    <tr><td><code>plausible</code></td><td>The site's domain, as you added it in Plausible. Without it, the domain of your site's address.</td></tr>
+    <tr><td><code>umami</code></td><td>The website ID from Umami's settings, like <code>94db1cb1-74f4-…</code>.</td></tr>
+    <tr><td><code>goatcounter</code></td><td>Your GoatCounter code: <code>ada</code> for <code>ada.goatcounter.com</code>.</td></tr>
+  </tbody>
+</table>
+<p>If you run the service yourself, set <code>analytics_url</code> to its script, for example <code>https://stats.example.com/js/script.js</code>; for a self-hosted GoatCounter, <code>analytics_id</code> is its count address, <code>https://stats.example.com/count</code>. Addresses must start with <code>https://</code>. A setting kvist can't use is left out with a warning in the publish report, and <code>analytics: none</code> turns counting off. The same settings work in the server's <code>[site.theme_params]</code>.</p>
+
 <h2 id="further">Going further</h2>
 <p>To change more than these settings, you can replace individual theme files, or write a whole theme. Both are done on the server; see <a href="themes.html">Writing a theme</a>.</p>
 <nav class="next" aria-label="Pages"><a href="writing.html"><small>Previous</small>Writing notes</a><a class="fwd" href="themes.html"><small>Next</small>Writing a theme</a></nav>

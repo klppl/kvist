@@ -32,7 +32,10 @@ folder, note ↔ tag, backlinks) are written as note ids.
 `StrictLineBreaks` (single line breaks were rendered as spaces, not `<br>`),
 `Nav` (list of `{Title, URL}`), `Params` (theme parameters), `Image` (the
 default social preview image, as `Note.Image`), `Favicon` (the browser tab
-icon, as `Image`; empty means the theme's own) and `Profile` (nil unless
+icon, as `Image`; empty means the theme's own), `Analytics` (nil, or
+`{Provider, ID, Script, Endpoint}`: `plausible`, `umami` or `goatcounter`,
+read from the `analytics`, `analytics_id` and `analytics_url` theme
+parameters and checked; `Script` is always https) and `Profile` (nil unless
 set: `{Avatar, Bio, Links}`, each link `{Title, URL, Kind}` with `Kind` one of
 `github`, `gitlab`, `mastodon`, `bluesky`, `linkedin`, `x`, `youtube`,
 `email`, `website`).

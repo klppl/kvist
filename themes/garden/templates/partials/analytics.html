@@ -1,0 +1,13 @@
+{{/* The analytics service from the analytics settings (checked by kvist,
+     see Site.Config.Analytics). None of these set cookies. */}}
+{{define "analytics" -}}
+{{- with .Site.Config.Analytics}}
+{{- if eq .Provider "plausible"}}
+<script defer data-domain="{{.ID}}" src="{{.Script}}"></script>
+{{- else if eq .Provider "umami"}}
+<script defer data-website-id="{{.ID}}" src="{{.Script}}"></script>
+{{- else if eq .Provider "goatcounter"}}
+<script async data-goatcounter="{{.Endpoint}}" src="{{.Script}}"></script>
+{{- end}}
+{{- end}}
+{{- end}}

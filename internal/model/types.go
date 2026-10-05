@@ -54,6 +54,8 @@ type SiteConfig struct {
 	Image   string   `json:"image,omitempty"`
 	Favicon string   `json:"favicon,omitempty"` // like Image; the theme's icon when empty
 	Profile *Profile `json:"profile,omitempty"` // nil when not set
+	// Analytics is the analytics service to load, nil for none.
+	Analytics *Analytics `json:"analytics,omitempty"`
 }
 
 // Profile is the site owner's card: a picture, a short bio and links.
