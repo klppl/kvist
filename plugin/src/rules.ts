@@ -116,6 +116,7 @@ export function allowedPath(rules: Rules, path: string): boolean {
 export const NOTE_IMAGE_KEYS = ["image", "cover"];
 export const SITE_IMAGE_KEYS = ["image"];
 export const SITE_AVATAR_KEYS = ["avatar", "logo"];
+export const SITE_ICON_KEYS = ["favicon"];
 
 export type ImageRef = { target: string } | { url: string };
 

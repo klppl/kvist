@@ -30,9 +30,9 @@ type siteSettings struct {
 	NavFrom                              string
 	Params                               map[string]any
 
-	Image, Avatar *vault.ImageRef // resolved once attachments are known
-	Bio           *string
-	ProfileLinks  []ProfileLink
+	Image, Avatar, Favicon *vault.ImageRef // resolved once attachments are known
+	Bio                    *string
+	ProfileLinks           []ProfileLink
 }
 
 // navRef is a menu link: a URL, or a note to resolve once URLs are known.
@@ -136,7 +136,7 @@ var serverOnlyKeys = map[string]bool{
 var ignoredKeys = map[string]bool{"tags": true, "tag": true, "aliases": true, "alias": true, "cssclasses": true, "cssclass": true, "publish": true}
 
 // imageKeys are read by vault.ImageProperty, after the other properties.
-var imageKeys = map[string]bool{"image": true, "avatar": true, "logo": true}
+var imageKeys = map[string]bool{"image": true, "avatar": true, "logo": true, "favicon": true}
 
 func (b *builder) readSiteNote(st *siteSettings, src []byte) {
 	m := vault.ParseMeta(src)
@@ -196,6 +196,9 @@ func (b *builder) readSiteNote(st *siteSettings, src []byte) {
 	}
 	if r, ok := vault.ImageProperty(m.Frontmatter, vault.SiteAvatarKeys); ok {
 		st.Avatar = &r
+	}
+	if r, ok := vault.ImageProperty(m.Frontmatter, vault.SiteIconKeys); ok {
+		st.Favicon = &r
 	}
 	if nav := parseNavList(src[m.BodyStart:]); nav != nil {
 		st.Nav, st.NavSet, st.NavFrom = nav, true, protocol.SiteNotePath
@@ -401,14 +404,17 @@ func applySettings(c *SiteConfig, st siteSettings) {
 	}
 }
 
-// siteImages resolves the settings note's default image and avatar to
-// published images.
+// siteImages resolves the settings note's default image, avatar and
+// favicon to published images.
 func (b *builder) siteImages(s *Site, st siteSettings) {
 	if st.Image != nil {
 		s.Config.Image = b.imageURL(protocol.SettingsNoteName, protocol.SiteNotePath, *st.Image)
 	}
 	if st.Avatar != nil && s.Config.Profile != nil {
 		s.Config.Profile.Avatar = b.imageURL(protocol.SettingsNoteName, protocol.SiteNotePath, *st.Avatar)
+	}
+	if st.Favicon != nil {
+		s.Config.Favicon = b.imageURL(protocol.SettingsNoteName, protocol.SiteNotePath, *st.Favicon)
 	}
 }
 

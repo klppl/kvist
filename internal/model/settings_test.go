@@ -194,10 +194,12 @@ func TestImagesAndProfile(t *testing.T) {
 		"Kvist/Broken.md":    "---\nimage: \"[[missing.png]]\"\ncover: \"[[cover.png]]\"\n---\nText.",
 		"Kvist/cover.png":    "png",
 		"Kvist/me.jpg":       "jpg",
+		"Kvist/icon.png":     "png",
 		"Private/hidden.png": "png",
 		"Kvist/_site.md": `---
 image: "[[hidden.png]]"
 avatar: "[[me.jpg]]"
+favicon: "[[icon.png]]"
 bio: Gardener.
 profile_links:
   - https://github.com/ada
@@ -234,6 +236,9 @@ profile_links:
 	if site.Config.Image != "" {
 		t.Errorf("site image from an excluded folder: %q", site.Config.Image)
 	}
+	if !strings.HasPrefix(site.Config.Favicon, "/_assets/") {
+		t.Errorf("favicon = %q", site.Config.Favicon)
+	}
 	p := site.Config.Profile
 	if p == nil || !strings.HasPrefix(p.Avatar, "/_assets/") || p.Bio != "Gardener." {
 		t.Fatalf("profile = %+v", p)
@@ -248,7 +253,7 @@ profile_links:
 	if !reflect.DeepEqual(p.Links, want) {
 		t.Errorf("links = %+v", p.Links)
 	}
-	for _, k := range []string{"image", "avatar", "bio", "profile_links"} {
+	for _, k := range []string{"image", "favicon", "avatar", "bio", "profile_links"} {
 		if _, ok := site.Config.Params[k]; ok {
 			t.Errorf("%s should not be a theme parameter", k)
 		}

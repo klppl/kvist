@@ -4,7 +4,7 @@ import "strings"
 
 // Image properties name a picture in the frontmatter: a note's social
 // preview image, or the site's default image and avatar in the settings
-// note. Both gates publish the vault image such a property points to, as if
+// note (and its favicon). Both gates publish the vault image such a property points to, as if
 // the note embedded it, so the property works without also embedding the
 // picture in the text. The plugin mirrors this in rules.ts.
 //
@@ -13,6 +13,7 @@ var (
 	NoteImageKeys  = []string{"image", "cover"} // a note's social preview image
 	SiteImageKeys  = []string{"image"}          // the site's default social preview image
 	SiteAvatarKeys = []string{"avatar", "logo"} // the profile picture
+	SiteIconKeys   = []string{"favicon"}        // the browser tab icon
 )
 
 // ImageRef is the value of an image property: a link to a vault file, or a

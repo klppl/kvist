@@ -52,6 +52,7 @@ type SiteConfig struct {
 	// Image is the default social preview image: the URL of a published
 	// attachment, or an http(s) URL.
 	Image   string   `json:"image,omitempty"`
+	Favicon string   `json:"favicon,omitempty"` // like Image; the theme's icon when empty
 	Profile *Profile `json:"profile,omitempty"` // nil when not set
 }
 

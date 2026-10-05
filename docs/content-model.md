@@ -31,12 +31,13 @@ folder, note ↔ tag, backlinks) are written as note ids.
 `Title`, `Description`, `BaseURL` (no trailing slash), `Language`, `Author`,
 `StrictLineBreaks` (single line breaks were rendered as spaces, not `<br>`),
 `Nav` (list of `{Title, URL}`), `Params` (theme parameters), `Image` (the
-default social preview image, as `Note.Image`) and `Profile` (nil unless
+default social preview image, as `Note.Image`), `Favicon` (the browser tab
+icon, as `Image`; empty means the theme's own) and `Profile` (nil unless
 set: `{Avatar, Bio, Links}`, each link `{Title, URL, Kind}` with `Kind` one of
 `github`, `gitlab`, `mastodon`, `bluesky`, `linkedin`, `x`, `youtube`,
 `email`, `website`).
 
-The server config sets these. `image`, `avatar` (or `logo`), `bio` and
+The server config sets these. `image`, `favicon`, `avatar` (or `logo`), `bio` and
 `profile_links` come from the settings note only. The vault may override `title`,
 `description`, `author`, `language`, `strict_line_breaks`, `home`, the menu (`Nav`) and theme
 parameters with a **settings note**: a note named `_site.md` in any folder,
@@ -135,7 +136,7 @@ or a note would take a reserved URL (`/tags/…`, `/_assets/…`,
 `Path`, `URL`, `Size`, `MediaType` (MIME), `Hash`. An attachment is
 published only if the rendered content of a published note references it,
 or it is the image of an image property (a published note's
-`image`/`cover`, the settings note's `image`/`avatar`/`logo`), and never if
+`image`/`cover`, the settings note's `image`/`favicon`/`avatar`/`logo`), and never if
 it is in an `exclude_folders` folder.
 
 ## Tag

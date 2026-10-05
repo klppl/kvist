@@ -7,7 +7,7 @@
 import { HashCache, sha256 } from "./hash";
 import { HINTS_PATH, ManifestFile, Rules, SETTINGS_NOTE_NAME, SITE_CONFIG_PATH, SITE_NOTE_PATH } from "./protocol";
 import {
-  Decision, NOTE_IMAGE_KEYS, SITE_AVATAR_KEYS, SITE_IMAGE_KEYS, allowedPath, attachmentAllowed, evaluate, imageProperty,
+  Decision, NOTE_IMAGE_KEYS, SITE_AVATAR_KEYS, SITE_ICON_KEYS, SITE_IMAGE_KEYS, allowedPath, attachmentAllowed, evaluate, imageProperty,
   isImage, isNote, isSettingsNote,
 } from "./rules";
 
@@ -135,6 +135,7 @@ export async function scan(vault: VaultLike, rules: Rules, cache: HashCache): Pr
     const fm = vault.meta(settingsNote)?.frontmatter;
     includeImage(vault, rules, include, leaks, settingsNote, SETTINGS_NOTE_NAME, fm, SITE_IMAGE_KEYS);
     includeImage(vault, rules, include, leaks, settingsNote, SETTINGS_NOTE_NAME, fm, SITE_AVATAR_KEYS);
+    includeImage(vault, rules, include, leaks, settingsNote, SETTINGS_NOTE_NAME, fm, SITE_ICON_KEYS);
   }
 
   const files: ManifestFile[] = [];

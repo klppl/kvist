@@ -187,6 +187,7 @@ func ScanDir(dir string, rules protocol.Rules) (*Scan, error) {
 		fm := vault.ParseMeta(src).Frontmatter
 		includeImages(include, ix, rules, protocol.SettingsNoteName, fm, vault.SiteImageKeys)
 		includeImages(include, ix, rules, protocol.SettingsNoteName, fm, vault.SiteAvatarKeys)
+		includeImages(include, ix, rules, protocol.SettingsNoteName, fm, vault.SiteIconKeys)
 	}
 
 	for p := range include {

@@ -78,10 +78,10 @@ test("scan publishes images named in properties, never from excluded folders", a
   v.write("Garden/Web.md", "---\ncover: https://example.com/c.png\n---\nText");
   v.write("Garden/Hidden.md", "---\ncover: Private/secret.png\n---\nText");
   v.write("Journal/Diary.md", "---\nimage: [[diary.png]]\n---\nSECRET");
-  v.write("Garden/_site.md", "---\navatar: [[me.png]]\nimage: [[Private/og.png]]\n---\n");
-  for (const p of ["Garden/cover.png", "Private/secret.png", "diary.png", "me.png", "Private/og.png"]) v.write(p, p);
+  v.write("Garden/_site.md", "---\navatar: [[me.png]]\nfavicon: [[icon.png]]\nimage: [[Private/og.png]]\n---\n");
+  for (const p of ["Garden/cover.png", "Private/secret.png", "diary.png", "me.png", "icon.png", "Private/og.png"]) v.write(p, p);
   const r = await scan(v, rules, new HashCache());
-  assert.deepEqual(r.files.map((f) => f.path).filter((p) => p.endsWith(".png")), ["Garden/cover.png", "me.png"]);
+  assert.deepEqual(r.files.map((f) => f.path).filter((p) => p.endsWith(".png")), ["Garden/cover.png", "icon.png", "me.png"]);
   assert.deepEqual(r.leaks.map((l) => [l.from, l.target]).sort(), [
     ["Garden/Hidden.md", "Private/secret.png"],
     ["Garden/_site.md", "Private/og.png"],
