@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roadmap · kvist docs</title>
+<meta name="description" content="What kvist can't do yet, what is planned, and what was added recently.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<script>try{var t=localStorage.getItem("kvist-docs-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="stylesheet" href="assets/docs.css?v=38df0dda">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="shell">
+  <aside class="side">
+    <div class="brand">
+      <a href="index.html"><img src="assets/icon.svg" width="22" height="22" alt="">kvist <small>docs</small></a>
+      <button class="icon-button theme-toggle" type="button" aria-label="Switch color theme" hidden><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
+      <button class="icon-button menu-toggle" type="button" aria-label="Menu" aria-expanded="false" hidden><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    </div>
+    <nav aria-label="Documentation">
+      <h2>Start</h2>
+      <ul>
+        <li><a href="index.html">Overview</a></li>
+        <li><a href="getting-started.html">Getting started</a></li>
+      </ul>
+      <h2>Guides</h2>
+      <ul>
+        <li><a href="publishing.html">Publishing notes</a></li>
+        <li><a href="writing.html">Writing notes</a></li>
+        <li><a href="customizing.html">Customizing the site</a></li>
+        <li><a href="themes.html">Writing a theme</a></li>
+        <li><a href="server.html">Running the server</a></li>
+        <li><a href="https.html">Domains and HTTPS</a></li>
+      </ul>
+      <h2>Reference</h2>
+      <ul>
+        <li><a href="configuration.html">Configuration</a></li>
+        <li><a href="troubleshooting.html">Troubleshooting</a></li>
+      </ul>
+      <h2>More</h2>
+      <ul>
+        <li><a href="roadmap.html" aria-current="page">Roadmap</a></li>
+        <li><a href="https://github.com/klppl/kvist" class="ext">GitHub</a></li>
+      </ul>
+    </nav>
+    <p class="side-foot">kvist is open source (<a href="https://github.com/klppl/kvist/blob/main/LICENSE">Lagom License</a>). <a href="https://github.com/klppl/kvist/issues">Report a problem</a></p>
+  </aside>
+  <main id="main">
+    <div class="page">
+      <article>
+<p class="eyebrow">More</p>
+<h1>Roadmap</h1>
+<p class="lead">What kvist can't do yet, and what is planned. There are no dates: things get built roughly in the order below, and what people ask for moves up. To ask for something, <a href="https://github.com/klppl/kvist/issues">open an issue on GitHub</a>.</p>
+
+<h2 id="not-yet">What doesn't work yet</h2>
+<p>Everything else from Obsidian is in <a href="writing.html#supported">Writing notes</a>. These don't work on the site today:</p>
+<ul>
+  <li><strong>Canvas</strong> files (<code>.canvas</code>) aren't published; links to them are plain text.</li>
+  <li><strong>Queries</strong> from plugins such as Dataview or Bases show as code blocks, not as their results.</li>
+  <li><strong>Excalidraw</strong> drawings show only if you embed an exported SVG or PNG, not the drawing itself.</li>
+  <li><strong>Markdown-style embeds of notes</strong>, <code>![text](Note.md)</code>, are left out. Use <code>![[Note]]</code>.</li>
+  <li><strong>Other plugins' own syntax</strong> is shown as written.</li>
+  <li><strong>Sites under a sub-path</strong>: <code>base_url</code> must be the root of a domain, like <code>https://garden.example.com</code>, not <code>https://example.com/garden/</code>.</li>
+  <li><strong>Installing the plugin</strong> is by hand: it isn't in Obsidian's community plugin list yet.</li>
+</ul>
+
+<h2 id="planned">Planned</h2>
+
+<h3 id="planned-writing">Writing</h3>
+<ul>
+  <li><strong>Markdown-style note embeds.</strong> <code>![text](Note.md)</code> embeds the note like <code>![[Note]]</code> does.</li>
+  <li><strong>Code block extras.</strong> A title (<code>```go title="main.go"</code>), line numbers and highlighted lines.</li>
+  <li><strong>Canvas.</strong> <code>.canvas</code> files as a page with their cards and arrows, and embedded with <code>![[board.canvas]]</code>.</li>
+  <li><strong>Excalidraw.</strong> Show a drawing from the SVG or PNG the Excalidraw plugin exports next to it, when you link or embed the drawing itself.</li>
+  <li><strong>Citations.</strong> <code>[@key]</code> resolved from a BibTeX file in your vault, with a bibliography at the end of the note.</li>
+</ul>
+
+<h3 id="planned-site">The site</h3>
+<ul>
+  <li><strong>Your own CSS from the vault.</strong> A <code>publish.css</code> in your vault, applied after the theme's styles, so small style changes don't need the server.</li>
+  <li><strong>Ordering and hiding menu entries.</strong> Choose the order of folders and groups, and hide some from the menu without unpublishing them.</li>
+  <li><strong>Comments.</strong> An optional comment section under notes, using <a href="https://giscus.app">giscus</a>.</li>
+  <li><strong>Stacked pages.</strong> Open linked notes side by side, as panes that slide.</li>
+  <li><strong>Password-protected sites.</strong> One password for the whole site, or for a folder.</li>
+</ul>
+
+<h3 id="planned-hosting">Addresses and hosting</h3>
+<ul>
+  <li><strong>Old addresses you list yourself.</strong> A <code>redirect_from</code> property with a note's old addresses, for moves that <a href="writing.html#addresses">automatic redirects</a> can't follow.</li>
+  <li><strong>Sites under a sub-path</strong>, like <code>https://example.com/garden/</code>.</li>
+  <li><strong>Ready-made programs.</strong> kvist for Linux, macOS and Windows on each release, so <code>kvist dev</code> and <code>kvist build</code> work on your own computer without Go.</li>
+  <li><strong>The community plugin list.</strong> Install the plugin from inside Obsidian.</li>
+</ul>
+
+<h2 id="recent">Recently added</h2>
+<ul>
+  <li><strong>Your published folder is the site's root</strong>: its subfolders are the top of the menu, and its name stays out of addresses (<a href="configuration.html#server-site"><code>root_folder</code></a>).</li>
+  <li><strong>Instant navigation</strong>: pages open without a full reload, and the menu keeps its place.</li>
+  <li><strong>Breadcrumbs</strong> above a note's title, and a <strong>reader mode</strong> that hides the menu and side panels.</li>
+  <li><strong>Search by tag</strong>: <code>#tag</code> in the search box filters the results.</li>
+  <li><strong>Preview images</strong> with the note's title, for sharing in chats and on social media.</li>
+  <li><strong>Unlisted notes</strong>: <code>unlisted: true</code> publishes a note without listing it anywhere.</li>
+  <li>Redirects for moved notes, a folder tree in the menu, a copy button on code, analytics settings, favicons and the interface in five languages.</li>
+</ul>
+<nav class="next" aria-label="Pages"><a href="troubleshooting.html"><small>Previous</small>Troubleshooting</a></nav>
+      </article>
+      <aside class="toc"></aside>
+    </div>
+  </main>
+</div>
+<script src="assets/docs.js?v=eee218fc" defer></script>
+</body>
+</html>

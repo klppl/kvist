@@ -41,6 +41,7 @@
       </ul>
       <h2>More</h2>
       <ul>
+        <li><a href="roadmap.html">Roadmap</a></li>
         <li><a href="https://github.com/klppl/kvist" class="ext">GitHub</a></li>
       </ul>
     </nav>
@@ -99,7 +100,7 @@ serve    = true
   <thead><tr><th>Key</th><th>Default</th><th></th></tr></thead>
   <tbody>
     <tr><td><code>id</code></td><td>required</td><td>Short name used by the plugin and the commands: lowercase letters, digits and dashes.</td></tr>
-    <tr><td><code>base_url</code></td><td>required</td><td>The site's address, e.g. <code>https://garden.example.com</code>. Must be the root of a domain (sub-paths aren't supported yet).</td></tr>
+    <tr><td><code>base_url</code></td><td>required</td><td>The site's address, e.g. <code>https://garden.example.com</code>. Must be the root of a domain; sub-paths are <a href="roadmap.html#planned-hosting">planned</a>.</td></tr>
     <tr><td><code>title</code>, <code>description</code>, <code>author</code></td><td>empty</td><td>Defaults; the settings note can override them.</td></tr>
     <tr><td><code>language</code></td><td><code>"en"</code></td><td>Language code for pages and feeds, and for the theme's words (see <a href="customizing.html#settings-note">Customizing</a>).</td></tr>
     <tr><td><code>strict_line_breaks</code></td><td><code>false</code></td><td>Render a single line break as a space (Obsidian's <em>Strict line breaks</em>) instead of a line break. The settings note can override it.</td></tr>
@@ -188,9 +189,6 @@ accent: "#8a4f9e"
 </table>
 <p>Empty properties keep their default. Obsidian's own properties (<code>tags</code>, <code>aliases</code>, <code>cssclasses</code>) are ignored. Server-only keys such as <code>base_url</code> or <code>exclude_folders</code> are ignored with a warning in the publish report.</p>
 <p><strong>Menu links</strong> are the list items in the note's text that are a single link: <code>[Text](https://…)</code>, <code>[Text](/path/)</code>, <code>[[Note]]</code> or <code>[[Note|Text]]</code>. Links to notes that aren't published are left out with a warning. Links inside <code>%% comments %%</code> and code blocks don't count, so you can keep examples there.</p>
-
-<h3 id="site-toml">The older .kvist/site.toml</h3>
-<p>Before the settings note, these settings lived in a hidden file, <code>.kvist/site.toml</code>. It still works; where both set something, the settings note wins. The keys are the same, with menu links as <code>[[nav]]</code> tables (<code>title</code>, <code>url</code>) and theme settings under <code>[theme_params]</code>.</p>
 
 <h2 id="plugin">Plugin settings</h2>
 <table>

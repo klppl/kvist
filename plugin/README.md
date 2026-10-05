@@ -61,8 +61,8 @@ and applies them before uploading anything; the server checks every note
 again. Only published notes, the attachments they reference (including images
 named in their `image`/`cover` properties, and the settings note's
 `image`, `avatar` and `favicon`), a hints file
-that names published notes only, the settings note `_site.md` and
-`.kvist/site.toml` (if present) leave your device.
+that names published notes only, and the settings note `_site.md` leave
+your device.
 
 ## Development
 

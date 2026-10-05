@@ -1,7 +1,8 @@
 # todo
 
 Features compared against Quartz and Obsidian Publish. Each item says which
-of them has it today.
+of them has it today. docs/roadmap.html is the readers' version of this
+list: update it too when an item is done or added.
 
 ## Need to have
 

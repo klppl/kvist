@@ -59,8 +59,8 @@ type hints struct {
 
 // ScanDir walks a vault folder and builds the manifest under rules: the
 // published notes, the attachments they reference, the optional settings
-// note (_site.md, sent as .kvist/site.md) and .kvist/site.toml, and a
-// .kvist/links.json hints file.
+// note (_site.md, sent as .kvist/site.md), and a .kvist/links.json hints
+// file.
 //
 // Dot folders (.obsidian, .git, .trash) and symlinks are skipped.
 func ScanDir(dir string, rules protocol.Rules) (*Scan, error) {
@@ -169,9 +169,6 @@ func ScanDir(dir string, rules protocol.Rules) (*Scan, error) {
 			}
 		}
 		includeImages(include, ix, rules, p, m.Frontmatter, vault.NoteImageKeys)
-	}
-	if _, ok := all[protocol.SiteConfigPath]; ok {
-		include[protocol.SiteConfigPath] = true
 	}
 	settings, err := findSettingsNote(paths)
 	if err != nil {

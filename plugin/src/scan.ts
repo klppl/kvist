@@ -1,11 +1,10 @@
 // Builds the manifest from a vault: gate 1 (the publish rules on Obsidian's
 // metadata), the attachments that published notes reference, the settings
-// note (_site.md, sent as .kvist/site.md), the optional .kvist/site.toml and
-// the hints file. Obsidian-independent so it can be
+// note (_site.md, sent as .kvist/site.md) and the hints file. Obsidian-independent so it can be
 // tested; main.ts adapts the real vault to VaultLike.
 
 import { HashCache, sha256 } from "./hash";
-import { HINTS_PATH, ManifestFile, Rules, SETTINGS_NOTE_NAME, SITE_CONFIG_PATH, SITE_NOTE_PATH } from "./protocol";
+import { HINTS_PATH, ManifestFile, Rules, SETTINGS_NOTE_NAME, SITE_NOTE_PATH } from "./protocol";
 import {
   Decision, NOTE_IMAGE_KEYS, SITE_AVATAR_KEYS, SITE_ICON_KEYS, SITE_IMAGE_KEYS, allowedPath, attachmentAllowed, evaluate, imageProperty,
   isImage, isNote, isSettingsNote,
@@ -34,8 +33,6 @@ export interface NoteMeta {
 export interface VaultLike {
   files(): VaultFile[];
   read(path: string): Promise<ArrayBuffer>;
-  /** Reads a file Obsidian doesn't index (e.g. in .kvist/); null if absent. */
-  readHidden(path: string): Promise<{ data: ArrayBuffer; mtime: number } | null>;
   meta(path: string): NoteMeta | null;
   /** Resolves a link path from a note to a vault path, or null. */
   resolve(linkpath: string, source: string): string | null;
@@ -165,11 +162,6 @@ export async function scan(vault: VaultLike, rules: Rules, cache: HashCache): Pr
     content.set(SITE_NOTE_PATH, () => vault.read(settingsNote));
   }
 
-  const siteToml = await vault.readHidden(SITE_CONFIG_PATH);
-  if (siteToml) {
-    files.push({ path: SITE_CONFIG_PATH, hash: await sha256(siteToml.data), size: siteToml.data.byteLength, mtime: iso(siteToml.mtime) });
-    content.set(SITE_CONFIG_PATH, async () => siteToml.data);
-  }
   if (Object.keys(hints).length > 0) {
     const data = new TextEncoder().encode(stableJSON({ version: 1, notes: hints })).buffer as ArrayBuffer;
     const newest = files.reduce((t, f) => (f.mtime > t ? f.mtime : t), iso(0));

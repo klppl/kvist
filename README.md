@@ -46,6 +46,8 @@ Publish, and your site updates. Private notes never leave your device.
 - [Domains and HTTPS](https://klppl.github.io/kvist/https.html): your
   domain with HTTPS, with the ready-made Caddy setup or your own proxy,
   and several sites on one server.
+- [Roadmap](https://klppl.github.io/kvist/roadmap.html): what doesn't work
+  yet, and what's planned.
 
 The server runs from the Docker image `ghcr.io/klppl/kvist`. The Obsidian
 plugin works on desktop and mobile: download

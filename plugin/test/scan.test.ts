@@ -22,10 +22,10 @@ test("scan publishes notes, their attachments and safe hints", async () => {
   v.write("Garden/pic.png", "PNG");
   v.write("Private/secret.png", "PNG2");
   v.write("unused.png", "PNG3");
-  v.write(".kvist/site.toml", "title = 'x'");
+  v.write(".kvist/site.toml", "title = 'x'"); // a stray dot file stays home
   const r = await scan(v, rules, new HashCache());
   assert.deepEqual(r.files.map((f) => f.path), [
-    ".kvist/links.json", ".kvist/site.toml", "Garden/Leaf.md", "Garden/Welcome.md", "Garden/pic.png",
+    ".kvist/links.json", "Garden/Leaf.md", "Garden/Welcome.md", "Garden/pic.png",
   ]);
   const hints = JSON.parse(new TextDecoder().decode(await r.content.get(".kvist/links.json")!()));
   assert.deepEqual(hints, { version: 1, notes: { "Garden/Welcome.md": { Diary: null, Leaf: "Garden/Leaf.md" } } });

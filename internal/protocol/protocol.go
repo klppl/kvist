@@ -30,8 +30,7 @@ const (
 // Reserved vault paths that may be pushed although they live under a dot
 // folder. Nothing else under .kvist/ is accepted.
 const (
-	HintsPath      = ".kvist/links.json"
-	SiteConfigPath = ".kvist/site.toml"
+	HintsPath = ".kvist/links.json"
 	// SiteNotePath carries the vault's settings note. Clients find the note
 	// by name (SettingsNoteName) anywhere in the vault and push its content
 	// under this path, so the server never depends on where it lives.

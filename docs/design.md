@@ -535,7 +535,7 @@ serve    = true                 # serve public/ from this binary on host match
 ```
 
 **Vault-side overrides.** An optional settings note (`_site.md`, pushed as
-`.kvist/site.md`; earlier `.kvist/site.toml`) may override *presentation*
+`.kvist/site.md`) may override *presentation*
 fields only: `title`, `description`, `author`, `language`, `home`, the
 menu and theme parameters. Everything security-relevant
 (`publish.*`, `theme`, `base_url`, paths, limits) is server-only; unknown or

@@ -93,15 +93,9 @@ func Build(site *config.Site, snap source.Snapshot) (*Site, error) {
 		aliases: map[string][]string{},
 		root:    site.SiteRoot(),
 	}
-	var siteToml, siteNote []byte
+	var siteNote []byte
 	for _, f := range snap.Files() {
 		switch {
-		case f.Path == protocol.SiteConfigPath:
-			src, err := b.read(f)
-			if err != nil {
-				return nil, err
-			}
-			siteToml = src
 		case f.Path == protocol.SiteNotePath:
 			src, err := b.read(f)
 			if err != nil {
@@ -134,7 +128,7 @@ func Build(site *config.Site, snap source.Snapshot) (*Site, error) {
 	b.ix = resolve.NewIndex(paths)
 
 	s := &Site{ModelVersion: Version, Revision: snap.Revision(), BuiltAt: snap.Time().UTC(), notesBy: map[string]*Note{}}
-	settings := b.readSettings(siteToml, siteNote)
+	settings := b.readSettings(siteNote)
 	s.Config = b.siteConfig(settings)
 
 	b.strict = s.Config.StrictLineBreaks
@@ -195,7 +189,7 @@ func (b *builder) siteConfig(st siteSettings) SiteConfig {
 	for k, v := range b.cfg.ThemeParams {
 		c.Params[k] = v
 	}
-	renameGroups(c.Params)
+	normalizeGroups(c.Params)
 	applySettings(&c, st)
 	c.Analytics = b.analytics(&c)
 	return c

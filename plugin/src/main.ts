@@ -375,14 +375,6 @@ class ObsidianVault implements VaultLike {
     return this.app.vault.readBinary(f);
   }
 
-  async readHidden(path: string) {
-    const p = normalizePath(path);
-    const adapter = this.app.vault.adapter;
-    if (!(await adapter.exists(p))) return null;
-    const stat = await adapter.stat(p);
-    return { data: await adapter.readBinary(p), mtime: stat?.mtime ?? 0 };
-  }
-
   meta(path: string): NoteMeta | null {
     const f = this.app.vault.getAbstractFileByPath(path);
     if (!(f instanceof TFile)) return null;

@@ -57,7 +57,7 @@ func ValidatePath(p string, maxBytes int) error {
 
 // IsReservedPath reports whether p is one of the reserved .kvist/ files.
 func IsReservedPath(p string) bool {
-	return p == HintsPath || p == SiteConfigPath || p == SiteNotePath
+	return p == HintsPath || p == SiteNotePath
 }
 
 // IsSettingsNote reports whether p is a settings note (_site.md, any case,

@@ -28,10 +28,6 @@ export class MemVault implements VaultLike {
     if (!f) throw new Error("missing " + path);
     return f.data.slice().buffer as ArrayBuffer;
   }
-  async readHidden(path: string) {
-    const f = this.hidden.get(path);
-    return f ? { data: f.data.slice().buffer as ArrayBuffer, mtime: f.mtime } : null;
-  }
   meta(path: string): NoteMeta | null {
     const f = this.files_.get(path);
     if (!f || !path.endsWith(".md")) return null;

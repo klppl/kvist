@@ -133,28 +133,14 @@ Settings text with an inline [[About me]] link that is not a menu entry.
 	}
 }
 
-func TestSettingsNoteOverridesSiteToml(t *testing.T) {
+// TestSiteTomlIgnored: the old .kvist/site.toml is not read.
+func TestSiteTomlIgnored(t *testing.T) {
 	site := buildVault(t, map[string]string{
-		"Kvist/Note.md": "x",
-		".kvist/site.toml": `title = "From toml"
-author = "Toml author"
-[[nav]]
-title = "Toml link"
-url = "/toml/"
-[theme_params]
-nav_tags = ["old"]
-`,
-		"_site.md": "---\ntitle: From note\n---\n",
+		"Kvist/Note.md":    "x",
+		".kvist/site.toml": "title = \"From toml\"\n[theme_params]\nnav_tags = [\"old\"]\n",
 	})
-	c := site.Config
-	if c.Title != "From note" || c.Author != "Toml author" {
-		t.Errorf("title %q, author %q", c.Title, c.Author)
-	}
-	if len(c.Nav) != 1 || c.Nav[0].URL != "/toml/" {
-		t.Errorf("the note has no links, so site.toml's nav stays: %+v", c.Nav)
-	}
-	if got := c.Params["groups"]; !reflect.DeepEqual(got, []any{"old"}) {
-		t.Errorf("nav_tags should become groups, got %#v", got)
+	if c := site.Config; c.Title != "Server title" || c.Params["groups"] != nil || c.Params["nav_tags"] != nil {
+		t.Errorf("site.toml was read: title %q, params %v", c.Title, c.Params)
 	}
 }
 

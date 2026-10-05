@@ -175,7 +175,7 @@ A manifest is rejected with `invalid_manifest` if any entry breaks these:
 - Path: relative, `/`-separated, Unicode **NFC**, valid UTF-8, no empty, `.`
   or `..` segments, no control characters, at most `max_path_bytes` bytes.
 - No segment may start with `.` (so no `.obsidian/`, `.trash/`), except the
-  reserved files `.kvist/links.json`, `.kvist/site.toml` and `.kvist/site.md`.
+  reserved files `.kvist/links.json` and `.kvist/site.md`.
   `.kvist/site.md` carries the settings note (`_site.md`, wherever it lives
   in the vault); a vault may have at most one. Notes named `_site.md` are
   never published as pages (rule 0 of the publish rules).

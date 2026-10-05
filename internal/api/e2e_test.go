@@ -232,7 +232,7 @@ func TestPushPublishesOnlyPublicContent(t *testing.T) {
 	res := d.mustPush()
 	// The settings note travels as .kvist/site.md and is never a page.
 	eq(t, "published", e.headPaths(), []string{
-		".kvist/links.json", ".kvist/site.md", ".kvist/site.toml", "Garden/Note.md", "Garden/Welcome.md", "Tagged.md", "att/doc.pdf", "map.png",
+		".kvist/links.json", ".kvist/site.md", "Garden/Note.md", "Garden/Welcome.md", "Tagged.md", "att/doc.pdf", "map.png",
 	})
 	if res.Revision != "r000001" || res.Build == nil || res.Build.State != protocol.BuildSucceeded {
 		t.Fatalf("result = %+v build=%+v", res, res.Build)
@@ -564,7 +564,7 @@ func TestManifestValidation(t *testing.T) {
 	ctx := context.Background()
 	bad := []string{
 		"../escape.md", "/abs.md", "a//b.md", "a/./b.md", "Cafe\u0301.md", // NFD
-		".obsidian/workspace.md", "x/.hidden.md", "virus.exe", "ctrl\x01.md", ".kvist/other.json",
+		".obsidian/workspace.md", "x/.hidden.md", "virus.exe", "ctrl\x01.md", ".kvist/other.json", ".kvist/site.toml",
 	}
 	for _, p := range bad {
 		m, _ := manifestFor(t, c, "", map[string]string{p: "x"})
@@ -581,7 +581,7 @@ func TestManifestValidation(t *testing.T) {
 	if _, err := c.StartSync(ctx, m); !pushclient.IsCode(err, protocol.ErrRulesChanged) {
 		t.Errorf("stale rules: %v", err)
 	}
-	m, _ = manifestFor(t, c, "", map[string]string{"Garden/A.md": "x", ".kvist/site.toml": "x", ".kvist/links.json": "{}", "Café.md": "nfc"})
+	m, _ = manifestFor(t, c, "", map[string]string{"Garden/A.md": "x", ".kvist/site.md": "x", ".kvist/links.json": "{}", "Café.md": "nfc"})
 	if _, err := c.StartSync(ctx, m); err != nil {
 		t.Errorf("valid manifest rejected: %v", err)
 	}

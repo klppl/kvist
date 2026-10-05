@@ -7,19 +7,16 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/BurntSushi/toml"
-
 	"github.com/klppl/kvist/internal/protocol"
 	"github.com/klppl/kvist/internal/vault"
 )
 
-// The vault may set presentation settings in two places: the settings note
-// (_site.md, pushed as .kvist/site.md) and the older .kvist/site.toml. The
-// note wins where both set something. Publish rules, the theme and the base
-// URL stay in the server config.
+// The vault sets presentation settings in the settings note (_site.md,
+// pushed as .kvist/site.md). Publish rules, the theme and the base URL stay
+// in the server config.
 
-// siteSettings are the vault's presentation settings, merged from both
-// sources. Nil and empty fields leave the server's values alone.
+// siteSettings are the vault's presentation settings. Nil and empty fields
+// leave the server's values alone.
 type siteSettings struct {
 	Title, Description, Author, Language *string
 	StrictLineBreaks                     *bool
@@ -42,40 +39,19 @@ type navRef struct {
 	Note  *vault.Link // set for links to notes
 }
 
-// siteTomlSettings is the shape of .kvist/site.toml.
-type siteTomlSettings struct {
-	Title            *string        `toml:"title"`
-	Description      *string        `toml:"description"`
-	Author           *string        `toml:"author"`
-	Language         *string        `toml:"language"`
-	StrictLineBreaks *bool          `toml:"strict_line_breaks"`
-	Home             *string        `toml:"home"`
-	Nav              []NavItem      `toml:"nav"`
-	ThemeParams      map[string]any `toml:"theme_params"`
-}
-
-// readSettings merges site.toml and then the settings note.
-func (b *builder) readSettings(siteToml, siteNote []byte) siteSettings {
+// readSettings reads the settings note.
+func (b *builder) readSettings(siteNote []byte) siteSettings {
 	st := siteSettings{Params: map[string]any{}}
-	if siteToml != nil {
-		b.readSiteToml(&st, siteToml)
-	}
 	if siteNote != nil {
 		b.readSiteNote(&st, siteNote)
 	}
-	renameGroups(st.Params)
+	normalizeGroups(st.Params)
 	return st
 }
 
-// renameGroups maps the old theme setting name nav_tags to groups, and
-// turns "articles, projects" written as text into a list.
-func renameGroups(params map[string]any) {
-	if v, ok := params["nav_tags"]; ok {
-		if _, set := params["groups"]; !set {
-			params["groups"] = v
-		}
-		delete(params, "nav_tags")
-	}
+// normalizeGroups turns groups written as text, "articles, projects",
+// into a list, without # in front of the tags.
+func normalizeGroups(params map[string]any) {
 	if v, ok := params["groups"].(string); ok {
 		var list []any
 		for _, g := range strings.Split(v, ",") {
@@ -94,32 +70,6 @@ func renameGroups(params map[string]any) {
 			list = append(list, g)
 		}
 		params["groups"] = list
-	}
-}
-
-func (b *builder) readSiteToml(st *siteSettings, src []byte) {
-	var o siteTomlSettings
-	md, err := toml.Decode(string(src), &o)
-	if err != nil {
-		b.warn(WarnSiteConfig, protocol.SiteConfigPath, "ignored: %v", err)
-		return
-	}
-	for _, k := range md.Undecoded() {
-		b.warn(WarnSiteConfig, protocol.SiteConfigPath, "key %q is not allowed in the vault and was ignored (it can only be set in the server config)", k.String())
-	}
-	st.Title, st.Description, st.Author, st.Language = o.Title, o.Description, o.Author, o.Language
-	st.StrictLineBreaks = o.StrictLineBreaks
-	if o.Home != nil {
-		st.Home, st.HomeFrom = o.Home, protocol.SiteConfigPath
-	}
-	if o.Nav != nil {
-		st.Nav, st.NavSet, st.NavFrom = nil, true, protocol.SiteConfigPath
-		for _, n := range o.Nav {
-			st.Nav = append(st.Nav, navRef{Title: n.Title, URL: n.URL})
-		}
-	}
-	for k, v := range o.ThemeParams {
-		st.Params[k] = v
 	}
 }
 

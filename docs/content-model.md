@@ -65,11 +65,6 @@ are a single link: URLs are kept, `[[wikilinks]]` and links to `.md` files resol
 (links to anything else are dropped with a warning). Links in comments and
 code blocks don't count.
 
-The older `.kvist/site.toml` is still read (`title`, `description`,
-`author`, `language`, `home`, `[[nav]]`, `[theme_params]`); the settings
-note wins where both set a value. The theme parameter `nav_tags` is read as
-`groups`.
-
 ## Note
 
 | Field | Type | |
