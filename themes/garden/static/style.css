@@ -190,6 +190,15 @@ main { min-width: 0; }
   .page-aside > * { position: sticky; top: 2rem; }
 }
 
+/* reader mode: only the page; the button stays in the corner */
+.reader-toggle { position: fixed; top: .9rem; right: .9rem; z-index: 4; color: var(--muted); }
+.reader-toggle:hover, .reader-toggle[aria-pressed="true"] { color: var(--fg); }
+@media (min-width: 821px) {
+  :root[data-reader] .nav-pane, :root[data-reader] .list-pane, :root[data-reader] .page-aside { display: none; }
+  :root[data-reader] .shell { display: block; }
+  :root[data-reader] .page { display: block; max-width: 46rem; }
+}
+
 /* notes */
 .note-header h1, .intro h1, .listing h1 {
   font-size: 2.6rem; line-height: 1.15; letter-spacing: -.025em; font-weight: 800; margin: .3rem 0 .7rem;
@@ -431,6 +440,7 @@ pre.mermaid { background: none; text-align: center; }
   .nav-pane { position: sticky; z-index: 5; height: auto; padding: .7rem 1rem; border-right: 0; border-bottom: 1px solid var(--border); }
   .nav-head { align-items: center; padding: 0; }
   .menu-toggle:not([hidden]) { display: inline-grid; }
+  .reader-toggle { display: none; }
   .nav-body, .nav-foot { display: none; }
   .nav-open .nav-pane { max-height: 100vh; overflow-y: auto; }
   .nav-open .nav-body { display: block; margin-top: .8rem; }

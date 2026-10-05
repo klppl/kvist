@@ -35,6 +35,20 @@
     });
   }
 
+  // ---- reader mode: only the page, remembered across pages ----
+  var reader = $(".reader-toggle");
+  if (reader) {
+    reader.hidden = false;
+    var readerState = function () { reader.setAttribute("aria-pressed", root.hasAttribute("data-reader") ? "true" : "false"); };
+    readerState();
+    reader.addEventListener("click", function () {
+      var on = !root.hasAttribute("data-reader");
+      if (on) root.dataset.reader = ""; else delete root.dataset.reader;
+      try { on ? localStorage.setItem("kvist-reader", "1") : localStorage.removeItem("kvist-reader"); } catch (e) {}
+      readerState();
+    });
+  }
+
   // ---- print: light colors and folded callouts opened ----
   var printState = null;
   window.addEventListener("beforeprint", function () {

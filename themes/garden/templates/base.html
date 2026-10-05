@@ -16,7 +16,7 @@
 <link rel="icon" href="{{.}}">{{else}}
 <link rel="icon" href="{{asset "favicon.svg"}}" type="image/svg+xml">{{end}}
 <link rel="alternate" type="application/rss+xml" title="{{.Site.Config.Title}}" href="/index.xml">
-<script>try{var t=localStorage.getItem("kvist-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<script>try{var t=localStorage.getItem("kvist-theme");if(t)document.documentElement.dataset.theme=t{{if param "reader_mode"}};if(localStorage.getItem("kvist-reader"))document.documentElement.dataset.reader=""{{end}}}catch(e){}</script>
 <style>:root{--accent:{{param "accent"}}}</style>
 <link rel="stylesheet" href="{{asset "style.css"}}">
 {{- if .Features.Code}}
@@ -46,6 +46,9 @@
   {{template "list-pane" $ctx}}
   {{- end}}
   <main id="main">
+    {{- if param "reader_mode"}}
+    <button class="icon-button reader-toggle" type="button" aria-label="{{t "reader_mode"}}" title="{{t "reader_mode"}}" aria-pressed="false" hidden>{{template "icon" "reader"}}</button>
+    {{- end}}
     <div class="page">
       <div class="page-main">{{block "main" .}}{{end}}</div>
       <aside class="page-aside">{{block "aside" .}}{{end}}</aside>
