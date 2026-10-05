@@ -111,6 +111,20 @@ main { min-width: 0; }
 .nav-list [aria-current] .icon { color: var(--fg); }
 .nav-list kbd { margin-left: auto; font: .72rem var(--font-mono); color: var(--muted); border: 1px solid var(--border); border-radius: 4px; padding: 0 .35rem; }
 .nav-external { justify-content: space-between; }
+/* The folder tree: a chevron opens a folder, its name goes to it. */
+.nav-tree .nav-list { margin-left: 1.05rem; padding-left: .35rem; border-left: 1px solid var(--border); }
+.tree-folder > summary { display: flex; align-items: center; list-style: none; cursor: pointer; border-radius: 7px; }
+.tree-folder > summary::-webkit-details-marker { display: none; }
+.tree-folder > summary:hover { background: var(--hover); }
+.tree-folder > summary > a { padding-left: .15rem; }
+.tree-folder > summary > a:hover { background: none; }
+.tree-toggle { flex: none; width: 1.1rem; height: 1.6rem; display: grid; place-items: center; color: var(--muted); }
+.tree-toggle::before { content: ""; width: .38rem; height: .38rem; border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: rotate(-45deg); transition: transform .15s; }
+.tree-folder[open] > summary > .tree-toggle::before { transform: rotate(45deg); }
+.tree-folder > summary:focus-visible { outline: 2px solid var(--accent); }
+.nav-tree a.tree-leaf { padding-left: 1.25rem; }
+.nav-tree [aria-current="true"] { background: none; }
+.nav-tree > li > a:not(.tree-leaf), .nav-tree .nav-list > li > a:not(.tree-leaf) { padding-left: 1.25rem; }
 .nav-list .count { margin-left: auto; font-size: .76rem; }
 .nav-list [aria-current] .count { color: var(--fg); }
 .nav-foot { margin-top: auto; padding: 1.5rem .45rem 0; font-size: .8rem; color: var(--muted); }

@@ -145,17 +145,19 @@ Params (set them in `theme_params`):
 | `footer` | `""` | Markdown at the bottom of the menu |
 | `mermaid_url`, `mermaid_integrity` | jsDelivr, pinned with an SRI hash | see below |
 
-Pages have three panes: the nav pane (main links, the top-level folders or
+Pages have three panes: the nav pane (main links, the folder tree or
 `groups`, and the menu links from the settings note), the list pane, and
 the page. The list pane shows
 the notes around the page: a note's folder, a folder's notes, a tag's notes,
 or the most recent notes on the home page. It has a filter box, and on
-small screens it moves below the page. Neither pane lists the whole vault,
-and the list stops at `list_max`, because a full tree on every page made a
-5 000-note site 2 GB. On wide screens the table of contents and the local
+small screens it moves below the page. The folder tree holds folders, not
+notes: folders on the way to the page start open, and so does the only
+top-level folder of a garden that has one. Neither pane lists every note,
+and the list stops at `list_max`, because a full tree of notes on every
+page made a 5 000-note site 2 GB. On wide screens the table of contents and the local
 graph sit to the right of a note; otherwise they follow it.
 
-**Grouping by tags.** By default the sidebar lists your top-level folders.
+**Grouping by tags.** By default the sidebar shows your folders.
 If everything you publish lives in one folder, group it by tags instead:
 
 ```markdown

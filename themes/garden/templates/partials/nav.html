@@ -1,9 +1,9 @@
 {{/*
-  The nav pane: site title, the main links, the top-level folders (or the
+  The nav pane: site title, the main links, the folder tree (or the
   groups) and the site's nav links. It takes (dict "P" page "Group"
-  tag), where Group is the group of the current note. It lists
-  only the top of the garden, so every page stays small however big the
-  garden is. The list pane shows the current folder or group.
+  tag), where Group is the group of the current note. The tree holds
+  folders only, so every page stays small however big the garden is; the
+  list pane shows the notes of the current folder or group.
 */}}
 {{define "nav-pane" -}}
 {{- $group := .Group}}
@@ -40,9 +40,10 @@
     </ul>
     {{- else if or $root.Children $root.Notes}}
     <h2 class="nav-section">Content</h2>
-    <ul class="nav-list">
+    <ul class="nav-list nav-tree">
+      {{- $only := eq (len $root.Children) 1}}
       {{- range $root.Children}}
-      <li><a href="{{.URL}}"{{if hasPrefix $cur .URL}} aria-current="{{if eq $cur .URL}}page{{else}}true{{end}}"{{end}}>{{template "icon" "folder"}}{{.Name}}</a></li>
+      {{template "nav-folder" (dict "F" . "Cur" $cur "Open" $only)}}
       {{- end}}
       {{- range $i, $n := $root.Notes}}{{if and (ne $n.URL "/") (lt $i 20)}}
       <li><a href="{{$n.URL}}"{{if eq $cur $n.URL}} aria-current="page"{{end}}>{{template "icon" "note"}}{{$n.Title}}</a></li>
@@ -64,6 +65,27 @@
     <p>Grown with <a href="https://github.com/klppl/kvist">kvist</a> · <a href="/index.xml">RSS</a></p>
   </footer>
 </aside>
+{{- end}}
+{{- end}}
+
+{{/* A folder in the tree, with its subfolders below it. Folders on the way to the current page start open, and so
+     does a garden's only top-level folder; the chevron opens and closes
+     the others, without JavaScript. */}}
+{{define "nav-folder" -}}
+{{- $cur := .Cur}}
+{{- with .F}}
+{{- $in := hasPrefix $cur .URL}}
+{{- if .Children}}
+<li><details class="tree-folder"{{if or $in $.Open}} open{{end}}><summary><span class="tree-toggle" aria-hidden="true"></span><a href="{{.URL}}"{{if $in}} aria-current="{{if eq $cur .URL}}page{{else}}true{{end}}"{{end}}>{{template "icon" "folder"}}<span>{{.Name}}</span></a></summary>
+  <ul class="nav-list">
+    {{- range .Children}}
+    {{template "nav-folder" (dict "F" . "Cur" $cur)}}
+    {{- end}}
+  </ul>
+</details></li>
+{{- else}}
+<li><a class="tree-leaf" href="{{.URL}}"{{if $in}} aria-current="{{if eq $cur .URL}}page{{else}}true{{end}}"{{end}}>{{template "icon" "folder"}}<span>{{.Name}}</span></a></li>
+{{- end}}
 {{- end}}
 {{- end}}
 
