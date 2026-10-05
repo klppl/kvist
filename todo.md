@@ -78,7 +78,7 @@ of them has it today.
 - [ ] **Markdown-style note embeds.** `![text](Note.md)` renders as an empty
   paragraph, without a warning, where `![[Note]]` embeds the note. Embed it
   the same way, or at least warn. (The docs now say it doesn't work.)
-- [ ] **Release the plugin.** The favicon is only uploaded by the new
+- [x] **Release the plugin.** The favicon is only uploaded by the new
   plugin (it decides which images leave the vault), and the settings note
   template gained `language`, `image` and `favicon`. Tag a version so
   `kvist-plugin.zip` has them.
