@@ -29,16 +29,16 @@ of them has it today.
 
 - [ ] **Canvas.** Render `.canvas` files as a page with cards and arrows,
   and embeds with `![[board.canvas]]`. (Publish)
-- [ ] **Instant navigation.** Load the next page without a full reload,
+- [x] **Instant navigation.** Load the next page without a full reload,
   keeping the menu's scroll position and the graph. (Quartz)
-- [ ] **Breadcrumbs.** The note's folders above its title. (Quartz)
-- [ ] **Reader mode.** A button that hides the menu, list and side panels.
+- [x] **Breadcrumbs.** The note's folders above its title. (Quartz)
+- [x] **Reader mode.** A button that hides the menu, list and side panels.
   (Quartz)
 - [ ] **Stacked pages.** Open linked notes side by side, as panes that
   slide. (Publish)
 - [ ] **Password-protected sites.** One password for the whole site, or
   for a folder. (Publish)
-- [ ] **Generated social images.** A preview image with the note's title
+- [x] **Generated social images.** A preview image with the note's title
   and the site's name, for notes without `image:`. (Quartz)
 - [ ] **Comments.** An optional giscus block under notes. (Quartz)
 - [ ] **Code block extras.** A title (```` ```go title="main.go" ````),
@@ -48,10 +48,10 @@ of them has it today.
   (Publish)
 - [ ] **Order and hide menu entries.** Choose the order of folders and
   groups, and hide some from the menu without unpublishing them. (Publish)
-- [ ] **Unlisted notes.** `unlisted: true` publishes a note but leaves it
+- [x] **Unlisted notes.** `unlisted: true` publishes a note but leaves it
   out of lists, search, the graph, feeds and the sitemap. Also `noindex`
   for search engines.
-- [ ] **Search by tag.** `#tag` in the search box filters the results.
+- [x] **Search by tag.** `#tag` in the search box filters the results.
   (Quartz)
 - [ ] **Citations.** `[@key]` resolved from a BibTeX file in the vault,
   with a bibliography at the end. (Quartz)
