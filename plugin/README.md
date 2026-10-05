@@ -6,15 +6,27 @@ as a website. Works on desktop and mobile.
 
 ## Install (until it is in the community plugin list)
 
+Download `kvist-plugin-<version>.zip` from the
+[releases](https://github.com/klppl/kvist/releases) and unzip it into
+`<vault>/.obsidian/plugins/`, so the files end up in
+`<vault>/.obsidian/plugins/kvist/`. Then enable **kvist** under
+*Settings → Community plugins*.
+
+Or build it yourself:
+
 ```sh
 cd plugin
 npm install
 npm run build
 ```
 
-Copy `main.js`, `manifest.json` and `styles.css` to
-`<vault>/.obsidian/plugins/kvist/`, then enable **kvist** under
-*Settings → Community plugins*.
+and copy `main.js`, `manifest.json` and `styles.css` to
+`<vault>/.obsidian/plugins/kvist/`.
+
+Releases are made by the *Plugin release* workflow: pushing a tag like
+`v0.2.0` builds the plugin and attaches the zip and the three loose files
+to that tag's release. It can also be run by hand from the Actions tab.
+Bump `version` in `manifest.json` (and `package.json`) before tagging.
 
 ## Set up
 

@@ -118,8 +118,9 @@ serve    = true
 <h2 id="plugin">Part 2: the Obsidian plugin</h2>
 <ol class="steps" style="counter-reset: step 5">
   <li>
-    <h3 id="build-plugin">Build the plugin</h3>
-    <p>kvist isn't in Obsidian's community plugin list yet, so you build it once on your computer. You need <a href="https://nodejs.org">Node.js</a> and Git:</p>
+    <h3 id="build-plugin">Get the plugin</h3>
+    <p>kvist isn't in Obsidian's community plugin list yet. Download <code>kvist-plugin-<em>version</em>.zip</code> from the <a href="https://github.com/klppl/kvist/releases">releases page</a> and unzip it: it holds a <code>kvist</code> folder with the whole plugin. Skip to the next step.</p>
+    <p>Or build it yourself on your computer. You need <a href="https://nodejs.org">Node.js</a> and Git:</p>
 <pre><code>git clone https://github.com/klppl/kvist
 cd kvist/plugin
 npm ci
@@ -128,7 +129,7 @@ npm run build</code></pre>
   </li>
   <li>
     <h3 id="install-plugin">Copy it into your vault</h3>
-    <p>Copy the three files into your vault's plugin folder (replace the path with your vault's):</p>
+    <p>From the zip, move the <code>kvist</code> folder into your vault's <code>.obsidian/plugins/</code> folder (it is hidden; on a Mac press <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>.</kbd> in Finder to show it). If you built it, copy the three files instead (replace the path with your vault's):</p>
 <pre><code>VAULT=~/Documents/MyVault
 mkdir -p "$VAULT/.obsidian/plugins/kvist"
 cp main.js manifest.json styles.css "$VAULT/.obsidian/plugins/kvist/"</code></pre>
