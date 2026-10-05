@@ -82,7 +82,7 @@ of them has it today.
   plugin (it decides which images leave the vault), and the settings note
   template gained `language`, `image` and `favicon`. Tag a version so
   `kvist-plugin.zip` has them.
-- [ ] **Refresh the screenshots.** `docs/assets/screens/` and the README
+- [x] **Refresh the screenshots.** `docs/assets/screens/` and the README
   image show the old menu with only top-level folders.
 - [ ] **Release binaries.** `kvist dev` and `kvist build` on your own
   computer need Go and a checkout (`make build`). Attach Linux, macOS and

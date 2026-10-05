@@ -6,7 +6,7 @@ kvist (Swedish for "twig") turns the notes you choose into a fast,
 searchable digital garden on your own server. Write in Obsidian, press
 Publish, and your site updates. Private notes never leave your device.
 
-![A kvist site: a menu, a list of related notes, and a note with callouts and code](docs/assets/screens/note-light.webp)
+![A kvist site: a menu with a profile and folder tree, a list of the notes in the folder, and a note with breadcrumbs above its title](docs/assets/screens/note-light.webp)
 
 - **Obsidian syntax:** wikilinks, embeds, callouts, tags, footnotes, math
   and Mermaid diagrams.
