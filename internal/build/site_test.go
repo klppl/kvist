@@ -96,6 +96,8 @@ func TestSiteOutput(t *testing.T) {
 		// the settings note's image, as the default social preview image
 		`<meta property="og:image" content="https://garden.example.com/_assets/`,
 		`<meta name="twitter:card" content="summary_large_image">`,
+		// breadcrumbs
+		`<nav class="crumbs" aria-label="Folder path"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/garden/">Garden</a></nav>`,
 	} {
 		if !strings.Contains(string(hub), frag) {
 			t.Errorf("hub page lacks %q", frag)

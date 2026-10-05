@@ -43,6 +43,7 @@ yes = "ja"
 no = "nein"
 
 tag_path = "Tag-Pfad"
+folder_path = "Ordnerpfad"
 tags_lead = "%s in %s. Wähle ein Thema, um alles dazu zu sehen."
 filter_tags = "Tags filtern"
 sort_tags = "Tags sortieren"

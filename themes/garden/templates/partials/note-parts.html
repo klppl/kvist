@@ -58,3 +58,17 @@
 </section>
 {{- end}}
 {{- end}}
+
+{{/* The folders above a note, from the top: Home / Recipes / Soups. A
+     folder note starts from its folder's parent. Folders without a page
+     (only unlisted notes in them) show as text. */}}
+{{define "breadcrumbs" -}}
+{{- $f := .Folder}}{{if and $f (eq $f.URL .URL)}}{{$f = $f.Parent}}{{end}}
+{{- if and $f $f.Parent}}
+<nav class="crumbs" aria-label="{{t "folder_path"}}"><a href="/">{{t "home"}}</a>{{template "folder-crumbs" $f}}</nav>
+{{- end}}
+{{- end}}
+
+{{define "folder-crumbs" -}}
+{{with .Parent}}{{if .Parent}}{{template "folder-crumbs" .}}{{end}}{{end}}<span aria-hidden="true">/</span>{{if .Unlisted}}<span>{{.Name}}</span>{{else}}<a href="{{.URL}}">{{.Name}}</a>{{end}}
+{{- end}}

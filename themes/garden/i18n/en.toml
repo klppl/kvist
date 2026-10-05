@@ -45,6 +45,7 @@ yes = "yes"
 no = "no"
 
 tag_path = "Tag path"
+folder_path = "Folder path"
 tags_lead = "%s across %s. Pick a topic to see everything filed under it."
 filter_tags = "Filter tags"
 sort_tags = "Sort tags"

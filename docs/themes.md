@@ -164,6 +164,7 @@ Params (set them in `theme_params`):
 | `list_max` | `100` | notes in the list pane before a "more…" link |
 | `groups` | `[]` | tags that group the sidebar instead of folders (below); `nav_tags` is an older name for it |
 | `show_toc`, `show_backlinks`, `show_graph` | `true` | note page parts |
+| `show_breadcrumbs` | `true` | the folders above a note's title (and a folder's), each linking to its folder page |
 | `graph_orphans` | `true` | the global graph shows notes without links |
 | `graph_tags` | `false` | the global graph shows tags as nodes, linked to their notes (nested tags to their parent) |
 | `graph_node_size` | `links` | `links`: nodes grow with their number of links; `same`: all nodes alike |

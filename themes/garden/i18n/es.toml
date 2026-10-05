@@ -43,6 +43,7 @@ yes = "sí"
 no = "no"
 
 tag_path = "Ruta de la etiqueta"
+folder_path = "Ruta de la carpeta"
 tags_lead = "%s en %s. Elige un tema para ver todo lo que contiene."
 filter_tags = "Filtrar etiquetas"
 sort_tags = "Ordenar etiquetas"

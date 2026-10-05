@@ -43,6 +43,7 @@ yes = "oui"
 no = "non"
 
 tag_path = "Chemin de l'étiquette"
+folder_path = "Chemin du dossier"
 tags_lead = "%s dans %s. Choisissez un sujet pour voir tout ce qui s'y rapporte."
 filter_tags = "Filtrer les étiquettes"
 sort_tags = "Trier les étiquettes"

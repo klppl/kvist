@@ -1,5 +1,8 @@
 {{define "main" -}}
 <article class="listing">
+  {{- if param "show_breadcrumbs"}}{{with .Folder.Parent}}
+  <nav class="crumbs" aria-label="{{t "folder_path"}}"><a href="/">{{t "home"}}</a>{{if .Parent}}{{template "folder-crumbs" .}}{{end}}</nav>
+  {{- end}}{{end}}
   <h1>{{.Folder.Name}}</h1>
   {{- with .Folder.Children}}
   <ul class="folders">{{range .}}<li><a href="{{.URL}}">{{.Name}}/</a></li>{{end}}</ul>

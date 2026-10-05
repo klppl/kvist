@@ -43,6 +43,7 @@ yes = "ja"
 no = "nej"
 
 tag_path = "Taggsökväg"
+folder_path = "Mappsökväg"
 tags_lead = "%s i %s. Välj ett ämne för att se allt som hör dit."
 filter_tags = "Filtrera taggar"
 sort_tags = "Sortera taggar"

@@ -1,6 +1,7 @@
 {{define "main" -}}
 <article class="note">
   <header class="note-header">
+    {{- if param "show_breadcrumbs"}}{{template "breadcrumbs" .Note}}{{end}}
     {{- with .Note.Params}}{{with .stage}}{{template "stage" .}}{{end}}{{end}}
     <h1>{{.Note.Title}}</h1>
     <p class="meta">
