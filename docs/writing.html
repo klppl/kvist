@@ -75,7 +75,7 @@
     <tr><td>Tasks</td><td><code>- [ ]</code>, <code>- [x]</code></td><td>Checkboxes</td></tr>
     <tr><td>Tables, strikethrough</td><td>Standard Markdown</td><td>As in Obsidian</td></tr>
     <tr><td>Code</td><td>Fenced code with a language, e.g. <code>```python</code></td><td>Syntax highlighting, light and dark, and a Copy button</td></tr>
-    <tr><td>Code extras</td><td><code>```go title="main.go" showLineNumbers {2,4-6}</code></td><td>A title above the block, line numbers (<code>showLineNumbers{10}</code> starts at 10) and highlighted lines, counted as numbered. Also work without a language</td></tr>
+    <tr><td>Code extras</td><td><code>```go title="main.go" showLineNumbers {2,4-6}</code></td><td>A title above the block, line numbers (<code>showLineNumbers{10}</code> starts at 10) and highlighted lines, counted as numbered (<code>hl_lines="2 4-6"</code> also works). Also work without a language</td></tr>
     <tr><td>Math</td><td><code>$e^{i\pi}+1=0$</code>, <code>$$ … $$</code></td><td>Typeset with KaTeX</td></tr>
     <tr><td>Diagrams</td><td>A <code>```mermaid</code> code block</td><td>A Mermaid diagram</td></tr>
     <tr><td>HTML</td><td><code>&lt;details&gt;</code>, <code>&lt;kbd&gt;</code>, <code>&lt;iframe&gt;</code>, …</td><td>Kept as written. Links and images inside HTML aren't converted, so point them at web addresses</td></tr>
@@ -99,6 +99,7 @@
   <li>A canvas in an always-public folder is published by itself. Any other canvas is published when a published note links to it (<code>[[Board.canvas]]</code>) or embeds it (<code>![[Board.canvas]]</code>), like an image. A canvas in an excluded folder never is.</li>
   <li>Text cards are Markdown, with links, embeds and tags as in a note. File cards show the note or image they point to, and link cards are links.</li>
   <li>A card showing a private note or file is left out, together with the arrows to and from it. Its links to private notes are plain text, as in notes.</li>
+  <li>The <code>.canvas</code> file itself goes to your server as it is, so it carries the names and folders of every note on the board, private ones too. Only the page is published: the file is never served. If a private note's name shouldn't reach your server at all, keep it off public canvases.</li>
   <li>The canvas's address is its name with <code>-canvas</code> at the end: <code>Board.canvas</code> is at <code>/board-canvas/</code>, so a note named <code>Board</code> can sit beside it. Its title is the file name; canvases have no properties.</li>
 </ul>
 

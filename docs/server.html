@@ -131,7 +131,7 @@ api_token_env = "CF_API_TOKEN"</code></pre></li>
     <tr><td><code>kvist gc</code></td><td>Cleans up unused uploads now (the server also does it by itself).</td></tr>
     <tr><td><code>kvist dev --dir VAULT --config kvist.toml</code></td><td>Previews a vault at <code>http://127.0.0.1:1313</code>, reloading on every change.</td></tr>
     <tr><td><code>kvist build --dir VAULT --out DIR</code></td><td>Builds the site into a folder, without a server.</td></tr>
-    <tr><td><code>kvist push --server URL --site ID --dir VAULT</code></td><td>Publishes a folder from the terminal, like the plugin does. The token goes in <code>KVIST_TOKEN</code>; <code>-v</code> shows the decision for every note.</td></tr>
+    <tr><td><code>kvist push --server URL --site ID --dir VAULT</code></td><td>Publishes a folder from the terminal, like the plugin does. The token goes in <code>KVIST_TOKEN</code>, and <code>KVIST_SERVER</code> and <code>KVIST_SITE</code> can stand in for the flags; <code>-v</code> shows the decision for every note, and <code>--no-wait</code> returns without waiting for the build.</td></tr>
     <tr><td><code>kvist version</code></td><td>Prints the version.</td></tr>
   </tbody>
 </table>

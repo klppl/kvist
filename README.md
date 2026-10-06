@@ -17,8 +17,9 @@ Publish, and your site updates. Private notes never leave your device.
   becomes the site's root, so its subfolders are the menu and the folder's
   name stays out of every address.
 - **Search, backlinks and a graph,** in a three-pane theme with light and
-  dark mode, breadcrumbs, a reader mode and instant page loads. Search
-  filters by `#tag`.
+  dark mode, breadcrumbs, a reader mode, instant page loads and optional
+  stacked pages that open linked notes side by side. Search filters by
+  `#tag`.
 - **Shares well:** every note gets a preview image with its title for
   chats and social media, and `unlisted: true` publishes a note without
   listing it anywhere.
