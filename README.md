@@ -33,6 +33,29 @@ Publish, and your site updates. Private notes never leave your device.
   a sitemap, photo metadata stripping and optional cookie-free analytics
   included.
 
+## TLDR
+
+You need a Linux server with Docker, ports 80 and 443 open, and a domain
+pointing at it. On the server:
+
+```sh
+DOMAIN=garden.example.com   # your domain
+mkdir -p ~/kvist && cd ~/kvist
+curl -fsSL https://raw.githubusercontent.com/klppl/kvist/main/deploy/docker-compose.caddy.yml -o docker-compose.yml
+curl -fsSLO https://raw.githubusercontent.com/klppl/kvist/main/deploy/Caddyfile
+curl -fsSLO https://raw.githubusercontent.com/klppl/kvist/main/deploy/kvist.toml
+sed -i "s/garden.example.com/$DOMAIN/g" Caddyfile kvist.toml
+docker compose up -d
+docker compose exec kvist kvist token create   # copy the token
+```
+
+Then unzip
+[kvist-plugin.zip](https://github.com/klppl/kvist/releases/latest/download/kvist-plugin.zip)
+into your vault's `.obsidian/plugins/`, enable **kvist**, enter your
+domain, site `garden` and the token, put a note in a `Kvist` folder and
+run **kvist: Publish now**. Step by step:
+**[TLDR: quick setup](https://klppl.github.io/kvist/tldr.html)**.
+
 ## Get started
 
 **[Read the documentation →](https://klppl.github.io/kvist/)**

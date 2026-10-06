@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TLDR: quick setup · kvist docs</title>
+<meta name="description" content="The shortest path from an empty server to a published kvist site: copy, paste, publish.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<script>try{var t=localStorage.getItem("kvist-docs-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="stylesheet" href="assets/docs.css?v=38df0dda">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="shell">
+  <aside class="side">
+    <div class="brand">
+      <a href="index.html"><img src="assets/icon.svg" width="22" height="22" alt="">kvist <small>docs</small></a>
+      <button class="icon-button theme-toggle" type="button" aria-label="Switch color theme" hidden><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
+      <button class="icon-button menu-toggle" type="button" aria-label="Menu" aria-expanded="false" hidden><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    </div>
+    <nav aria-label="Documentation">
+      <h2>Start</h2>
+      <ul>
+        <li><a href="index.html">Overview</a></li>
+        <li><a href="tldr.html" aria-current="page">TLDR: quick setup</a></li>
+        <li><a href="getting-started.html">Getting started</a></li>
+      </ul>
+      <h2>Guides</h2>
+      <ul>
+        <li><a href="publishing.html">Publishing notes</a></li>
+        <li><a href="writing.html">Writing notes</a></li>
+        <li><a href="customizing.html">Customizing the site</a></li>
+        <li><a href="themes.html">Writing a theme</a></li>
+        <li><a href="server.html">Running the server</a></li>
+        <li><a href="https.html">Domains and HTTPS</a></li>
+      </ul>
+      <h2>Reference</h2>
+      <ul>
+        <li><a href="configuration.html">Configuration</a></li>
+        <li><a href="troubleshooting.html">Troubleshooting</a></li>
+      </ul>
+      <h2>More</h2>
+      <ul>
+        <li><a href="roadmap.html">Roadmap</a></li>
+        <li><a href="https://github.com/klppl/kvist" class="ext">GitHub</a></li>
+      </ul>
+    </nav>
+    <p class="side-foot">kvist is open source (<a href="https://github.com/klppl/kvist/blob/main/LICENSE">Lagom License</a>). <a href="https://github.com/klppl/kvist/issues">Report a problem</a></p>
+  </aside>
+  <main id="main">
+    <div class="page">
+      <article>
+<p class="eyebrow">Start</p>
+<h1>TLDR: quick setup</h1>
+<p class="lead">The shortest path from an empty server to a published site. Copy, paste, publish. For the why behind each step, read <a href="getting-started.html">Getting started</a>.</p>
+
+<div class="callout">
+  <p class="callout-title">You need</p>
+  <p>A Linux server with <a href="https://docs.docker.com/engine/install/">Docker</a>, ports 80 and 443 open, and a domain whose <strong>A record</strong> (and AAAA, if you have IPv6) points at the server. Check with <code>dig +short garden.example.com</code>. Plus Obsidian on your computer.</p>
+</div>
+
+<h2 id="server">1. Server</h2>
+<p>On the server, set your domain and run this. It downloads kvist with <a href="https.html#caddy">Caddy</a> for HTTPS, puts your domain in the settings, and starts both:</p>
+<pre><code>DOMAIN=garden.example.com   <span class="c"># your domain</span>
+
+mkdir -p ~/kvist &amp;&amp; cd ~/kvist
+curl -fsSL https://raw.githubusercontent.com/klppl/kvist/main/deploy/docker-compose.caddy.yml -o docker-compose.yml
+curl -fsSLO https://raw.githubusercontent.com/klppl/kvist/main/deploy/Caddyfile
+curl -fsSLO https://raw.githubusercontent.com/klppl/kvist/main/deploy/kvist.toml
+sed -i "s/garden.example.com/$DOMAIN/g" Caddyfile kvist.toml
+docker compose up -d</code></pre>
+<p>Check it from your own computer. It should answer with <code>{"protocol":…}</code>:</p>
+<pre><code>curl https://garden.example.com/api/v1/info</code></pre>
+<p>Create a token for the plugin. <strong>Copy it now:</strong> it is shown only once.</p>
+<pre><code>docker compose exec kvist kvist token create</code></pre>
+<p>Already run nginx, Traefik or a tunnel? Use <a href="getting-started.html#download">the plain setup</a> instead and forward your domain to <code>127.0.0.1:8080</code>.</p>
+
+<h2 id="plugin">2. Obsidian plugin</h2>
+<p>On your computer, unzip the plugin into your vault (replace the path with your vault's):</p>
+<pre><code>VAULT=~/Documents/MyVault
+mkdir -p "$VAULT/.obsidian/plugins"
+curl -L -o /tmp/kvist-plugin.zip https://github.com/klppl/kvist/releases/latest/download/kvist-plugin.zip
+unzip -o /tmp/kvist-plugin.zip -d "$VAULT/.obsidian/plugins"</code></pre>
+<p>Or download <a href="https://github.com/klppl/kvist/releases/latest/download/kvist-plugin.zip">kvist-plugin.zip</a> and unzip it into <code>&lt;vault&gt;/.obsidian/plugins/</code> by hand.</p>
+<p>In Obsidian: <strong>Settings → Community plugins</strong>, turn off <em>Restricted mode</em>, reload, and switch on <strong>kvist</strong>. Then in <strong>Settings → kvist</strong>:</p>
+<table>
+  <thead><tr><th>Setting</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td>Server URL</td><td><code>https://garden.example.com</code></td></tr>
+    <tr><td>Site</td><td><code>garden</code></td></tr>
+    <tr><td>Token</td><td>The token you copied</td></tr>
+  </tbody>
+</table>
+<p>Press <strong>Test</strong>. You should see <em>connected to “garden”</em>.</p>
+
+<h2 id="publish">3. Publish</h2>
+<ol>
+  <li>Create a folder called <code>Kvist</code> in your vault and put a note in it. Everything in <code>Kvist</code> is public; everything else stays private unless tagged <code>#public</code>.</li>
+  <li>Run <strong>kvist: Publish now</strong> from the command palette (<kbd>Cmd</kbd>/<kbd>Ctrl</kbd>+<kbd>P</kbd>).</li>
+  <li>Open your domain in a browser. Done.</li>
+</ol>
+<p>To set the site's title, home page and colors, run <strong>kvist: Open site settings note</strong>, fill it in and publish again.</p>
+
+<h2 id="next">Next</h2>
+<ul>
+  <li>Something didn't answer? <a href="troubleshooting.html">Troubleshooting</a>.</li>
+  <li>Choose what's public: <a href="publishing.html">Publishing notes</a>.</li>
+  <li>Updates and backups: <a href="server.html">Running the server</a>. Update with <code>docker compose pull &amp;&amp; docker compose up -d</code>.</li>
+</ul>
+<nav class="next" aria-label="Pages"><a href="index.html"><small>Previous</small>Overview</a><a class="fwd" href="getting-started.html"><small>Next</small>Getting started</a></nav>
+      </article>
+      <aside class="toc"></aside>
+    </div>
+  </main>
+</div>
+<script src="assets/docs.js?v=eee218fc" defer></script>
+</body>
+</html>
