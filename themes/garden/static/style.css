@@ -207,6 +207,51 @@ main { min-width: 0; }
   :root[data-reader] .page { display: block; max-width: 46rem; }
 }
 
+/* stacked pages (added by garden.js): the page and the notes opened from
+   it side by side; each slides over the last, leaving its spine */
+:root { --stack-w: 40rem; --spine: 2.5rem; }
+.stack-pane { position: relative; max-width: 46rem; margin: 0 auto; padding: 3rem 2.5rem 6rem; border-top: 1px solid var(--border); }
+.stack-close { position: absolute; top: .9rem; right: .9rem; z-index: 2; font-size: 1.2rem; line-height: 1; color: var(--muted); }
+.stack-close:hover { color: var(--fg); }
+.stack-spine { display: none; }
+@media (min-width: 821px) {
+  .stacking main {
+    position: sticky; top: 0; height: 100vh; display: flex; overflow-x: auto; overflow-y: hidden;
+    overscroll-behavior-x: contain;
+  }
+  .stacking main > .page, .stacking main > .stack-pane {
+    flex: 0 0 min(var(--stack-w), 100%); display: block; max-width: none; height: 100vh; margin: 0;
+    overflow-y: auto; overscroll-behavior: contain; position: sticky; padding: 3.5rem 2.5rem 5rem;
+    background: var(--bg); border: 0; border-right: 1px solid var(--border);
+  }
+  .stacking main > .page { left: 0; }
+  .stacking main > .stack-pane { box-shadow: -8px 0 18px -10px rgba(0, 0, 0, .18); }
+  .stacking main > .stack-pane:nth-of-type(1) { left: calc(1 * var(--spine)); }
+  .stacking main > .stack-pane:nth-of-type(2) { left: calc(2 * var(--spine)); }
+  .stacking main > .stack-pane:nth-of-type(3) { left: calc(3 * var(--spine)); }
+  .stacking main > .stack-pane:nth-of-type(4) { left: calc(4 * var(--spine)); }
+  .stacking main > .stack-pane:nth-of-type(5) { left: calc(5 * var(--spine)); }
+  .stacking main > .stack-pane:nth-of-type(6) { left: calc(6 * var(--spine)); }
+  .stacking main > .stack-pane:nth-of-type(n+7) { left: calc(7 * var(--spine)); }
+  .stacking .page-aside { display: none; }
+  .stacking .note-header h1 { font-size: 2.1rem; }
+  .stacking main > .stack-pane:last-child .stack-close { right: 3.4rem; } /* beside the reader mode button */
+  /* A zero-size float that sticks to the pane's top left corner, so the
+     label beside it stays in place as the pane scrolls. */
+  .stacking .stack-spine {
+    display: block; position: sticky; top: 0; float: left; width: 0; height: 0; z-index: 1;
+    margin: -3.5rem 0 0 -2.5rem; padding: 0; border: 0; background: none; font: inherit; cursor: pointer;
+    opacity: 0; pointer-events: none; transition: opacity .15s;
+  }
+  .stack-spine > span {
+    display: block; width: var(--spine); height: 100vh; padding: 1.2rem 0; background: var(--bg); color: var(--muted);
+    font: 600 .85rem/var(--spine) var(--font); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    writing-mode: vertical-rl; text-align: start;
+  }
+  .stacking .covered > .stack-spine { opacity: 1; pointer-events: auto; }
+  .stacking .stack-spine:hover > span { color: var(--accent); }
+}
+
 /* notes */
 .note-header h1, .intro h1, .listing h1 {
   font-size: 2.6rem; line-height: 1.15; letter-spacing: -.025em; font-weight: 800; margin: .3rem 0 .7rem;

@@ -246,3 +246,30 @@ func TestUnlistedOutput(t *testing.T) {
 		}
 	}
 }
+
+// TestStackedPagesSetting checks that the garden theme marks pages for
+// stacked pages only when the setting is on (garden.js does the rest).
+func TestStackedPagesSetting(t *testing.T) {
+	note := "Garden/Note.md"
+	for _, tc := range []struct {
+		settings string
+		want     bool
+	}{
+		{"", false},
+		{"---\nstacked_pages: true\n---\n", true},
+		{"---\nstacked_pages: false\n---\n", false},
+	} {
+		files := map[string]string{note: "Text with a [[Other]] link.", "Garden/Other.md": "Other text."}
+		if tc.settings != "" {
+			files["_site.md"] = tc.settings
+		}
+		out := writeVault(t, files)
+		b, err := os.ReadFile(filepath.Join(out, "garden/note/index.html"))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if got := bytes.Contains(b, []byte(" data-stacked")); got != tc.want {
+			t.Errorf("settings %q: data-stacked = %v, want %v", tc.settings, got, tc.want)
+		}
+	}
+}

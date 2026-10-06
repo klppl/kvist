@@ -39,6 +39,7 @@
 <body class="kind-{{.Kind}}{{if $list}} has-list{{end}}"{{with .Note}} data-note="{{.ID}}"{{end}} data-i18n="{{json (i18n "script")}}"
   {{- if param "link_previews"}} data-previews{{end}}
   {{- if param "instant_navigation"}} data-instant{{end}}
+  {{- if param "stacked_pages"}} data-stacked{{end}}
   {{- if param "show_graph"}} data-graph="{{json (dict "orphans" (param "graph_orphans") "tags" (param "graph_tags") "size" (param "graph_node_size") "distance" (param "graph_link_distance"))}}"{{end}}>
 <a class="skip" href="#main">{{t "skip_to_content"}}</a>
 <div class="shell">
