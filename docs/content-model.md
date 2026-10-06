@@ -138,6 +138,13 @@ or a note would take a reserved URL (`/tags/…`, `/_assets/…`,
   `<div class="math math-display">\[…\]</div>`, for KaTeX in the browser.
 - Mermaid: `<pre class="mermaid">`, drawn in the browser.
 - Code: chroma, with CSS classes (`<div class="code-block" data-lang="go"><pre class="chroma">`).
+  A fence's info after the language can ask for a title, line numbers and
+  highlighted lines (```` ```go title="main.go" showLineNumbers{10} {2,4-6} ````;
+  `linenos` and `hl_lines="2 4-6"` are accepted too). The title is a
+  `<div class="code-title">` before the `<pre>`; with numbers or
+  highlights each line is `<span class="line">` (`line hl` when
+  highlighted) and numbers are `<span class="ln">`. These also work
+  without a language, as plain text.
 - `%% comments %%` and `<!-- comments -->` are removed before parsing.
 - Other HTML written in a note is passed through as written, scripts
   included; links and images inside it are not resolved, so it can't pull

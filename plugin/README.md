@@ -62,7 +62,11 @@ again. Only published notes, the attachments they reference (including images
 named in their `image`/`cover` properties, and the settings note's
 `image`, `avatar` and `favicon`), a hints file
 that names published notes only, and the settings note `_site.md` leave
-your device.
+your device. Canvases are published the same way: those in an always-public
+folder, and those a published note links to or embeds, with the images and
+files their cards show. A `.canvas` file is uploaded whole, so it carries
+the names (vault paths) of every note on it, private ones included; the
+server leaves those cards out of the site and never serves the file.
 
 ## Development
 
