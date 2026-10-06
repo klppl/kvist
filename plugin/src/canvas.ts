@@ -2,7 +2,7 @@
 // shows are published with it. Mirrors Canvas.Links in internal/vault: file
 // cards embed their file, text cards are Markdown with links and embeds.
 
-import type { LinkInfo } from "./scan";
+import { stableJSON, type LinkInfo } from "./scan";
 
 interface CanvasNode {
   type?: unknown;
@@ -60,4 +60,42 @@ export function textLinks(md: string): LinkInfo[] {
     out.push({ link: dest, original: m[0], embed: m[3] === "!" });
   }
   return out;
+}
+
+/**
+ * Removes the file cards of a canvas whose file is not going up, and the
+ * arrows to and from them, so a canvas never carries the vault paths of
+ * private notes or files to the server. Mirrors stripCanvas in
+ * internal/pushclient: a canvas with nothing to remove comes back as it is,
+ * otherwise it is re-encoded with sorted keys and no spaces. Returns null
+ * when the canvas isn't a JSON object.
+ */
+export function stripCanvas(json: string, keep: (file: string) => boolean): string | null {
+  let doc: unknown;
+  try {
+    doc = JSON.parse(json);
+  } catch {
+    return null;
+  }
+  if (!doc || typeof doc !== "object" || Array.isArray(doc)) return null;
+  const d = doc as Record<string, unknown>;
+  const nodes = Array.isArray(d.nodes) ? d.nodes : [];
+  const dropped = new Set<string>();
+  const kept = nodes.filter((n) => {
+    const c = n as CanvasNode & { id?: unknown };
+    if (!c || typeof c !== "object" || c.type !== "file" || typeof c.file !== "string" || !c.file.trim() || keep(c.file)) {
+      return true;
+    }
+    if (typeof c.id === "string") dropped.add(c.id);
+    return false;
+  });
+  if (kept.length === nodes.length) return json;
+  d.nodes = kept;
+  if (Array.isArray(d.edges)) {
+    d.edges = d.edges.filter((e) => {
+      const x = e as { fromNode?: unknown; toNode?: unknown };
+      return !x || typeof x !== "object" || !(dropped.has(x.fromNode as string) || dropped.has(x.toNode as string));
+    });
+  }
+  return stableJSON(d);
 }

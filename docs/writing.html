@@ -99,7 +99,7 @@
   <li>A canvas in an always-public folder is published by itself. Any other canvas is published when a published note links to it (<code>[[Board.canvas]]</code>) or embeds it (<code>![[Board.canvas]]</code>), like an image. A canvas in an excluded folder never is.</li>
   <li>Text cards are Markdown, with links, embeds and tags as in a note. File cards show the note or image they point to, and link cards are links.</li>
   <li>A card showing a private note or file is left out, together with the arrows to and from it. Its links to private notes are plain text, as in notes.</li>
-  <li>The <code>.canvas</code> file itself goes to your server as it is, so it carries the names and folders of every note on the board, private ones too. Only the page is published: the file is never served. If a private note's name shouldn't reach your server at all, keep it off public canvases.</li>
+  <li>Cards showing private notes or files are taken out before the canvas leaves your device, so their names never reach your server. Links to private notes inside text cards go up as written, like links in a note, and become plain text on the site.</li>
   <li>The canvas's address is its name with <code>-canvas</code> at the end: <code>Board.canvas</code> is at <code>/board-canvas/</code>, so a note named <code>Board</code> can sit beside it. Its title is the file name; canvases have no properties.</li>
 </ul>
 

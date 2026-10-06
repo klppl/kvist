@@ -228,7 +228,40 @@ func ScanDir(dir string, rules protocol.Rules) (*Scan, error) {
 		includeImages(include, ix, rules, protocol.SettingsNoteName, fm, vault.SiteIconKeys)
 	}
 
+	// Canvases go up without the cards of files that don't, so they carry
+	// no private paths; one that isn't JSON doesn't go up at all.
+	canvasSrc := map[string][]byte{}
+	for p := range canvases {
+		src, err := os.ReadFile(all[p].abs)
+		if err != nil {
+			return nil, err
+		}
+		var doc map[string]any
+		if json.Unmarshal(src, &doc) != nil || doc == nil {
+			delete(include, p)
+			continue
+		}
+		canvasSrc[p] = src
+	}
+	for p, src := range canvasSrc {
+		out, _ := stripCanvas(src, func(file string) bool {
+			target, ok := ix.Resolve(p, vault.Link{Target: file, Embed: true})
+			return ok && include[target]
+		})
+		b := out
+		s.open[p] = func() (io.ReadCloser, error) { return io.NopCloser(bytes.NewReader(b)), nil }
+		s.Files = append(s.Files, protocol.File{
+			Path:  p,
+			Hash:  protocol.HashBytes(b),
+			Size:  int64(len(b)),
+			MTime: all[p].info.ModTime().UTC().Truncate(time.Millisecond),
+		})
+	}
+
 	for p := range include {
+		if canvasSrc[p] != nil {
+			continue // above
+		}
 		e := all[p]
 		hash, err := hashFile(e.abs)
 		if err != nil {
