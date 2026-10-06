@@ -35,16 +35,16 @@ Publish, and your site updates. Private notes never leave your device.
 
 ## TLDR
 
-You need a Linux server with Docker, ports 80 and 443 open, and a domain
-pointing at it. On the server:
+You need a Linux server with Docker, and an HTTPS address that forwards to
+`127.0.0.1:8080` on it (Cloudflare, nginx, Caddy, whatever you use). On the
+server:
 
 ```sh
-DOMAIN=garden.example.com   # your domain
+DOMAIN=garden.example.com   # your address
 mkdir -p ~/kvist && cd ~/kvist
-curl -fsSL https://raw.githubusercontent.com/klppl/kvist/main/deploy/docker-compose.caddy.yml -o docker-compose.yml
-curl -fsSLO https://raw.githubusercontent.com/klppl/kvist/main/deploy/Caddyfile
+curl -fsSLO https://raw.githubusercontent.com/klppl/kvist/main/deploy/docker-compose.yml
 curl -fsSLO https://raw.githubusercontent.com/klppl/kvist/main/deploy/kvist.toml
-sed -i "s/garden.example.com/$DOMAIN/g" Caddyfile kvist.toml
+sed -i "s/garden.example.com/$DOMAIN/g" kvist.toml
 docker compose up -d
 docker compose exec kvist kvist token create   # copy the token
 ```

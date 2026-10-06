@@ -57,24 +57,26 @@
 
 <div class="callout">
   <p class="callout-title">You need</p>
-  <p>A Linux server with <a href="https://docs.docker.com/engine/install/">Docker</a>, ports 80 and 443 open, and a domain whose <strong>A record</strong> (and AAAA, if you have IPv6) points at the server. Check with <code>dig +short garden.example.com</code>. Plus Obsidian on your computer.</p>
+  <ul>
+    <li>A Linux server with <a href="https://docs.docker.com/engine/install/">Docker</a>.</li>
+    <li>An address with <strong>HTTPS</strong> that forwards to <code>http://127.0.0.1:8080</code> on that server, using whatever you prefer: Cloudflare, nginx, Caddy, Traefik or something else. The plugin only publishes over HTTPS. No setup yet? See <a href="https.html">Domains and HTTPS</a>.</li>
+    <li>Obsidian on your computer.</li>
+  </ul>
 </div>
 
 <h2 id="server">1. Server</h2>
-<p>On the server, set your domain and run this. It downloads kvist with <a href="https.html#caddy">Caddy</a> for HTTPS, puts your domain in the settings, and starts both:</p>
-<pre><code>DOMAIN=garden.example.com   <span class="c"># your domain</span>
+<p>On the server, set your address and run this. It downloads kvist, puts your address in the settings, and starts it:</p>
+<pre><code>DOMAIN=garden.example.com   <span class="c"># your address</span>
 
 mkdir -p ~/kvist &amp;&amp; cd ~/kvist
-curl -fsSL https://raw.githubusercontent.com/klppl/kvist/main/deploy/docker-compose.caddy.yml -o docker-compose.yml
-curl -fsSLO https://raw.githubusercontent.com/klppl/kvist/main/deploy/Caddyfile
+curl -fsSLO https://raw.githubusercontent.com/klppl/kvist/main/deploy/docker-compose.yml
 curl -fsSLO https://raw.githubusercontent.com/klppl/kvist/main/deploy/kvist.toml
-sed -i "s/garden.example.com/$DOMAIN/g" Caddyfile kvist.toml
+sed -i "s/garden.example.com/$DOMAIN/g" kvist.toml
 docker compose up -d</code></pre>
-<p>Check it from your own computer. It should answer with <code>{"protocol":…}</code>:</p>
+<p>kvist now listens on <code>127.0.0.1:8080</code>. Check it from your own computer, through your HTTPS address. It should answer with <code>{"protocol":…}</code>:</p>
 <pre><code>curl https://garden.example.com/api/v1/info</code></pre>
 <p>Create a token for the plugin. <strong>Copy it now:</strong> it is shown only once.</p>
 <pre><code>docker compose exec kvist kvist token create</code></pre>
-<p>Already run nginx, Traefik or a tunnel? Use <a href="getting-started.html#download">the plain setup</a> instead and forward your domain to <code>127.0.0.1:8080</code>.</p>
 
 <h2 id="plugin">2. Obsidian plugin</h2>
 <p>On your computer, unzip the plugin into your vault (replace the path with your vault's):</p>
