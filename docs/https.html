@@ -84,7 +84,7 @@ curl -fsSLO https://raw.githubusercontent.com/klppl/kvist/main/deploy/Caddyfile<
 <pre><code>docker compose up -d</code></pre>
     <p>Caddy gets a certificate within a minute. Check from your own computer:</p>
 <pre><code>curl https://garden.example.com/api/v1/info</code></pre>
-    <p>If it doesn't answer, see <a href="troubleshooting.html#no-https">Troubleshooting</a>. From now on, <code>docker compose pull</code> updates Caddy along with kvist.</p>
+    <p>If it doesn't answer, check that <code>dig +short garden.example.com</code> prints the server's IP, that ports 80 and 443 are open (Caddy needs 80 for the certificate), and read <code>docker compose logs caddy</code>. Behind Cloudflare's proxy, set SSL/TLS to <em>Full (strict)</em>. From now on, <code>docker compose pull</code> updates Caddy along with kvist.</p>
   </li>
 </ol>
 
