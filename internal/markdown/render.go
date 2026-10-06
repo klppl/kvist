@@ -364,6 +364,7 @@ func parseCodeInfo(info string) codeInfo {
 	}
 	if m := codeTitleRe.FindStringSubmatch(info); m != nil {
 		ci.title = strings.TrimSpace(m[1] + m[2] + m[3])
+		info = strings.Replace(info, m[0], " ", 1) // a title="a {2}" highlights nothing
 	}
 	if m := codeNumbersRe.FindStringSubmatch(info); m != nil {
 		ci.numbers, ci.firstLine = true, 1

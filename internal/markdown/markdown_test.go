@@ -271,6 +271,9 @@ func TestParseCodeInfo(t *testing.T) {
 		{`rust hl_lines="1 3-4"`, codeInfo{lang: "rust", lines: [][2]int{{1, 1}, {3, 4}}}},
 		{"{1,3-5} showLineNumbers{7}", codeInfo{numbers: true, firstLine: 7, lines: [][2]int{{1, 1}, {3, 5}}}},
 		{"sh {5-2}", codeInfo{lang: "sh"}},
+		// Options inside the title are part of it.
+		{`go title="step {2} linenos off" {1}`, codeInfo{lang: "go", title: "step {2} linenos off", lines: [][2]int{{1, 1}}}},
+		{`txt title='hl_lines="3" {4}'`, codeInfo{lang: "txt", title: `hl_lines="3" {4}`}},
 	} {
 		if got := parseCodeInfo(tc.info); !reflect.DeepEqual(got, tc.want) {
 			t.Errorf("parseCodeInfo(%q) = %+v, want %+v", tc.info, got, tc.want)
