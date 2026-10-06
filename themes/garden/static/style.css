@@ -296,6 +296,32 @@ a.external-link::after { content: "↗"; font-size: .75em; margin-left: .1em; }
 iframe.embed-video { display: block; width: 100%; aspect-ratio: 16 / 9; height: auto; border: 0; border-radius: var(--radius); background: var(--code-bg); margin: 1rem 0; }
 iframe.embed-pdf { width: 100%; height: 70vh; border: 1px solid var(--border); border-radius: var(--radius); }
 
+/* canvases: a board of absolutely placed cards, scrolled when wider than the page */
+.canvas { overflow: auto; max-height: 80vh; margin: 1.2rem 0; border: 1px solid var(--border); border-radius: var(--radius); background-color: var(--pane); background-image: radial-gradient(var(--border) 1px, transparent 1px); background-size: 20px 20px; -webkit-overflow-scrolling: touch; }
+.embed .canvas { max-height: 28rem; margin: .6rem 0; }
+.canvas-board { position: relative; font-size: .92rem; line-height: 1.5; }
+.canvas-node { position: absolute; --c: var(--canvas-color, var(--border)); border: 2px solid var(--c); border-radius: var(--radius); background: var(--bg); overflow: hidden; display: flex; flex-direction: column; }
+.canvas-node-content { flex: 1; overflow: auto; padding: .5rem .9rem; }
+.canvas-node-content > :first-child { margin-top: 0; }
+.canvas-node-content > :last-child { margin-bottom: 0; }
+.canvas-node-content h1, .canvas-node-content h2, .canvas-node-content h3 { margin: .6rem 0 .3rem; font-size: 1.1rem; }
+.canvas-node-content img { display: block; margin: 0 auto; max-height: 100%; }
+.canvas-file-title { padding: .3rem .9rem; border-bottom: 1px solid var(--border); font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; }
+.canvas-file-title a { text-decoration: none; }
+.canvas-group { background: color-mix(in srgb, var(--canvas-color, var(--muted)) 7%, transparent); border-style: solid; border-width: 2px; overflow: visible; }
+.canvas-group-label { position: absolute; bottom: 100%; left: 0; margin-bottom: .3rem; font-weight: 600; font-size: .85rem; color: var(--muted); white-space: nowrap; }
+.canvas-edges { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
+.canvas-edge { --e: var(--canvas-color, var(--muted)); }
+.canvas-edge > path { fill: none; stroke: var(--e); stroke-width: 2; }
+.canvas-edge > path.canvas-arrow { fill: var(--e); stroke: none; }
+.canvas-edge-label { position: absolute; transform: translate(-50%, -50%); padding: .05rem .45rem; border-radius: 4px; background: var(--bg); color: var(--muted); font-size: .8rem; white-space: nowrap; }
+.canvas-color-1 { --canvas-color: #e93147; }
+.canvas-color-2 { --canvas-color: #ec7500; }
+.canvas-color-3 { --canvas-color: #e0ac00; }
+.canvas-color-4 { --canvas-color: #08b94e; }
+.canvas-color-5 { --canvas-color: #00bfbc; }
+.canvas-color-6 { --canvas-color: #a882ff; }
+
 /* callouts */
 .callout { --c: 70, 120, 200; border-radius: var(--radius); margin: 1.2rem 0; padding: .7rem 1rem; background: rgba(var(--c), .1); border-left: 4px solid rgb(var(--c)); }
 .callout-title { font-weight: 600; color: rgb(var(--c)); }

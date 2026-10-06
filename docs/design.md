@@ -24,7 +24,7 @@ the site and serves it.
 - Themes are plain folders consuming a documented, versioned content model.
 
 **Non-goals (v1)** — designed for, not built: a watched-folder content source,
-Dataview snapshots, Canvas, multilingual sites (one site in several
+Dataview snapshots, multilingual sites (one site in several
 languages; the theme's own words do follow `language`), multiple sites per vault,
 Cloudflare/GitHub Pages publishing (Phase 7 bonus), Hugo export, comments,
 server-side math rendering, an admin web UI.
@@ -328,7 +328,7 @@ Links inside comments are ignored, since comment content is never rendered. Exac
 tags (`#public`, `#private`) are hidden from tag pages by default.
 
 Attachments (non-`.md`) have no rules of their own: an attachment is published
-iff referenced (link or embed) by a published note's *rendered* content, and
+iff referenced (link or embed) by a published note's (or canvas's) *rendered* content, and
 never if it lies in an `exclude_folders` folder (the leak suite caught a
 published note linking straight into `Private/`). *Addition:* an image named
 in a published note's `image`/`cover` property, or in the settings note's
@@ -374,7 +374,8 @@ Trusted: the server operator, the theme, the plugin (but verified).
 | Redirects for moved notes | Old URL → new URL only when the target is a published note in the new build; an old URL whose note became private gets no redirect (a 404, like any missing page). The history file (`redirects.json`, published paths and hashes only) is never served. |
 | Raw HTML in notes | Passed through as the author wrote it (goldmark `WithUnsafe`). Links and images inside it are not resolved, so it cannot publish an attachment; a hard-coded private path in it is the author's own text. Excluded from search text and descriptions. |
 | Analytics | Opt-in from the vault or server config; only known providers, `https://` script URLs and IDs of the expected shape (see `docs/content-model.md`). The script runs on every page, as raw HTML could. |
-| Future features | Dataview snapshots and Canvas must go through the same filter (results referencing non-published notes are dropped). Noted in the model contract. |
+| Canvas | *Added after v1.* A canvas is published from an always-public folder or when a published note or canvas links to it, never from an excluded folder (`publish.CanvasInPublicFolder`, mirrored in `rules.ts`, with parity cases). Its cards resolve through the same resolver as a note's links and embeds: a card showing an unpublished note or attachment is dropped with its arrows and their labels. The `.canvas` file is never output (it names every card's vault path, and the card ids), and is never an asset. Both clients read canvases to push what their cards show. |
+| Future features | Dataview snapshots must go through the same filter (results referencing non-published notes are dropped). Noted in the model contract. |
 
 **Leak tests** are first-class: `testdata/leaks/` contains vaults where every
 vector above is exercised; a test builds the site and asserts that no output

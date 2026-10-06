@@ -29,6 +29,10 @@ func TestParity(t *testing.T) {
 			Path    string `json:"path"`
 			Allowed bool   `json:"allowed"`
 		} `json:"attachments"`
+		Canvases []struct {
+			Path   string `json:"path"`
+			Public bool   `json:"public"`
+		} `json:"canvases"`
 	}
 	if err := json.Unmarshal(b, &fx); err != nil {
 		t.Fatal(err)
@@ -49,6 +53,11 @@ func TestParity(t *testing.T) {
 	for _, a := range fx.Attachments {
 		if got := AttachmentAllowed(fx.Rules, a.Path); got != a.Allowed {
 			t.Errorf("attachment %s: %v, want %v", a.Path, got, a.Allowed)
+		}
+	}
+	for _, c := range fx.Canvases {
+		if got := CanvasInPublicFolder(fx.Rules, c.Path); got != c.Public {
+			t.Errorf("canvas %s: %v, want %v", c.Path, got, c.Public)
 		}
 	}
 }

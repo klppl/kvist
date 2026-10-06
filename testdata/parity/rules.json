@@ -5,7 +5,7 @@
     "public_tag": "public",
     "private_tag": "private",
     "frontmatter_key": "publish",
-    "attachment_extensions": ["png", "pdf"]
+    "attachment_extensions": ["png", "pdf", "canvas"]
   },
   "cases": [
     {"path": "Garden/a.md", "published": true, "reason": "public_folder"},
@@ -40,5 +40,16 @@
     {"path": "Private/pic.png", "allowed": false},
     {"path": "PRIVATE/pic.png", "allowed": false},
     {"path": "Garden/Drafts/pic.png", "allowed": false}
+  ],
+  "canvases": [
+    {"path": "Garden/board.canvas", "public": true},
+    {"path": "Garden/Sub/Board.CANVAS", "public": true},
+    {"path": "Docs/Public/board.canvas", "public": true},
+    {"path": "Docs/board.canvas", "public": false},
+    {"path": "garden/board.canvas", "public": false},
+    {"path": "Garden/Drafts/board.canvas", "public": false},
+    {"path": "Garden/.hidden/board.canvas", "public": false},
+    {"path": "Garden/board.md", "public": false},
+    {"path": "Garden/board.png", "public": false}
   ]
 }

@@ -1,14 +1,15 @@
 // Builds the manifest from a vault: gate 1 (the publish rules on Obsidian's
-// metadata), the attachments that published notes reference, the settings
+// metadata), the canvases and attachments that published notes reference, the settings
 // note (_site.md, sent as .kvist/site.md) and the hints file. Obsidian-independent so it can be
 // tested; main.ts adapts the real vault to VaultLike.
 
 import { HashCache, sha256 } from "./hash";
 import { HINTS_PATH, ManifestFile, Rules, SETTINGS_NOTE_NAME, SITE_NOTE_PATH } from "./protocol";
 import {
-  Decision, NOTE_IMAGE_KEYS, SITE_AVATAR_KEYS, SITE_ICON_KEYS, SITE_IMAGE_KEYS, allowedPath, attachmentAllowed, evaluate, imageProperty,
-  isImage, isNote, isSettingsNote,
+  Decision, NOTE_IMAGE_KEYS, SITE_AVATAR_KEYS, SITE_ICON_KEYS, SITE_IMAGE_KEYS, allowedPath, attachmentAllowed, canvasInPublicFolder,
+  evaluate, imageProperty, isCanvas, isImage, isNote, isSettingsNote,
 } from "./rules";
+import { canvasLinks } from "./canvas";
 
 export interface VaultFile {
   path: string;
@@ -100,29 +101,48 @@ export async function scan(vault: VaultLike, rules: Rules, cache: HashCache): Pr
   const include = new Set<string>(published);
   const leaks: LeakItem[] = [];
   const hints: Record<string, Record<string, string | null>> = {};
-  for (const from of [...published].sort()) {
-    for (const l of vault.meta(from)?.links ?? []) {
-      const target = linkTarget(l.link);
-      if (!target) continue;
-      const dest = vault.resolve(target, from);
-      if (!dest) continue;
-      if (isNote(dest)) {
-        const pub = published.has(dest);
-        if (!pub) leaks.push({ kind: l.embed ? "unpublished_embed" : "unpublished_link", from, target: dest });
-        if (isWikilink(l.original)) {
-          // Never write an unpublished path here: null means "not public".
-          (hints[from] ??= {})[target] = pub ? dest : null;
-        }
-        continue;
+  // Canvases to publish: those in an always-public folder, and those a
+  // published note or canvas links to (followed below).
+  const canvases = new Set<string>();
+  const queue: string[] = [];
+  const addCanvas = (p: string) => {
+    if (canvases.has(p) || !allowedPath(rules, p) || !attachmentAllowed(rules, p)) return;
+    canvases.add(p);
+    queue.push(p);
+  };
+  for (const p of [...all.keys()].sort()) {
+    if (canvasInPublicFolder(rules, p)) addCanvas(p);
+  }
+  const follow = (from: string, l: LinkInfo) => {
+    const target = linkTarget(l.link);
+    if (!target) return;
+    const dest = vault.resolve(target, from);
+    if (!dest) return;
+    if (isNote(dest)) {
+      const pub = published.has(dest);
+      if (!pub) leaks.push({ kind: l.embed ? "unpublished_embed" : "unpublished_link", from, target: dest });
+      if (isWikilink(l.original)) {
+        // Never write an unpublished path here: null means "not public".
+        (hints[from] ??= {})[target] = pub ? dest : null;
       }
-      if (!allowedPath(rules, dest)) continue;
-      if (!attachmentAllowed(rules, dest)) {
-        leaks.push({ kind: "excluded_attachment", from, target: dest });
-        continue;
-      }
-      include.add(dest);
+      return;
     }
+    if (!allowedPath(rules, dest)) return;
+    if (!attachmentAllowed(rules, dest)) {
+      leaks.push({ kind: "excluded_attachment", from, target: dest });
+      return;
+    }
+    if (isCanvas(dest)) addCanvas(dest);
+    else include.add(dest);
+  };
+  for (const from of [...published].sort()) {
+    for (const l of vault.meta(from)?.links ?? []) follow(from, l);
     includeImage(vault, rules, include, leaks, from, from, vault.meta(from)?.frontmatter, NOTE_IMAGE_KEYS);
+  }
+  while (queue.length > 0) {
+    const from = queue.shift()!;
+    include.add(from);
+    for (const l of canvasLinks(new TextDecoder().decode(await vault.read(from)))) follow(from, l);
   }
 
   const settingsNote = findSettingsNote(all.keys());

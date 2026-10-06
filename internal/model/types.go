@@ -97,7 +97,11 @@ type Note struct {
 	Image       string         `json:"image,omitempty"` // social preview image, like SiteConfig.Image
 	// Unlisted: published, but left out of folders, tags, the graph,
 	// backlinks, search, the feed and the sitemap (frontmatter unlisted).
-	Unlisted    bool              `json:"unlisted,omitempty"`
+	Unlisted bool `json:"unlisted,omitempty"`
+	// Canvas: the page is an Obsidian canvas (a .canvas file). Content is
+	// then a board of cards and arrows, and there are no properties,
+	// aliases or TOC.
+	Canvas      bool              `json:"canvas,omitempty"`
 	Content     template.HTML     `json:"content"`
 	TOC         []*Heading        `json:"toc,omitempty"`
 	Links       []*Link           `json:"links,omitempty"`

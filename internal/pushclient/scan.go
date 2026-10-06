@@ -58,9 +58,9 @@ type hints struct {
 }
 
 // ScanDir walks a vault folder and builds the manifest under rules: the
-// published notes, the attachments they reference, the optional settings
-// note (_site.md, sent as .kvist/site.md), and a .kvist/links.json hints
-// file.
+// published notes, the canvases and attachments they reference (and what
+// those canvases' cards show), the optional settings note (_site.md, sent
+// as .kvist/site.md), and a .kvist/links.json hints file.
 //
 // Dot folders (.obsidian, .git, .trash) and symlinks are skipped.
 func ScanDir(dir string, rules protocol.Rules) (*Scan, error) {
@@ -137,6 +137,52 @@ func ScanDir(dir string, rules protocol.Rules) (*Scan, error) {
 
 	include := map[string]bool{}
 	h := hints{Version: 1, Notes: map[string]map[string]*string{}}
+	// Canvases to publish: those in an always-public folder, and those a
+	// published note or canvas links to (followed below).
+	canvases := map[string]bool{}
+	var queue []string
+	addCanvas := func(p string) {
+		if !canvases[p] && protocol.AllowedPath(p, rules) && publish.AttachmentAllowed(rules, p) {
+			canvases[p] = true
+			queue = append(queue, p)
+		}
+	}
+	for _, p := range paths {
+		if publish.CanvasInPublicFolder(rules, p) {
+			addCanvas(p)
+		}
+	}
+	// follow handles one link from a published note or canvas. hint says
+	// whether the server may look it up in the hints file.
+	follow := func(p string, l vault.Link, hint bool) {
+		target, ok := ix.Resolve(p, l)
+		if !ok || l.Target == "" {
+			return
+		}
+		if protocol.IsNote(target) {
+			var v *string
+			if published[target] {
+				t := target
+				v = &t
+			} else {
+				s.UnpublishedLinks = append(s.UnpublishedLinks, LinkReport{From: p, Target: target, Embed: l.Embed})
+			}
+			if hint && !l.Markdown {
+				if h.Notes[p] == nil {
+					h.Notes[p] = map[string]*string{}
+				}
+				h.Notes[p][l.Target] = v
+			}
+			return
+		}
+		if vault.IsCanvas(target) {
+			addCanvas(target)
+			return
+		}
+		if protocol.AllowedPath(target, rules) && publish.AttachmentAllowed(rules, target) {
+			include[target] = true
+		}
+	}
 	for _, p := range paths {
 		m := metas[p]
 		if m == nil {
@@ -144,31 +190,26 @@ func ScanDir(dir string, rules protocol.Rules) (*Scan, error) {
 		}
 		include[p] = true
 		for _, l := range m.Links {
-			target, ok := ix.Resolve(p, l)
-			if !ok || l.Target == "" {
-				continue
-			}
-			if protocol.IsNote(target) {
-				var v *string
-				if published[target] {
-					t := target
-					v = &t
-				} else {
-					s.UnpublishedLinks = append(s.UnpublishedLinks, LinkReport{From: p, Target: target, Embed: l.Embed})
-				}
-				if !l.Markdown {
-					if h.Notes[p] == nil {
-						h.Notes[p] = map[string]*string{}
-					}
-					h.Notes[p][l.Target] = v
-				}
-				continue
-			}
-			if protocol.AllowedPath(target, rules) && publish.AttachmentAllowed(rules, target) {
-				include[target] = true
-			}
+			follow(p, l, true)
 		}
 		includeImages(include, ix, rules, p, m.Frontmatter, vault.NoteImageKeys)
+	}
+	for len(queue) > 0 {
+		p := queue[0]
+		queue = queue[1:]
+		include[p] = true
+		src, err := os.ReadFile(all[p].abs)
+		if err != nil {
+			return nil, err
+		}
+		c, err := vault.ParseCanvas(src)
+		if err != nil {
+			continue // the server skips it with a warning
+		}
+		for _, l := range c.Links() {
+			// File cards name an exact path; only text cards have wikilinks.
+			follow(p, l, c.Nodes[l.Offset].Type == "text")
+		}
 	}
 	settings, err := findSettingsNote(paths)
 	if err != nil {

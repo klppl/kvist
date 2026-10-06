@@ -156,7 +156,7 @@ const (
 // DefaultAttachmentExtensions are accepted when a site lists none.
 var DefaultAttachmentExtensions = []string{
 	"png", "jpg", "jpeg", "gif", "webp", "svg", "avif",
-	"pdf", "mp3", "m4a", "ogg", "wav", "mp4", "webm",
+	"pdf", "mp3", "m4a", "ogg", "wav", "mp4", "webm", "canvas",
 }
 
 var siteIDRe = regexp.MustCompile(`^[a-z0-9][a-z0-9-]{0,62}$`)

@@ -65,6 +65,7 @@
     <tr><td>Images</td><td><code>![[photo.jpg]]</code>, <code>![[photo.jpg|300]]</code>, <code>![[photo.jpg|300x200]]</code></td><td>The image, optionally resized</td></tr>
     <tr><td>Image placement</td><td><code>![[photo.jpg|center]]</code>, <code>![[photo.jpg|right|200]]</code>, <code>![[photo.jpg|A harbor at dusk|100]]</code></td><td>Centered, or floated left or right with the text flowing around it (stacked on phones). Other text is the image's description for screen readers</td></tr>
     <tr><td>YouTube, Vimeo</td><td><code>![Title](https://www.youtube.com/watch?v=…)</code>, <code>![Title](https://vimeo.com/…)</code></td><td>An embedded player. YouTube plays from <code>youtube-nocookie.com</code> and Vimeo with “do not track”, and nothing loads until the player scrolls into view</td></tr>
+    <tr><td>Canvas</td><td><code>[[Board.canvas]]</code>, <code>![[Board.canvas]]</code></td><td>A page with the canvas's cards and arrows, or the board shown inline. See <a href="#canvas">Canvases</a></td></tr>
     <tr><td>PDF, audio, video</td><td><code>![[paper.pdf]]</code>, <code>![[talk.mp3]]</code>, <code>![[demo.mp4]]</code></td><td>An inline viewer or player</td></tr>
     <tr><td>Tags</td><td><code>#idea</code>, <code>#projects/kvist</code></td><td>A link to the tag's page; nested tags have their own pages</td></tr>
     <tr><td>Callouts</td><td><code>&gt; [!tip] Title</code>, foldable with <code>[!tip]-</code> or <code>[!tip]+</code></td><td>Colored boxes; foldable ones open on click</td></tr>
@@ -88,7 +89,16 @@
 </div>
 
 <h3 id="not-supported">What doesn't work (yet)</h3>
-<p>Canvas files, queries from plugins like Dataview and Bases, Excalidraw drawings (other than an exported image) and Markdown-style note embeds don't work on the site yet. The <a href="roadmap.html#not-yet">Roadmap</a> has the details, and what's planned.</p>
+<p>Queries from plugins like Dataview and Bases, Excalidraw drawings (other than an exported image) and Markdown-style note embeds don't work on the site yet. The <a href="roadmap.html#not-yet">Roadmap</a> has the details, and what's planned.</p>
+
+<h3 id="canvas">Canvases</h3>
+<p>A canvas (a <code>.canvas</code> file) is published as a page of its own, with its cards and arrows where you placed them. When the board is wider than the page, it scrolls.</p>
+<ul>
+  <li>A canvas in an always-public folder is published by itself. Any other canvas is published when a published note links to it (<code>[[Board.canvas]]</code>) or embeds it (<code>![[Board.canvas]]</code>), like an image. A canvas in an excluded folder never is.</li>
+  <li>Text cards are Markdown, with links, embeds and tags as in a note. File cards show the note or image they point to, and link cards are links.</li>
+  <li>A card showing a private note or file is left out, together with the arrows to and from it. Its links to private notes are plain text, as in notes.</li>
+  <li>The canvas's address is its name with <code>-canvas</code> at the end: <code>Board.canvas</code> is at <code>/board-canvas/</code>, so a note named <code>Board</code> can sit beside it. Its title is the file name; canvases have no properties.</li>
+</ul>
 
 <h2 id="properties">Note properties</h2>
 <p>Properties (frontmatter) at the top of a note control how it appears. All are optional.</p>

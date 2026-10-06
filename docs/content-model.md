@@ -81,6 +81,7 @@ code blocks don't count.
 | `Params` | map | Only the frontmatter keys listed in `expose_frontmatter`. Other keys never reach a theme. |
 | `Image` | string | Social preview image from the `image` or `cover` property: the URL of a published image (`/_assets/…`), or an http(s) URL; empty if unset or not a published image. The value may be `"[[cover.png]]"`, a vault path, or a URL. |
 | `Unlisted` | bool | Frontmatter `unlisted: true`. The note has its page, but no folder, tag, graph, backlink, search index, feed or sitemap lists it; a theme should add `<meta name="robots" content="noindex">`. Its `Tags` are only the ones listed notes carry too. |
+| `Canvas` | bool | The page is an Obsidian canvas (a `.canvas` file), not a Markdown note; see [Canvases](#canvases). |
 | `Content` | HTML | The rendered body. |
 | `TOC` | []*Heading | Nested `{Level, Text, ID, Children}`. |
 | `Links` | []*Link | Outgoing links to published notes (`Target`, `Embed`), in order, without duplicates. |
@@ -142,6 +143,39 @@ or a note would take a reserved URL (`/tags/…`, `/_assets/…`,
   included; links and images inside it are not resolved, so it can't pull
   an unpublished attachment onto the site. It is left out of search text
   and descriptions.
+- Embeds of a published canvas (`![[Board.canvas]]`): the canvas's board
+  (below) inside the usual `<div class="embed">`.
+
+### Canvases
+
+A canvas (`.canvas`, [JSON Canvas](https://jsoncanvas.org/)) is a `Note`
+with `Canvas` set. It is published when it lies in an always-public folder
+(and in no excluded one), or when a published note or canvas links to or
+embeds it; a canvas in an excluded folder never is. It needs `canvas` in
+`attachment_extensions` (in the default list). The `.canvas` file itself is
+never output, since it names the vault paths of every card.
+
+- `Title` is the file name, `URL` keeps the extension as a word
+  (`Garden/Board.canvas` → `/garden/board-canvas/`), so a note named
+  `Board` can sit beside it. `Created` and `Updated` are the file's
+  modification time; there are no `Params`, `Aliases` or `TOC`.
+- `Tags`, `Links`, `Backlinks`, `Text` (search) and `Description` come from
+  the text cards, and the edge and group labels count as text.
+- `Content` is `<div class="canvas"><div class="canvas-board" style="width;height">`
+  holding the cards, each `<div class="canvas-node canvas-<type>" style="left;top;width;height">`
+  (`canvas-text`, `canvas-file`, `canvas-link`, `canvas-group`), placed as
+  on the canvas with 40px around them. Groups come first, then
+  `<svg class="canvas-edges">` with one `<g class="canvas-edge">` per arrow
+  (a curve and `canvas-arrow` heads), then the other cards, then
+  `<div class="canvas-edge-label">`s. A preset color adds
+  `canvas-color-1` … `canvas-color-6`; a hex color adds `canvas-color` and
+  sets `--canvas-color`.
+- Text cards are Markdown, rendered and resolved like a note
+  (`canvas-node-content`). File cards show a published note as an embed of
+  it (`canvas-file-title` and `canvas-node-content`), a published canvas as
+  a link, an attachment as its embed. Link cards show http(s) links only.
+- A file card pointing to anything unpublished is left out, with the
+  arrows to and from it (and their labels), as an embed would be.
 
 ## Asset
 

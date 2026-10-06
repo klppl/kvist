@@ -18,7 +18,7 @@ serve    = true              # serve the built site from this binary (or point C
   private_tag           = "private"
   frontmatter_key       = "publish"
   expose_frontmatter    = ["stage"]   # frontmatter keys themes may show
-  # attachment_extensions = ["png", "jpg", "jpeg", "gif", "webp", "svg", "avif", "pdf", "mp3", "m4a", "ogg", "wav", "mp4", "webm"]
+  # attachment_extensions = ["png", "jpg", "jpeg", "gif", "webp", "svg", "avif", "pdf", "mp3", "m4a", "ogg", "wav", "mp4", "webm", "canvas"]
 
   # [site.limits]
   # max_file_size = 52428800   # 50 MiB, below Cloudflare's 100 MB limit

@@ -89,6 +89,24 @@ func AttachmentAllowed(r protocol.Rules, p string) bool {
 	return true
 }
 
+// CanvasInPublicFolder reports whether the canvas at p is published on its
+// own, without a published note linking to it: it lies in an
+// always_public_folders entry and in no exclude_folders entry. Canvases
+// have no frontmatter or tags, so the folder is their only rule; any other
+// canvas is published like an attachment, when a published note (or a
+// published canvas) links to or embeds it.
+func CanvasInPublicFolder(r protocol.Rules, p string) bool {
+	if !vault.IsCanvas(p) || !protocol.AllowedPath(p, r) || !AttachmentAllowed(r, p) {
+		return false
+	}
+	for _, f := range r.AlwaysPublicFolders {
+		if inFolder(p, f, false) {
+			return true
+		}
+	}
+	return false
+}
+
 // EvaluateSource parses src and evaluates the rules for it.
 func EvaluateSource(r protocol.Rules, p string, src []byte) (Decision, *vault.Meta) {
 	m := vault.ParseMeta(src)

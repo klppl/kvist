@@ -57,7 +57,6 @@
 <h2 id="not-yet">What doesn't work yet</h2>
 <p>Everything else from Obsidian is in <a href="writing.html#supported">Writing notes</a>. These don't work on the site today:</p>
 <ul>
-  <li><strong>Canvas</strong> files (<code>.canvas</code>) aren't published; links to them are plain text.</li>
   <li><strong>Queries</strong> from plugins such as Dataview or Bases show as code blocks, not as their results.</li>
   <li><strong>Excalidraw</strong> drawings show only if you embed an exported SVG or PNG, not the drawing itself.</li>
   <li><strong>Markdown-style embeds of notes</strong>, <code>![text](Note.md)</code>, are left out. Use <code>![[Note]]</code>.</li>
@@ -72,7 +71,6 @@
 <ul>
   <li><strong>Markdown-style note embeds.</strong> <code>![text](Note.md)</code> embeds the note like <code>![[Note]]</code> does.</li>
   <li><strong>Code block extras.</strong> A title (<code>```go title="main.go"</code>), line numbers and highlighted lines.</li>
-  <li><strong>Canvas.</strong> <code>.canvas</code> files as a page with their cards and arrows, and embedded with <code>![[board.canvas]]</code>.</li>
   <li><strong>Excalidraw.</strong> Show a drawing from the SVG or PNG the Excalidraw plugin exports next to it, when you link or embed the drawing itself.</li>
   <li><strong>Citations.</strong> <code>[@key]</code> resolved from a BibTeX file in your vault, with a bibliography at the end of the note.</li>
 </ul>
@@ -96,6 +94,7 @@
 
 <h2 id="recent">Recently added</h2>
 <ul>
+  <li><strong>Canvases</strong>: <code>.canvas</code> files are published as a page with their cards and arrows, and can be embedded with <code>![[Board.canvas]]</code> (<a href="writing.html#canvas">Canvases</a>).</li>
   <li><strong>Your published folder is the site's root</strong>: its subfolders are the top of the menu, and its name stays out of addresses (<a href="configuration.html#server-site"><code>root_folder</code></a>).</li>
   <li><strong>Instant navigation</strong>: pages open without a full reload, and the menu keeps its place.</li>
   <li><strong>Breadcrumbs</strong> above a note's title, and a <strong>reader mode</strong> that hides the menu and side panels.</li>

@@ -36,6 +36,44 @@ test("scan publishes notes, their attachments and safe hints", async () => {
   ]);
 });
 
+test("scan publishes canvases from public folders and links, with what their cards show", async () => {
+  const v = new MemVault();
+  const canvas = (nodes: object[]) => JSON.stringify({ nodes, edges: [] });
+  const r0 = { attachment_extensions: ["png", "canvas"] };
+  v.write("Garden/Welcome.md", "A board: [[Linked.canvas]] and [[Hidden.canvas]]");
+  v.write("Garden/Board.canvas", canvas([
+    { id: "a", type: "text", text: "[[Leaf]], [[Diary]], ![[pic.png]] `[[Code.md]]` %% [[Secret.md]] %%" },
+    { id: "b", type: "file", file: "Journal/Diary.md" },
+    { id: "c", type: "file", file: "Private/secret.png" },
+  ]));
+  v.write("Boards/Linked.canvas", canvas([{ id: "a", type: "file", file: "Boards/Chained.canvas" }]));
+  v.write("Boards/Chained.canvas", canvas([{ id: "a", type: "text", text: "[x](other.png)" }]));
+  v.write("Private/Hidden.canvas", canvas([{ id: "a", type: "file", file: "hidden.png" }]));
+  v.write("Boards/Alone.canvas", canvas([{ id: "a", type: "file", file: "alone.png" }]));
+  v.write("Garden/Leaf.md", "leaf");
+  v.write("Journal/Diary.md", "SECRET");
+  v.write("Journal/Code.md", "x");
+  v.write("Journal/Secret.md", "x");
+  v.write("Garden/pic.png", "PNG");
+  v.write("other.png", "PNG4");
+  v.write("hidden.png", "PNG5");
+  v.write("alone.png", "PNG6");
+  v.write("Private/secret.png", "PNG2");
+  const r = await scan(v, { ...rules, ...r0 }, new HashCache());
+  assert.deepEqual(r.files.map((f) => f.path), [
+    ".kvist/links.json", "Boards/Chained.canvas", "Boards/Linked.canvas", "Garden/Board.canvas", "Garden/Leaf.md",
+    "Garden/Welcome.md", "Garden/pic.png", "other.png",
+  ]);
+  const hints = JSON.parse(new TextDecoder().decode(await r.content.get(".kvist/links.json")!()));
+  assert.deepEqual(hints.notes["Garden/Board.canvas"], { Diary: null, Leaf: "Garden/Leaf.md" });
+  assert.deepEqual(r.leaks.map((l) => [l.kind, l.from, l.target]).sort(), [
+    ["excluded_attachment", "Garden/Board.canvas", "Private/secret.png"],
+    ["excluded_attachment", "Garden/Welcome.md", "Private/Hidden.canvas"],
+    ["unpublished_embed", "Garden/Board.canvas", "Journal/Diary.md"],
+    ["unpublished_link", "Garden/Board.canvas", "Journal/Diary.md"],
+  ]);
+});
+
 test("scan reuses cached hashes", async () => {
   const v = new MemVault();
   v.write("Garden/a.md", "a", 1000);

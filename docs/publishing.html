@@ -112,7 +112,8 @@ frontmatter_key       = "publish"   <span class="c"># the property: publish: tru
 <p>An image, PDF or other file is published only if a published note links to or embeds it, and never if the file itself sits in an excluded folder. You don't need to make attachments public separately.</p>
 <p>An image a published note names in its <code>image</code> or <code>cover</code> property counts as embedded, and so do the <code>image</code>, <code>avatar</code> and <code>favicon</code> of the <a href="customizing.html#settings-note">settings note</a>. The excluded-folder rule still applies to them.</p>
 <p>Before publishing, kvist removes metadata from <strong>JPEG, PNG and WebP</strong> images: GPS location, camera details, author and comments. The image itself isn't re-compressed. <strong>SVG, GIF, AVIF and PDF files are published as they are</strong>, so check those for anything personal.</p>
-<p>The allowed file types are png, jpg, jpeg, gif, webp, svg, avif, pdf, mp3, m4a, ogg, wav, mp4 and webm. Files can be up to 50 MiB each. Both can be changed in the <a href="configuration.html#server-publish">configuration</a>.</p>
+<p>A canvas is published the same way, as a page, and also when it sits in an always-public folder; the images and notes its cards show follow the same rules (see <a href="writing.html#canvas">Canvases</a>).</p>
+<p>The allowed file types are png, jpg, jpeg, gif, webp, svg, avif, pdf, mp3, m4a, ogg, wav, mp4, webm and canvas. Files can be up to 50 MiB each. Both can be changed in the <a href="configuration.html#server-publish">configuration</a>.</p>
 
 <h2 id="report">The publish report</h2>
 <p>Run <strong>kvist: Open publish report</strong>, or click the kvist status in the status bar. After a publish it shows:</p>

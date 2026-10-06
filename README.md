@@ -8,8 +8,8 @@ Publish, and your site updates. Private notes never leave your device.
 
 ![A kvist site: a menu with a profile and folder tree, a list of the notes beside it, and a note with callouts and code](docs/assets/screens/note-light.webp)
 
-- **Obsidian syntax:** wikilinks, embeds, callouts, tags, footnotes, math
-  and Mermaid diagrams.
+- **Obsidian syntax:** wikilinks, embeds, callouts, tags, footnotes, math,
+  Mermaid diagrams and canvases.
 - **Private stays private:** you choose what's public by folder, tag or
   property, and the server checks every note again. Links to private notes
   become plain text.

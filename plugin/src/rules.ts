@@ -100,6 +100,21 @@ export function attachmentAllowed(rules: Rules, path: string): boolean {
   return !rules.exclude_folders.some((f) => inFolder(path, f, true));
 }
 
+export function isCanvas(path: string): boolean {
+  return path.toLowerCase().endsWith(".canvas");
+}
+
+/**
+ * A canvas in an always-public folder (and in no excluded one) is published
+ * on its own. Canvases have no frontmatter or tags, so the folder is their
+ * only rule; any other canvas is published like an attachment, when a
+ * published note or canvas links to or embeds it.
+ */
+export function canvasInPublicFolder(rules: Rules, path: string): boolean {
+  if (!isCanvas(path) || !allowedPath(rules, path) || !attachmentAllowed(rules, path)) return false;
+  return rules.always_public_folders.some((f) => inFolder(path, f, false));
+}
+
 /** AllowedPath mirrors the server's manifest check. */
 export function allowedPath(rules: Rules, path: string): boolean {
   if (path.split("/").some((seg) => seg.startsWith("."))) return false;

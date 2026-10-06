@@ -28,7 +28,7 @@ list: update it too when an item is done or added.
 
 ## Nice to have
 
-- [ ] **Canvas.** Render `.canvas` files as a page with cards and arrows,
+- [x] **Canvas.** Render `.canvas` files as a page with cards and arrows,
   and embeds with `![[board.canvas]]`. (Publish)
 - [x] **Instant navigation.** Load the next page without a full reload,
   keeping the menu's scroll position and the graph. (Quartz)

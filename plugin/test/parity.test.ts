@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { attachmentAllowed, evaluate, parseImageValue } from "../src/rules";
+import { attachmentAllowed, canvasInPublicFolder, evaluate, parseImageValue } from "../src/rules";
 import { noteURL } from "../src/slug";
 
 // The same fixtures run in the Go tests (internal/publish, internal/model).
@@ -16,6 +16,9 @@ test("publish rules match the server", () => {
   }
   for (const a of rules.attachments) {
     assert.equal(attachmentAllowed(rules.rules, a.path), a.allowed, a.path);
+  }
+  for (const c of rules.canvases) {
+    assert.equal(canvasInPublicFolder(rules.rules, c.path), c.public, c.path);
   }
 });
 

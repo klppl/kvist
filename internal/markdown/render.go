@@ -1,6 +1,7 @@
 package markdown
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"html"
@@ -98,6 +99,15 @@ func writeLink(w util.BufWriter, t Target, innerHTML string) {
 		return
 	}
 	fmt.Fprintf(w, `<a class="internal-link" href="%s">%s</a>`, esc(t.URL), innerHTML)
+}
+
+// AssetHTML renders an embed of an attachment, as ![[name|alias]] would.
+func AssetHTML(t Target, alias, name string) string {
+	var b bytes.Buffer
+	w := bufio.NewWriter(&b)
+	writeAsset(w, t, alias, name)
+	w.Flush()
+	return b.String()
 }
 
 // writeAsset embeds an attachment. For images the alias is split at "|"

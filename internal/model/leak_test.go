@@ -101,7 +101,7 @@ func TestFixtureModel(t *testing.T) {
 	for _, n := range site.Notes {
 		paths = append(paths, n.Path)
 	}
-	want := []string{"Garden/Collide.md", "Garden/Covered by path.md", "Garden/Covered.md", "Garden/Embedder.md", "Garden/HintUser.md", "Garden/Hub.md", "Garden/Leaf.md"}
+	want := []string{"Garden/Board.canvas", "Garden/Boards.md", "Garden/Collide.md", "Garden/Covered by path.md", "Garden/Covered.md", "Garden/Embedder.md", "Garden/HintUser.md", "Garden/Hub.md", "Garden/Leaf.md", "Journal/Linked.canvas"}
 	sort.Strings(paths)
 	if strings.Join(paths, ",") != strings.Join(want, ",") {
 		t.Fatalf("published = %v\nwant %v", paths, want)
@@ -145,7 +145,8 @@ func TestFixtureModel(t *testing.T) {
 	}
 
 	leaf := site.Note("Garden/Leaf.md")
-	if len(leaf.Backlinks) != 1 || leaf.Backlinks[0].Source != hub {
+	// From the hub and from the board's text and file cards (once).
+	if len(leaf.Backlinks) != 2 || leaf.Backlinks[0].Source != site.Note("Garden/Board.canvas") || leaf.Backlinks[1].Source != hub {
 		t.Errorf("leaf backlinks = %+v", leaf.Backlinks)
 	}
 	if len(hub.Backlinks) != 1 || hub.Backlinks[0].Source != leaf {
@@ -175,8 +176,12 @@ func TestFixtureModel(t *testing.T) {
 		t.Errorf("hub embeds:\n%s", hub.Content)
 	}
 
+	linkers := map[string]bool{}
+	for _, p := range []string{"Garden/Hub.md", "Garden/Leaf.md", "Garden/Embedder.md", "Garden/Boards.md", "Garden/Board.canvas"} {
+		linkers[site.Note(p).ID] = true
+	}
 	for _, e := range site.Graph.Edges {
-		if site.Note("Garden/Hub.md").ID != e.Source && site.Note("Garden/Leaf.md").ID != e.Source && e.Source != em.ID {
+		if !linkers[e.Source] {
 			t.Errorf("unexpected edge %+v", e)
 		}
 	}

@@ -61,6 +61,9 @@ type noteState struct {
 	src  []byte
 	meta *vault.Meta
 	doc  *markdown.Doc // for headings, block ids and sections
+	// canvas is set for a canvas (see canvas.go); meta and doc are then
+	// empty.
+	canvas *vault.Canvas
 }
 
 type builder struct {
@@ -70,7 +73,8 @@ type builder struct {
 	hints    *source.Hints
 	notes    map[string]*noteState // published notes by vault path
 	assets   map[string]source.File
-	used     map[string]bool // assets referenced by rendered content
+	canvases map[string]source.File // canvas files that may be published (canvas.go)
+	used     map[string]bool        // assets referenced by rendered content
 	ix       *resolve.Index
 	aliases  map[string][]string // lower(alias) → note paths
 	warnings []protocol.Warning
@@ -83,15 +87,16 @@ type builder struct {
 // needs from the snapshot; notes that fail the publish rules are ignored.
 func Build(site *config.Site, snap source.Snapshot) (*Site, error) {
 	b := &builder{
-		cfg:     site,
-		rules:   site.Rules(),
-		snap:    snap,
-		hints:   snap.Hints(),
-		notes:   map[string]*noteState{},
-		assets:  map[string]source.File{},
-		used:    map[string]bool{},
-		aliases: map[string][]string{},
-		root:    site.SiteRoot(),
+		cfg:      site,
+		rules:    site.Rules(),
+		snap:     snap,
+		hints:    snap.Hints(),
+		notes:    map[string]*noteState{},
+		assets:   map[string]source.File{},
+		canvases: map[string]source.File{},
+		used:     map[string]bool{},
+		aliases:  map[string][]string{},
+		root:     site.SiteRoot(),
 	}
 	var siteNote []byte
 	for _, f := range snap.Files() {
@@ -114,18 +119,26 @@ func Build(site *config.Site, snap source.Snapshot) (*Site, error) {
 			}
 			b.notes[f.Path] = &noteState{file: f, src: src, meta: meta, doc: markdown.Parse(src[meta.BodyStart:])}
 		case protocol.AllowedPath(f.Path, b.rules) && publish.AttachmentAllowed(b.rules, f.Path):
-			b.assets[f.Path] = f
+			if vault.IsCanvas(f.Path) {
+				b.canvases[f.Path] = f // never an asset: it names private paths
+			} else {
+				b.assets[f.Path] = f
+			}
 		}
 	}
 
-	paths := make([]string, 0, len(b.notes)+len(b.assets))
+	paths := make([]string, 0, len(b.notes)+len(b.assets)+len(b.canvases))
 	for p := range b.notes {
 		paths = append(paths, p)
 	}
 	for p := range b.assets {
 		paths = append(paths, p)
 	}
+	for p := range b.canvases {
+		paths = append(paths, p)
+	}
 	b.ix = resolve.NewIndex(paths)
+	b.pickCanvases()
 
 	s := &Site{ModelVersion: Version, Revision: snap.Revision(), BuiltAt: snap.Time().UTC(), notesBy: map[string]*Note{}}
 	settings := b.readSettings(siteNote)
@@ -203,6 +216,13 @@ func (b *builder) makeNotes(s *Site) {
 		expose[k] = true
 	}
 	for p, ns := range b.notes {
+		if ns.canvas != nil {
+			n := b.makeCanvasNote(p, ns)
+			ns.note = n
+			s.Notes = append(s.Notes, n)
+			s.notesBy[p] = n
+			continue
+		}
 		fm := ns.meta.Frontmatter
 		n := &Note{Path: p, Aliases: ns.meta.Aliases}
 		n.Title = firstString(fm, "title")
@@ -401,29 +421,40 @@ func (b *builder) render(s *Site) {
 	for _, n := range s.Notes {
 		ns := b.notes[n.Path]
 		r := &noteResolver{b: b, from: ns, stack: []string{n.Path}, top: true, root: n}
-		ns.doc.Resolve(r)
-		if n.Description == "" {
-			// After Resolve, so tags keep their text and only control tags
-			// are left out.
-			n.Description = truncate(ns.doc.FirstParagraph(), 200)
+		var refs []markdown.ResolvedRef
+		if ns.canvas != nil {
+			cv := b.renderCanvas(ns, r)
+			n.Content = template.HTML(cv.html)
+			n.Text = strings.Join(cv.text, "\n")
+			n.Description = truncate(cv.first, 200)
+			n.TagNames = b.tagNames(nil, cv.tags)
+			refs = cv.refs
+		} else {
+			ns.doc.Resolve(r)
+			if n.Description == "" {
+				// After Resolve, so tags keep their text and only control tags
+				// are left out.
+				n.Description = truncate(ns.doc.FirstParagraph(), 200)
+			}
+			ns.doc.StrictLineBreaks = b.strict
+			html, err := ns.doc.Render()
+			if err != nil {
+				b.problems = append(b.problems, fmt.Sprintf("%s: %v", n.Path, err))
+				continue
+			}
+			n.Content = template.HTML(html)
+			n.Text = ns.doc.PlainText()
+			n.TagNames = b.tagNames(ns.meta.FrontmatterTags, ns.doc.Tags())
+			refs = ns.doc.Refs()
 		}
-		ns.doc.StrictLineBreaks = b.strict
-		html, err := ns.doc.Render()
-		if err != nil {
-			b.problems = append(b.problems, fmt.Sprintf("%s: %v", n.Path, err))
-			continue
-		}
-		n.Content = template.HTML(html)
-		n.Text = ns.doc.PlainText()
 		n.WordCount = len(strings.Fields(n.Text))
 		n.ReadingTime = int(math.Ceil(float64(n.WordCount) / 200))
 		if n.ReadingTime < 1 {
 			n.ReadingTime = 1
 		}
-		n.TagNames = noteTags(b, ns)
 
 		seen := map[string]bool{}
-		for _, ref := range ns.doc.Refs() {
+		for _, ref := range refs {
 			if ref.Target.Kind != markdown.NoteTarget || ref.Target.Path == n.Path {
 				continue
 			}
@@ -446,10 +477,10 @@ func (b *builder) render(s *Site) {
 	}
 }
 
-// noteTags are the frontmatter tags plus the tags in the rendered body
-// (not the ones in comments, which are never published), without the
+// tagNames are a note's frontmatter tags plus the tags in its rendered
+// body (not the ones in comments, which are never published), without the
 // control tags.
-func noteTags(b *builder, ns *noteState) []string {
+func (b *builder) tagNames(frontmatter, body []string) []string {
 	seen := map[string]bool{}
 	var out []string
 	add := func(t string) {
@@ -460,10 +491,10 @@ func noteTags(b *builder, ns *noteState) []string {
 		seen[k] = true
 		out = append(out, t)
 	}
-	for _, t := range ns.meta.FrontmatterTags {
+	for _, t := range frontmatter {
 		add(t)
 	}
-	for _, t := range ns.doc.Tags() {
+	for _, t := range body {
 		add(t)
 	}
 	sort.Slice(out, func(i, j int) bool { return strings.ToLower(out[i]) < strings.ToLower(out[j]) })
@@ -587,6 +618,10 @@ func (r *noteResolver) Embed(t markdown.Target, ref markdown.Ref) (string, bool)
 	if len(r.stack) > maxEmbedDepth {
 		r.b.warn(WarnEmbedCycle, r.from.note.Path, "embeds nested deeper than %d levels; omitted", maxEmbedDepth)
 		return "", false
+	}
+	if ns.canvas != nil {
+		cv := r.b.renderCanvas(ns, &noteResolver{b: r.b, from: ns, stack: append(append([]string(nil), r.stack...), t.Path), root: r.root})
+		return cv.html, true
 	}
 	body := ns.src[ns.meta.BodyStart:]
 	if ref.Subpath != "" {
