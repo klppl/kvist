@@ -48,3 +48,24 @@ func TestTokens(t *testing.T) {
 		t.Error("revoked token still accepted")
 	}
 }
+
+func TestRevokeSite(t *testing.T) {
+	f := Open(t.TempDir())
+	now := time.Now()
+	for _, site := range []string{"garden", "work", "garden"} {
+		if _, _, err := f.Create(site, "laptop", now); err != nil {
+			t.Fatal(err)
+		}
+	}
+	revoked, err := f.RevokeSite("garden")
+	if err != nil || len(revoked) != 2 {
+		t.Fatalf("RevokeSite = %d tokens, %v", len(revoked), err)
+	}
+	list, _ := f.List()
+	if len(list) != 1 || list[0].Site != "work" {
+		t.Errorf("left = %+v", list)
+	}
+	if revoked, err := f.RevokeSite("garden"); err != nil || len(revoked) != 0 {
+		t.Errorf("second RevokeSite = %d tokens, %v", len(revoked), err)
+	}
+}

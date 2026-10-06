@@ -246,7 +246,8 @@ never resolve to something unpublished.
 
 - Per-site tokens, created/revoked only via CLI on the server
   (`kvist token create`, with `--site` on a multi-site server and an
-  optional `--name laptop`). Shown once, stored as SHA-256 (tokens are
+  optional `--name laptop`; `kvist site delete` revokes all tokens of a
+  site it deletes). Shown once, stored as SHA-256 (tokens are
   256-bit random, so a slow KDF adds nothing).
 - Scope in v1: `push` (sync + build status for one site). There is no HTTP API
   for config, tokens or themes — a stolen token can change content, never the
@@ -549,7 +550,7 @@ scope at "content" while letting you edit the site from Obsidian.
 
 ```
 kvist/
-  cmd/kvist/              CLI: serve, build, dev, push, token, rollback, gc, version
+  cmd/kvist/              CLI: serve, build, dev, push, token, site, rollback, gc, version
   internal/
     config/               load + validate TOML
     protocol/             wire types, version constants (shared with test client)

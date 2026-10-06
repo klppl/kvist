@@ -186,6 +186,28 @@ func (f *File) Revoke(id string) (Token, error) {
 	return t, f.save()
 }
 
+// RevokeSite deletes all tokens of a site and returns them.
+func (f *File) RevokeSite(site string) ([]Token, error) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if err := f.load(); err != nil {
+		return nil, err
+	}
+	var kept, revoked []Token
+	for _, t := range f.tokens {
+		if t.Site == site {
+			revoked = append(revoked, t)
+		} else {
+			kept = append(kept, t)
+		}
+	}
+	if len(revoked) == 0 {
+		return nil, nil
+	}
+	f.tokens = kept
+	return revoked, f.save()
+}
+
 // Authenticate returns the token matching secret if it grants scope on site.
 func (f *File) Authenticate(secret, site, scope string) (Token, bool) {
 	if !strings.HasPrefix(secret, TokenPrefix) {

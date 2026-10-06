@@ -17,6 +17,7 @@ Usage:
   kvist build    --dir VAULT --out DIR               build a site from a folder (--emit-model FILE for the model)
   kvist dev      [--dir VAULT] [--config FILE]       preview a vault with live reload
   kvist token    create|list|revoke [flags]          manage push tokens
+  kvist site     list|delete [flags]                 list sites, delete one removed from the config
   kvist rollback [--config kvist.toml] SITE REV      make an earlier revision current again
   kvist gc       [--config kvist.toml]               remove expired syncs and unreferenced blobs
   kvist version                                      print the version
@@ -42,6 +43,8 @@ func main() {
 		err = cmdDev(args)
 	case "token":
 		err = cmdToken(args)
+	case "site":
+		err = cmdSite(args)
 	case "rollback":
 		err = cmdRollback(args)
 	case "gc":

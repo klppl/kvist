@@ -76,6 +76,40 @@ type Site struct {
 // Dir returns the site directory.
 func (s *Site) Dir() string { return s.dir }
 
+// SiteIDs lists the sites that have a directory in the store, sorted.
+func (s *Store) SiteIDs() ([]string, error) {
+	ents, err := os.ReadDir(filepath.Join(s.dir, "sites"))
+	if err != nil {
+		return nil, err
+	}
+	var ids []string
+	for _, e := range ents {
+		if e.IsDir() {
+			ids = append(ids, e.Name())
+		}
+	}
+	return ids, nil
+}
+
+// RemoveSite deletes everything stored for a site. The caller makes sure no
+// server still serves it; a running server keeps its directories open.
+func (s *Store) RemoveSite(id string) error {
+	if id == "" || id == "." || id == ".." || strings.ContainsAny(id, `/\`) {
+		return fmt.Errorf("invalid site id %q", id)
+	}
+	dir := filepath.Join(s.dir, "sites", id)
+	if _, err := os.Stat(dir); err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return ErrNotFound
+		}
+		return err
+	}
+	s.mu.Lock()
+	delete(s.sites, id)
+	s.mu.Unlock()
+	return os.RemoveAll(dir)
+}
+
 // Revision is an immutable committed manifest.
 type Revision struct {
 	ID          string          `json:"id"`

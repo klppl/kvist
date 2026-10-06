@@ -81,6 +81,15 @@ docker compose exec kvist kvist token revoke 3f9a1c2e</code></pre>
 <pre><code>docker compose exec kvist kvist rollback garden r000041</code></pre>
 <p>If you give an id that's no longer kept, kvist lists the ones that are. A rollback is undone by the next publish from your vault, so fix the vault first (or turn off automatic publishing for a while).</p>
 
+<h2 id="delete-site">Starting over or removing a site</h2>
+<p>To put a different vault on a site, publish from the new vault with the site's token. Each publish replaces the whole site, so the old notes are gone from it at once; they stay in the stored history until they age out (see <a href="#disk">disk use</a>).</p>
+<p>To remove a site completely, first delete its <code>[[site]]</code> block from <code>kvist.toml</code> and restart, so kvist stops serving it. Then delete its stored data and tokens:</p>
+<pre><code>docker compose restart kvist
+docker compose exec kvist kvist site list
+docker compose exec kvist kvist site delete garden</code></pre>
+<p><code>site list</code> shows each site with its stored data and tokens, including sites that are no longer in <code>kvist.toml</code>. <code>site delete</code> asks you to type the site's id before it deletes anything, and refuses a site that's still in <code>kvist.toml</code>. To start a site over from nothing under the same id, delete it this way, then add its block back and restart.</p>
+<p>When a vault moves to another site, or its site was started over, press <strong>Reset settings</strong> at the bottom of the plugin's settings on each device, then enter the site and a new token. This makes the plugin forget the old site's history, so the first publish isn't stopped as <a href="troubleshooting.html#newer-content">“newer content on the server”</a>.</p>
+
 <h2 id="backups">Backups</h2>
 <p>Everything kvist stores is in the <code>kvist-data</code> Docker volume: what you published, the built site, the token fingerprints and the old addresses of moved notes. Your vault is the real original, so losing the server only means setting it up again and publishing; only the redirects from old addresses would start over. To keep a copy anyway:</p>
 <pre><code>docker run --rm -v kvist_kvist-data:/data -v "$PWD":/backup alpine \
@@ -127,6 +136,7 @@ api_token_env = "CF_API_TOKEN"</code></pre></li>
   <tbody>
     <tr><td><code>kvist serve</code></td><td>Runs the server (what the Docker container does).</td></tr>
     <tr><td><code>kvist token create|list|revoke</code></td><td>Manages tokens.</td></tr>
+    <tr><td><code>kvist site list|delete</code></td><td>Lists sites with their stored data and tokens; deletes a site that's no longer in <code>kvist.toml</code> (<a href="#delete-site">details</a>).</td></tr>
     <tr><td><code>kvist rollback SITE REVISION</code></td><td>Makes an earlier revision live again.</td></tr>
     <tr><td><code>kvist gc</code></td><td>Cleans up unused uploads now (the server also does it by itself).</td></tr>
     <tr><td><code>kvist dev --dir VAULT --config kvist.toml</code></td><td>Previews a vault at <code>http://127.0.0.1:1313</code>, reloading on every change.</td></tr>

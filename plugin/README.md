@@ -47,6 +47,9 @@ them. Use one token per device, so you can revoke one without the others.
 - **Open publish report**, or click the status bar: links and embeds to
   notes that stay private, attachments in excluded folders, and the server's
   warnings, each with a link to the note.
+- **Reset settings**, at the bottom of the settings, clears the server URL,
+  site, token and this device's publish state, for example to connect the
+  vault to a different site. It doesn't touch your notes.
 - **Publish automatically** publishes after changes settle (30 s by
   default). Turn it on for **one** device: a device that hasn't finished
   syncing could otherwise publish older notes. It never overrides the

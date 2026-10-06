@@ -162,7 +162,8 @@ and stored revisions live there. Only `public/` is meant to be served.
 Install the plugin (`plugin/README.md`), then enter the server URL
 (`https://garden.example.com`), the site id and the token. Press **Test**,
 then **Publish now**. Create one token per device; `kvist token list` and
-`kvist token revoke ID` manage them.
+`kvist token revoke ID` manage them. To remove a site, delete its `[[site]]`
+block, restart, then run `kvist site delete ID` to delete its data and tokens.
 
 The site's title, home page, menu and colors are set in the vault, in the
 settings note `_site.md`: run **kvist: Open site settings note** to create
@@ -203,6 +204,11 @@ With the DNS record proxied (orange cloud):
 - **Undo a publish:** `kvist rollback garden r000041` makes an earlier
   revision current again (the last 10 are kept). Then fix the vault, or the
   next push from a device replaces it again.
+- **Remove a site:** delete its `[[site]]` block from `kvist.toml`, restart,
+  then `kvist site delete garden` deletes `sites/garden/` and revokes the
+  site's tokens. It refuses a site that is still configured, because a
+  running server keeps that site's folders in use. `kvist site list` shows
+  leftover data of sites no longer in the config.
 - **Retention:** unpublished content leaves the website at once but stays in
   older revisions and builds on the server's disk until they drop out of
   `[site.retention]` (10 revisions, 3 builds by default). Set both to 1 to

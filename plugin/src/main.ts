@@ -171,6 +171,27 @@ export default class KvistPlugin extends Plugin {
     await this.saveData(this.shared);
   }
 
+  /** Forgets the server, site, token and this device's publish state. */
+  async resetSettings() {
+    if (this.timer) window.clearTimeout(this.timer);
+    this.timer = undefined;
+    this.shared = { ...DEFAULT_SHARED };
+    await this.saveShared();
+    this.app.saveLocalStorage("kvist-local", null);
+    this.local = this.loadLocal();
+    this.cache = new HashCache(this.local.hashes);
+    this.saveLocal();
+    this.rules = undefined;
+    this.lastResult = undefined;
+    this.lastWarnings = [];
+    this.lastLeaks = [];
+    this.setStatus("idle", "kvist");
+  }
+
+  publishing(): boolean {
+    return this.running;
+  }
+
   configured(): boolean {
     return !!(this.shared.serverURL && this.shared.site && this.local.token);
   }
@@ -569,5 +590,52 @@ class KvistSettingTab extends PluginSettingTab {
         new Notice("kvist: " + (e instanceof Error ? e.message : e));
       }
     }));
+
+    containerEl.createEl("h3", { text: "Reset" });
+    new Setting(containerEl).setName("Reset settings")
+      .setDesc("Forget the server, site, token and this device's settings, for example to connect to a new site. Your notes are not touched.")
+      .addButton((b) => b.setButtonText("Reset").setWarning().onClick(async () => {
+        if (p.publishing()) {
+          new Notice("kvist: wait for the publish to finish.");
+          return;
+        }
+        const ok = await new ConfirmModal(this.app, "Reset kvist settings?",
+          "This clears the server URL, site and token, and this device's publish state. On other devices, the server URL and site are cleared once this vault's settings sync to them.",
+          "Reset").ask();
+        if (!ok) return;
+        await p.resetSettings();
+        new Notice("kvist: settings reset.");
+        this.display();
+      }));
+  }
+}
+
+class ConfirmModal extends Modal {
+  private resolve?: (ok: boolean) => void;
+  constructor(app: App, private heading: string, private message: string, private action: string) {
+    super(app);
+  }
+  ask(): Promise<boolean> {
+    return new Promise((r) => {
+      this.resolve = r;
+      this.open();
+    });
+  }
+  onOpen() {
+    const { contentEl } = this;
+    contentEl.createEl("h2", { text: this.heading });
+    contentEl.createEl("p", { text: this.message });
+    new Setting(contentEl)
+      .addButton((b) => b.setButtonText("Cancel").onClick(() => this.done(false)))
+      .addButton((b) => b.setButtonText(this.action).setWarning().onClick(() => this.done(true)));
+  }
+  private done(ok: boolean) {
+    this.resolve?.(ok);
+    this.resolve = undefined;
+    this.close();
+  }
+  onClose() {
+    this.resolve?.(false);
+    this.contentEl.empty();
   }
 }

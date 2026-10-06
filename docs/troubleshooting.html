@@ -103,6 +103,7 @@
 
 <h3 id="newer-content">“The server has newer content than this device” (◆)</h3>
 <p>Another device published changes this one hasn't synced yet, and publishing now would put older notes back. Let your vault finish syncing, then run <strong>Publish now</strong>. See <a href="publishing.html#devices">More than one device</a>.</p>
+<p>If you just pointed the plugin at a different site, this device still remembers the old one. Use <strong>Reset settings</strong> at the bottom of the plugin's settings, enter the new site's details and publish again.</p>
 
 <h3 id="old-link">An old link to a renamed note shows “Nothing grows here”</h3>
 <p>kvist redirects a renamed or moved note's old address when it can tell which note it became. It can't when the note was renamed <em>and</em> edited <em>and</em> another new note shares its new file name, or when it was renamed while private. Publishing after each rename gives it the best chance.</p>
@@ -111,6 +112,9 @@
 <p>Pages are cached for up to 60 seconds. With Cloudflare, set up the <a href="server.html#purge">cache purge</a> so it disappears immediately.</p>
 
 <h2 id="settings">Settings</h2>
+
+<h3 id="other-site">I want to publish the vault to a different site, or start a site over</h3>
+<p>In the plugin's settings, press <strong>Reset settings</strong> at the bottom, then enter the new server URL, site and token. To clear out the old site on the server, see <a href="server.html#delete-site">Starting over or removing a site</a>.</p>
 
 <h3 id="toml-ignored">My changes to <code>kvist.toml</code> did nothing</h3>
 <p>kvist only reads it at startup. Run <code>docker compose restart kvist</code>, then publish again. If kvist doesn't come back up, <code>docker compose logs kvist</code> points at the mistake.</p>

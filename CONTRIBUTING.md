@@ -7,7 +7,7 @@ change must keep.
 ## Layout
 
 ```
-cmd/kvist/          CLI (serve, push, build, dev, token, rollback, gc)
+cmd/kvist/          CLI (serve, push, build, dev, token, site, rollback, gc)
 internal/           Go packages (see design.md §10)
 themes/garden/      the built-in theme (embedded in the binary)
 plugin/             the Obsidian plugin (TypeScript)

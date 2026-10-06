@@ -79,6 +79,8 @@ run **kvist: Publish now**. Step by step:
 - [Domains and HTTPS](https://klppl.github.io/kvist/https.html): your
   domain with HTTPS, with the ready-made Caddy setup or your own proxy,
   and several sites on one server.
+- [Running the server](https://klppl.github.io/kvist/server.html):
+  updates, tokens, rollbacks, removing a site and backups.
 - [Roadmap](https://klppl.github.io/kvist/roadmap.html): what doesn't work
   yet, and what's planned.
 
