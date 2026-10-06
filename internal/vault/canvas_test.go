@@ -1,7 +1,9 @@
 package vault
 
 import (
+	"encoding/json"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -34,5 +36,40 @@ func TestCanvasLinks(t *testing.T) {
 	}
 	if !IsCanvas("a/B.Canvas") || IsCanvas("a/b.md") {
 		t.Error("IsCanvas")
+	}
+}
+
+// TestCanvasLinksInCode checks that text cards skip links in code and
+// comments but not the ones after them; plugin/test/canvas.test.ts has the
+// same card.
+func TestCanvasLinksInCode(t *testing.T) {
+	text := strings.Join([]string{
+		"[[Before]]",
+		"```js",
+		"[[InFence]]",
+		"still code ![[in-fence.png]]",
+		"```",
+		"![[after.png]] and `[[InSpan]]`",
+		"~~~~",
+		"[[InTilde]]",
+		"~~~", // too short to close a ~~~~ fence
+		"[[StillInTilde]]",
+		"~~~~",
+		"%% [[Hidden]] %% <!-- [[AlsoHidden]] -->",
+		"[[Last]]",
+		"```",
+		"[[Unclosed]]",
+	}, "\n")
+	src, _ := json.Marshal(Canvas{Nodes: []CanvasNode{{ID: "a", Type: "text", Text: text}}})
+	c, err := ParseCanvas(src)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var got []string
+	for _, l := range c.Links() {
+		got = append(got, l.Target)
+	}
+	if want := []string{"Before", "after.png", "Last"}; !reflect.DeepEqual(got, want) {
+		t.Errorf("links = %q, want %q", got, want)
 	}
 }

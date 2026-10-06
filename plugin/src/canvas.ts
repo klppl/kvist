@@ -36,8 +36,7 @@ export function canvasLinks(json: string): LinkInfo[] {
 
 /** Links and embeds in Markdown, outside code and comments. */
 export function textLinks(md: string): LinkInfo[] {
-  const text = md
-    .replace(/^(\s*)(```|~~~)[^\n]*\n[\s\S]*?(\n\s*\2[^\n]*|$)/gm, "")
+  const text = maskFences(md)
     .replace(/`[^`\n]*`/g, "")
     .replace(/%%[\s\S]*?(%%|$)/g, "")
     .replace(/<!--[\s\S]*?(-->|$)/g, "");
@@ -98,4 +97,26 @@ export function stripCanvas(json: string, keep: (file: string) => boolean): stri
     });
   }
   return stableJSON(d);
+}
+
+/**
+ * Blanks fenced code blocks, line by line as maskCodeBlocks in
+ * internal/vault does: a fence closes at a line of the same character, at
+ * least as long, and an unclosed fence runs to the end.
+ */
+function maskFences(md: string): string {
+  let fence = "";
+  return md.split("\n").map((line) => {
+    const t = line.trim();
+    const m = /^(`{3,}|~{3,})/.exec(t)?.[1] ?? "";
+    if (fence) {
+      if (m && m[0] === fence[0] && m.length >= fence.length && t.split(m[0]).join("") === "") fence = "";
+      return "";
+    }
+    if (m && !(m[0] === "`" && t.slice(m.length).includes("`"))) {
+      fence = m;
+      return "";
+    }
+    return line;
+  }).join("\n");
 }
