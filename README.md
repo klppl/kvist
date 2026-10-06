@@ -1,5 +1,14 @@
 # kvist
 
+[![100% vibecoded](https://img.shields.io/badge/vibecoded-100%25-ff69b4?logo=sparkles&logoColor=white)](#)
+[![Made with love](https://img.shields.io/badge/made%20with-%E2%9D%A4%EF%B8%8F%20%26%20a%20suspicious%20eye-blueviolet)](#)
+[![Code reviewed by](https://img.shields.io/badge/code%20reviewed%20by-an%20actual%20human-success)](#)
+
+> 🌿 **Disclosure:** every line of kvist was vibecoded. Lovingly. By someone
+> who knows what a race condition is, reads the diffs, and has said "no,
+> that's wrong, try again" more times than they've said "ship it". The vibes
+> are immaculate; the tests still have to pass.
+
 **Publish your Obsidian notes as a website you own.**
 
 kvist (Swedish for "twig") turns the notes you choose into a fast,
