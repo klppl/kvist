@@ -1,6 +1,7 @@
 package markdown
 
 import (
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -233,5 +234,46 @@ func TestImageOptions(t *testing.T) {
 	for in, want := range cases {
 		out, _ := render(t, in)
 		contains(t, out, want)
+	}
+}
+
+func TestCodeBlockExtras(t *testing.T) {
+	out, _ := render(t, "```go title=\"main.go\" showLineNumbers {2}\na := 1\nb := 2\n```\n")
+	contains(t, out,
+		`<div class="code-block" data-lang="go"><div class="code-title">main.go</div><pre class="chroma">`,
+		`<span class="line"><span class="ln">1</span>`,
+		`<span class="line hl"><span class="ln">2</span>`,
+	)
+
+	// Numbering can start elsewhere, and highlights count displayed numbers.
+	out, _ = render(t, "```py showLineNumbers{10} {11-12}\na\nb\nc\n```\n")
+	contains(t, out, `<span class="ln">10</span>`, `<span class="line hl"><span class="ln">11</span>`, `<span class="line hl"><span class="ln">12</span>`)
+	lacks(t, out, `<span class="line hl"><span class="ln">10</span>`)
+
+	// Extras work without a language, and the title is escaped.
+	out, _ = render(t, "``` title='a <b>.txt' {1}\nplain\n```\n")
+	contains(t, out, `<div class="code-block"><div class="code-title">a &lt;b&gt;.txt</div>`, `<span class="line hl">`)
+
+	// A block without extras is unchanged.
+	out, _ = render(t, "```\nplain\n```\n")
+	contains(t, out, "<pre><code>plain\n</code></pre>")
+	lacks(t, out, "code-title", `class="ln"`)
+}
+
+func TestParseCodeInfo(t *testing.T) {
+	for _, tc := range []struct {
+		info string
+		want codeInfo
+	}{
+		{"go", codeInfo{lang: "go"}},
+		{`Go title="cmd/main.go"`, codeInfo{lang: "go", title: "cmd/main.go"}},
+		{"js title=app.js linenos", codeInfo{lang: "js", title: "app.js", numbers: true, firstLine: 1}},
+		{`rust hl_lines="1 3-4"`, codeInfo{lang: "rust", lines: [][2]int{{1, 1}, {3, 4}}}},
+		{"{1,3-5} showLineNumbers{7}", codeInfo{numbers: true, firstLine: 7, lines: [][2]int{{1, 1}, {3, 5}}}},
+		{"sh {5-2}", codeInfo{lang: "sh"}},
+	} {
+		if got := parseCodeInfo(tc.info); !reflect.DeepEqual(got, tc.want) {
+			t.Errorf("parseCodeInfo(%q) = %+v, want %+v", tc.info, got, tc.want)
+		}
 	}
 }

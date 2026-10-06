@@ -214,7 +214,8 @@
       var b = el("button", "code-copy", copy);
       b.type = "button";
       b.addEventListener("click", function () {
-        var code = pre.querySelector("code") || pre;
+        var code = (pre.querySelector("code") || pre).cloneNode(true);
+        code.querySelectorAll(".ln").forEach(function (n) { n.remove(); }); // line numbers aren't code
         navigator.clipboard.writeText(code.textContent.replace(/\n$/, "")).then(function () {
           b.textContent = tr("code_copied", "Copied");
           b.classList.add("copied");

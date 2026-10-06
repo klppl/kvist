@@ -42,7 +42,7 @@ list: update it too when an item is done or added.
 - [x] **Generated social images.** A preview image with the note's title
   and the site's name, for notes without `image:`. (Quartz)
 - [ ] **Comments.** An optional giscus block under notes. (Quartz)
-- [ ] **Code block extras.** A title (```` ```go title="main.go" ````),
+- [x] **Code block extras.** A title (```` ```go title="main.go" ````),
   line numbers and highlighted lines. (Quartz)
 - [ ] **Custom CSS from the vault.** A `publish.css` in the vault, applied
   after the theme's styles, so small style changes don't need the server.
