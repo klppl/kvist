@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"html"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -328,30 +329,102 @@ func (r *nodeRenderer) paragraph(w util.BufWriter, src []byte, node ast.Node, en
 
 var codeFormatter = chromahtml.New(chromahtml.WithClasses(true), chromahtml.TabWidth(4))
 
+// codeInfo is what a fence's info string asks for: ```go title="main.go"
+// showLineNumbers {2,4-6}.
+type codeInfo struct {
+	lang      string
+	title     string
+	numbers   bool
+	firstLine int      // the first line's number when numbers is set
+	lines     [][2]int // highlighted ranges, in displayed line numbers
+}
+
+var (
+	codeTitleRe   = regexp.MustCompile(`(?:^|\s)title=(?:"([^"]*)"|'([^']*)'|(\S+))`)
+	codeNumbersRe = regexp.MustCompile(`(?:^|\s)(?:showLineNumbers|linenos)(?:\{(\d+)\})?(?:\s|$)`)
+	codeLinesRe   = regexp.MustCompile(`(?:^|\s)(?:\{([\d,\s-]+)\}|(?:hl_lines|highlight)=(?:"([\d,\s-]+)"|'([\d,\s-]+)'|([\d,-]+)))`)
+)
+
+func parseCodeInfo(info string) codeInfo {
+	info = strings.TrimSpace(info)
+	var ci codeInfo
+	if f := strings.Fields(info); len(f) > 0 && !strings.ContainsAny(f[0], "={") && !codeNumbersRe.MatchString(f[0]) {
+		ci.lang = strings.ToLower(f[0])
+		info = strings.TrimSpace(info[len(f[0]):])
+	}
+	if m := codeTitleRe.FindStringSubmatch(info); m != nil {
+		ci.title = strings.TrimSpace(m[1] + m[2] + m[3])
+	}
+	if m := codeNumbersRe.FindStringSubmatch(info); m != nil {
+		ci.numbers, ci.firstLine = true, 1
+		if n, err := strconv.Atoi(m[1]); err == nil {
+			ci.firstLine = n
+		}
+	}
+	for _, m := range codeLinesRe.FindAllStringSubmatch(info, -1) {
+		for _, part := range strings.FieldsFunc(m[1]+m[2]+m[3]+m[4], func(r rune) bool { return r == ',' || r == ' ' }) {
+			a, b, isRange := strings.Cut(part, "-")
+			from, err1 := strconv.Atoi(a)
+			to, err2 := from, error(nil)
+			if isRange {
+				to, err2 = strconv.Atoi(b)
+			}
+			if err1 == nil && err2 == nil && from <= to {
+				ci.lines = append(ci.lines, [2]int{from, to})
+			}
+		}
+	}
+	return ci
+}
+
 func (r *nodeRenderer) codeBlock(w util.BufWriter, src []byte, node ast.Node, entering bool) (ast.WalkStatus, error) {
 	if !entering {
 		return ast.WalkSkipChildren, nil
 	}
-	lang := ""
-	if f, ok := node.(*ast.FencedCodeBlock); ok {
-		lang = strings.ToLower(string(f.Language(src)))
+	var ci codeInfo
+	if f, ok := node.(*ast.FencedCodeBlock); ok && f.Info != nil {
+		ci = parseCodeInfo(string(f.Info.Segment.Value(src)))
 	}
+	extras := ci.title != "" || ci.numbers || len(ci.lines) > 0
 	code := string(linesValue(node, src))
 	var lexer chroma.Lexer
-	if lang != "" {
-		lexer = lexers.Get(lang)
+	if ci.lang != "" {
+		lexer = lexers.Get(ci.lang)
 	}
-	if lexer == nil {
+	if lexer == nil && extras {
+		lexer = lexers.Get("plaintext") // numbers and highlights need chroma's line markup
+	}
+	var it chroma.Iterator
+	if lexer != nil {
+		var err error
+		if it, err = chroma.Coalesce(lexer).Tokenise(nil, code); err != nil {
+			it = nil
+		}
+	}
+	if it == nil {
 		fmt.Fprintf(w, "<pre><code>%s</code></pre>\n", esc(code))
 		return ast.WalkSkipChildren, nil
 	}
-	it, err := chroma.Coalesce(lexer).Tokenise(nil, code)
-	if err != nil {
-		fmt.Fprintf(w, "<pre><code>%s</code></pre>\n", esc(code))
-		return ast.WalkSkipChildren, nil
+	if ci.lang != "" {
+		fmt.Fprintf(w, `<div class="code-block" data-lang="%s">`, esc(ci.lang))
+	} else {
+		w.WriteString(`<div class="code-block">`)
 	}
-	fmt.Fprintf(w, `<div class="code-block" data-lang="%s">`, esc(lang))
-	if err := codeFormatter.Format(w, styles.Fallback, it); err != nil {
+	if ci.title != "" {
+		fmt.Fprintf(w, `<div class="code-title">%s</div>`, esc(ci.title))
+	}
+	f := codeFormatter
+	if ci.numbers || len(ci.lines) > 0 {
+		opts := []chromahtml.Option{chromahtml.WithClasses(true), chromahtml.TabWidth(4)}
+		if ci.numbers {
+			opts = append(opts, chromahtml.WithLineNumbers(true), chromahtml.BaseLineNumber(ci.firstLine))
+		}
+		if len(ci.lines) > 0 {
+			opts = append(opts, chromahtml.HighlightLines(ci.lines))
+		}
+		f = chromahtml.New(opts...)
+	}
+	if err := f.Format(w, styles.Fallback, it); err != nil {
 		return ast.WalkStop, err
 	}
 	w.WriteString("</div>\n")
