@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/klppl/kvist/internal/auth"
+	"github.com/klppl/kvist/internal/config"
 	"github.com/klppl/kvist/internal/protocol"
 	"github.com/klppl/kvist/internal/store"
 )
@@ -29,19 +30,11 @@ func cmdToken(args []string) error {
 	toks := auth.Open(cfg.DataDir)
 	switch sub {
 	case "create":
-		if *site == "" && len(cfg.Sites) == 1 {
-			*site = cfg.Sites[0].ID
+		sc, err := tokenSite(cfg, *site)
+		if err != nil {
+			return err
 		}
-		if cfg.Site(*site) == nil {
-			ids := make([]string, len(cfg.Sites))
-			for i, s := range cfg.Sites {
-				ids[i] = s.ID
-			}
-			if *site == "" {
-				return fmt.Errorf("this server has several sites (%s); choose one with --site", strings.Join(ids, ", "))
-			}
-			return fmt.Errorf("unknown site %q (sites: %s)", *site, strings.Join(ids, ", "))
-		}
+		*site = sc.ID
 		if *name == "" {
 			*name = "token-" + time.Now().Format("2006-01-02")
 		}
@@ -78,6 +71,28 @@ func cmdToken(args []string) error {
 		return fmt.Errorf("unknown token command %q", sub)
 	}
 	return nil
+}
+
+// tokenSite is the site a new token is for: the one given, else the only
+// configured site.
+func tokenSite(cfg *config.Config, id string) (*config.Site, error) {
+	if id == "" && len(cfg.Sites) == 1 {
+		return cfg.Sites[0], nil
+	}
+	if sc := cfg.Site(id); sc != nil {
+		return sc, nil
+	}
+	ids := make([]string, len(cfg.Sites))
+	for i, s := range cfg.Sites {
+		ids[i] = s.ID
+	}
+	switch {
+	case len(ids) == 0:
+		return nil, errors.New("this server has no sites; add a [[site]] to its config first")
+	case id == "":
+		return nil, fmt.Errorf("this server has several sites (%s); choose one with --site", strings.Join(ids, ", "))
+	}
+	return nil, fmt.Errorf("unknown site %q (sites: %s)", id, strings.Join(ids, ", "))
 }
 
 func cmdRollback(args []string) error {
