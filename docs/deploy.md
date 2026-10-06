@@ -1,12 +1,12 @@
 # Deploying kvist
 
-This guide sets up kvist on a small Linux server (for example a Hetzner
-CX22) with HTTPS, optionally behind Cloudflare. kvist is one static binary.
+This guide sets up kvist on a server with HTTPS, optionally behind
+Cloudflare. kvist is one static binary.
 It needs very little memory and keeps everything in `data_dir`.
 
 ## 1. Server
 
-Any Linux VM with a public IP. Point DNS for your site (for example
+Any server with a public IP. Point DNS for your site (for example
 `garden.example.com`) at it. Open ports 80 and 443; kvist itself listens
 on localhost or a private Docker network only.
 
@@ -14,7 +14,7 @@ on localhost or a private Docker network only.
 
 Every push to `main` that changes the server publishes an image to
 GitHub's container registry, once the tests pass, for `linux/amd64`
-(Intel/AMD servers such as Hetzner CX). Pushes that only change docs, the
+(Intel/AMD servers). Pushes that only change docs, the
 plugin or the example vault publish nothing. For an ARM server, add
 `linux/arm64` to `platforms` in the `image` job of `.github/workflows/ci.yml`.
 

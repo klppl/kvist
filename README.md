@@ -36,7 +36,7 @@ Publish, and your site updates. Private notes never leave your device.
 
 ## TLDR
 
-You need a Linux server with Docker, and an HTTPS address that forwards to
+You need a server with Docker, and an HTTPS address that forwards to
 `127.0.0.1:8080` on it (Cloudflare, nginx, Caddy, whatever you use). On the
 server:
 
