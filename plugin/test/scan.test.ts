@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { HashCache } from "../src/hash";
+import { HashCache, sha256 } from "../src/hash";
 import { Rules } from "../src/protocol";
 import { scan } from "../src/scan";
 import { MemVault } from "./memvault";
@@ -72,6 +72,44 @@ test("scan publishes canvases from public folders and links, with what their car
     ["unpublished_embed", "Garden/Board.canvas", "Journal/Diary.md"],
     ["unpublished_link", "Garden/Board.canvas", "Journal/Diary.md"],
   ]);
+});
+
+test("scan sends canvases without the cards of private notes and files", async () => {
+  const v = new MemVault();
+  v.write("Garden/Board.canvas", JSON.stringify({
+    nodes: [
+      { id: "t", type: "text", text: "<b>[[Leaf]]</b>" },
+      { id: "leaf", type: "file", file: "Garden/Leaf.md", x: 1.5 },
+      { id: "diary", type: "file", file: "Journal/Diary.md" },
+      { id: "img", type: "file", file: "Private/secret.png" },
+      { id: "gone", type: "file", file: "Missing.md" },
+    ],
+    edges: [
+      { id: "e1", fromNode: "t", toNode: "leaf", label: "kept" },
+      { id: "e2", fromNode: "leaf", toNode: "diary", label: "SECRET-edge" },
+      { id: "e3", fromNode: "img", toNode: "t" },
+    ],
+    extra: true,
+  }));
+  v.write("Garden/Plain.canvas", "{\n\t\"nodes\":[{\"id\":\"a\",\"type\":\"file\",\"file\":\"Garden/Leaf.md\"}],\n\t\"edges\":[]\n}");
+  v.write("Garden/Broken.canvas", "not json");
+  v.write("Garden/Leaf.md", "leaf");
+  v.write("Journal/Diary.md", "SECRET");
+  v.write("Private/secret.png", "PNG2");
+  const r = await scan(v, { ...rules, attachment_extensions: ["png", "canvas"] }, new HashCache());
+  assert.deepEqual(r.files.map((f) => f.path), [".kvist/links.json", "Garden/Board.canvas", "Garden/Leaf.md", "Garden/Plain.canvas"]);
+  const sent = async (p: string) => {
+    const data = await r.content.get(p)!();
+    const f = r.files.find((x) => x.path === p)!;
+    assert.equal(f.hash, await sha256(data));
+    assert.equal(f.size, data.byteLength);
+    return new TextDecoder().decode(data);
+  };
+  // The same bytes as stripCanvas in internal/pushclient sends.
+  assert.equal(await sent("Garden/Board.canvas"),
+    '{"edges":[{"fromNode":"t","id":"e1","label":"kept","toNode":"leaf"}],"extra":true,' +
+    '"nodes":[{"id":"t","text":"<b>[[Leaf]]</b>","type":"text"},{"file":"Garden/Leaf.md","id":"leaf","type":"file","x":1.5}]}');
+  assert.equal(await sent("Garden/Plain.canvas"), "{\n\t\"nodes\":[{\"id\":\"a\",\"type\":\"file\",\"file\":\"Garden/Leaf.md\"}],\n\t\"edges\":[]\n}");
 });
 
 test("scan reuses cached hashes", async () => {

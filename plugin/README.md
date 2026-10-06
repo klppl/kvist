@@ -64,9 +64,9 @@ named in their `image`/`cover` properties, and the settings note's
 that names published notes only, and the settings note `_site.md` leave
 your device. Canvases are published the same way: those in an always-public
 folder, and those a published note links to or embeds, with the images and
-files their cards show. A `.canvas` file is uploaded whole, so it carries
-the names (vault paths) of every note on it, private ones included; the
-server leaves those cards out of the site and never serves the file.
+files their cards show. Cards showing a private note or file, and the
+arrows to and from them, are taken out of the canvas before it leaves your
+device.
 
 ## Development
 

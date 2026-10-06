@@ -9,7 +9,7 @@ import {
   Decision, NOTE_IMAGE_KEYS, SITE_AVATAR_KEYS, SITE_ICON_KEYS, SITE_IMAGE_KEYS, allowedPath, attachmentAllowed, canvasInPublicFolder,
   evaluate, imageProperty, isCanvas, isImage, isNote, isSettingsNote,
 } from "./rules";
-import { canvasLinks } from "./canvas";
+import { canvasLinks, stripCanvas } from "./canvas";
 
 export interface VaultFile {
   path: string;
@@ -157,7 +157,26 @@ export async function scan(vault: VaultLike, rules: Rules, cache: HashCache): Pr
 
   const files: ManifestFile[] = [];
   const content = new Map<string, () => Promise<ArrayBuffer>>();
+  // Canvases go up without the cards of files that don't, so they carry no
+  // private paths; one that isn't JSON doesn't go up at all.
+  const canvasRaw = new Map<string, ArrayBuffer>();
+  for (const p of canvases) {
+    const raw = await vault.read(p);
+    if (stripCanvas(new TextDecoder().decode(raw), () => true) === null) include.delete(p);
+    else canvasRaw.set(p, raw);
+  }
+  for (const [p, raw] of canvasRaw) {
+    const text = new TextDecoder().decode(raw);
+    const out = stripCanvas(text, (file) => {
+      const dest = vault.resolve(linkTarget(file), p);
+      return dest !== null && include.has(dest);
+    })!;
+    const data = out === text ? raw : (new TextEncoder().encode(out).buffer as ArrayBuffer);
+    files.push({ path: p, hash: await sha256(data), size: data.byteLength, mtime: iso(all.get(p)!.mtime) });
+    content.set(p, async () => data);
+  }
   for (const p of include) {
+    if (canvasRaw.has(p)) continue; // above
     const f = all.get(p);
     if (!f) continue;
     let hash = cache.get(p, f.mtime, f.size);
