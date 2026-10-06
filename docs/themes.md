@@ -180,6 +180,7 @@ Params (set them in `theme_params`):
 | `graph_node_size` | `links` | `links`: nodes grow with their number of links; `same`: all nodes alike |
 | `graph_link_distance` | `45` | how long links are at rest, in pixels; larger spreads the graph out |
 | `instant_navigation` | `true` | links to the site's pages load in place: the page, its head metadata and the list pane (kept when it lists the same notes) are swapped, the nav pane keeps its scroll and open folders, search and the graph stay loaded, and scripts and styles a page needs (KaTeX, Mermaid) are added; anything unexpected falls back to a normal load |
+| `stacked_pages` | `false` | on screens wider than 820px, links to notes in a note's text or backlinks open the note in a pane to the right of the one the link is in (closing the panes after it); panes slide over each other, leaving a spine with their title, and are listed in the address as `?stack=/a/&stack=/b/`; links to other pages, and all links on small screens, open as usual |
 | `link_previews` | `true` | hovering a link to a note shows a preview of it (of the section, for `#heading` links); on touch screens the first tap previews and the second opens |
 | `reader_mode` | `true` | a button in the page's top corner that hides the nav pane, the list pane and the aside (wide screens only); the reader's choice is kept in `localStorage` |
 | `show_profile` | `true` | the profile (`Site.Config.Profile`: avatar, author, bio, links) at the top of the menu |

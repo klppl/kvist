@@ -35,7 +35,7 @@ list: update it too when an item is done or added.
 - [x] **Breadcrumbs.** The note's folders above its title. (Quartz)
 - [x] **Reader mode.** A button that hides the menu, list and side panels.
   (Quartz)
-- [ ] **Stacked pages.** Open linked notes side by side, as panes that
+- [x] **Stacked pages.** Open linked notes side by side, as panes that
   slide. (Publish)
 - [ ] **Password-protected sites.** One password for the whole site, or
   for a folder. (Publish)

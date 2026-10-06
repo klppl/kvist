@@ -51,6 +51,25 @@
     if (text != null) e.textContent = text;
     return e;
   }
+  // Stylesheets and scripts another page of the site needs (KaTeX,
+  // Mermaid, code styles) and this one lacks, for showing that page here.
+  // Resolves when the scripts have loaded.
+  function addAssets(doc) {
+    var sameNode = function (a, b) {
+      return a.tagName === b.tagName && (a.getAttribute("href") || a.getAttribute("src")) === (b.getAttribute("href") || b.getAttribute("src"));
+    };
+    var waits = [];
+    doc.head.querySelectorAll('link[rel="stylesheet"], script[src]').forEach(function (n) {
+      var have = Array.prototype.some.call(document.head.querySelectorAll(n.tagName), function (o) { return sameNode(o, n); });
+      if (have) return;
+      if (n.tagName === "LINK") { document.head.appendChild(document.importNode(n, true)); return; }
+      var s = document.createElement("script");
+      Array.prototype.forEach.call(n.attributes, function (a) { if (a.name !== "defer") s.setAttribute(a.name, a.value); });
+      waits.push(new Promise(function (resolve) { s.onload = s.onerror = resolve; }));
+      document.head.appendChild(s);
+    });
+    return Promise.all(waits);
+  }
 
   // ---- color theme: system → light → dark → system ----
   var toggle = $(".theme-toggle");
@@ -813,6 +832,173 @@
     initLocalGraph(page);
   }
 
+  // ---- stacked pages: linked notes open side by side ----
+  // On wide screens a link in a note opens its note in a pane to the right
+  // of the one it is in, closing the panes after that. Panes slide over
+  // each other, leaving a spine with the title of the ones underneath. The
+  // open panes are in the address (?stack=/a/&stack=/b/), so back,
+  // forward, reloads and shared links keep them.
+  if (document.body.hasAttribute("data-stacked") && window.fetch && window.DOMParser && history.pushState) {
+    var wide = window.matchMedia("(min-width: 821px)");
+    var stackDocs = {}, stackToken = 0, stackHere = location.pathname;
+    var fetchNote = function (path) {
+      if (!stackDocs[path]) {
+        stackDocs[path] = fetch(path, { credentials: "same-origin" }).then(function (r) {
+          var type = r.headers.get("content-type") || "";
+          if (!r.ok || type.indexOf("text/html") !== 0) throw new Error(r.status);
+          return r.text();
+        }).then(function (html) {
+          var doc = new DOMParser().parseFromString(html, "text/html");
+          if (!$("main .page .note", doc)) throw new Error("not a note");
+          return doc;
+        });
+        stackDocs[path].catch(function () { delete stackDocs[path]; });
+      }
+      return stackDocs[path];
+    };
+    var stackPaths = function () { return new URLSearchParams(location.search).getAll("stack"); };
+    var stackURL = function (paths) {
+      var q = new URLSearchParams(location.search);
+      q.delete("stack");
+      var parts = paths.map(function (p) { return "stack=" + encodeURI(p).replace(/[&#+]/g, encodeURIComponent); });
+      if (q.toString()) parts.unshift(q.toString());
+      return location.pathname + (parts.length ? "?" + parts.join("&") : "");
+    };
+    var panes = function () { return Array.prototype.slice.call(document.querySelectorAll("main > .stack-pane")); };
+    // The page and the open panes, left to right.
+    var columns = function () { return [$("main > .page")].concat(panes()); };
+    var paneWidth = function () { return $("main > .page").offsetWidth; };
+    var spineWidth = function () { return parseFloat(css("--spine")) * parseFloat(getComputedStyle(root).fontSize) || 40; };
+
+    // Show column i as far left as it slides, or, with whole, scroll just
+    // enough to see all of it.
+    var reveal = function (i, whole) {
+      var main = $("main");
+      var left = whole ? Math.max(main.scrollLeft, (i + 1) * paneWidth() - main.clientWidth) : i * (paneWidth() - spineWidth());
+      main.scrollTo({ left: Math.max(0, left), behavior: "smooth" });
+    };
+    var scrollToId = function (col, hash) {
+      if (!col || !hash) return;
+      var t = null;
+      try { t = col.querySelector('[id="' + CSS.escape(decodeURIComponent(hash.slice(1))) + '"]'); } catch (e) {}
+      if (t) col.scrollTop += t.getBoundingClientRect().top - col.getBoundingClientRect().top - 16;
+    };
+    // A column with the next one slid over it shows its spine.
+    var markCovered = function () {
+      var cols = columns(), spine = spineWidth();
+      cols.forEach(function (c, i) {
+        var next = cols[i + 1];
+        c.classList.toggle("covered", !!next && document.body.classList.contains("stacking") &&
+          next.getBoundingClientRect().left - c.getBoundingClientRect().left < spine * 4);
+      });
+    };
+    var addSpine = function (col, title) {
+      if ($(":scope > .stack-spine", col)) return;
+      var spine = el("button", "stack-spine");
+      spine.type = "button";
+      spine.appendChild(el("span", null, title));
+      spine.tabIndex = -1; // keyboard users reach the pane itself
+      spine.addEventListener("click", function () { reveal(columns().indexOf(col)); });
+      col.insertBefore(spine, col.firstChild);
+    };
+    var makePane = function (path, doc) {
+      var title = ($(".note h1", doc) || {}).textContent || path;
+      var pane = el("section", "stack-pane");
+      pane.dataset.path = path;
+      pane.tabIndex = -1;
+      pane.setAttribute("aria-label", title);
+      var close = el("button", "icon-button stack-close", "×");
+      close.type = "button";
+      close.title = tr("close", "Close");
+      close.setAttribute("aria-label", close.title);
+      close.addEventListener("click", function () { openStack(stackPaths().slice(0, panes().indexOf(pane)), "", true); });
+      var body = document.importNode($("main .page .page-main", doc), true);
+      // Links to sections of the pane's own note point to the note.
+      body.querySelectorAll('a[href^="#"]').forEach(function (a) { a.setAttribute("href", path + a.getAttribute("href")); });
+      body.querySelectorAll("script").forEach(function (s) { s.remove(); });
+      body.querySelectorAll(".link-unpublished").forEach(function (x) { x.title = tr("not_published", "Not published"); });
+      pane.appendChild(close);
+      pane.appendChild(body);
+      addSpine(pane, title);
+      initCode(body);
+      addAssets(doc).then(function () { renderMath(body); initDiagrams(body); });
+      return pane;
+    };
+    var setStacking = function () {
+      var page = $("main > .page");
+      var on = panes().length > 0;
+      document.body.classList.toggle("stacking", on);
+      if (on) addSpine(page, ($("h1", page) || {}).textContent || document.title);
+      markCovered();
+    };
+    // openStack shows the panes for paths: the open ones are kept while
+    // they match, the rest closed and the missing ones loaded. push
+    // records it in history and brings the last pane into view.
+    var openStack = function (paths, hash, push) {
+      var token = ++stackToken;
+      if (push) history.pushState(history.state, "", stackURL(paths));
+      var have = panes(), keep = 0;
+      while (keep < have.length && keep < paths.length && have[keep].dataset.path === paths[keep]) keep++;
+      have.slice(keep).forEach(function (p) { p.remove(); });
+      setStacking();
+      var want = paths.slice(keep);
+      if (!want.length) return;
+      hidePreview();
+      Promise.all(want.map(fetchNote)).then(function (docs) {
+        if (token !== stackToken) return;
+        var last = null;
+        docs.forEach(function (doc, i) { last = makePane(want[i], doc); $("main").appendChild(last); });
+        setStacking();
+        if (!push) return;
+        reveal(paths.length, true);
+        scrollToId(last, hash);
+        last.focus({ preventScroll: true });
+      }).catch(function () {
+        // A pane that isn't a note (any more): leave it out.
+        if (token !== stackToken) return;
+        history.replaceState(history.state, "", stackURL(paths.slice(0, keep)));
+        openStack(paths.slice(0, keep), "", false);
+      });
+    };
+    var syncStack = function () { openStack(stackPaths(), "", false); };
+
+    document.addEventListener("click", function (e) {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      // Sections of a pane's note (footnotes, [[#heading]]) stay in the pane.
+      var own = e.target.closest && e.target.closest("main > .stack-pane a[href]");
+      if (own && own.hash && own.pathname === own.closest(".stack-pane").dataset.path && own.origin === location.origin) {
+        e.preventDefault();
+        scrollToId(own.closest(".stack-pane"), own.hash);
+        return;
+      }
+      if (!wide.matches) return;
+      var a = e.target.closest && e.target.closest("a.internal-link[href]");
+      if (!a || !a.closest(".content, .backlinks")) return;
+      var col = a.closest("main > .page, main > .stack-pane");
+      if (!col) return;
+      var url = new URL(a.href, location.href);
+      if (url.origin !== location.origin || /^\/_(assets|kvist)\//.test(url.pathname) || /\.(?!html?$)[a-z0-9]+$/i.test(url.pathname)) return;
+      e.preventDefault();
+      var cols = columns();
+      var at = url.pathname === location.pathname ? 0 : panes().map(function (p) { return p.dataset.path; }).indexOf(url.pathname) + 1;
+      if (at > 0 || url.pathname === location.pathname) { // open already: show it
+        reveal(at);
+        scrollToId(cols[at], url.hash);
+        return;
+      }
+      // Only notes stack; other pages open the usual way.
+      var paths = stackPaths().slice(0, cols.indexOf(col)).concat(url.pathname);
+      fetchNote(url.pathname).then(function () { openStack(paths, url.hash, true); }, function () { go(url.href); });
+    });
+    // Back and forward between stacks of the same page; instant navigation
+    // handles other pages and calls syncStack after.
+    window.addEventListener("popstate", function () { if (location.pathname === stackHere) syncStack(); });
+    onNavigate.push(function () { stackHere = location.pathname; syncStack(); });
+    $("main").addEventListener("scroll", markCovered, { passive: true });
+    window.addEventListener("resize", markCovered);
+    syncStack();
+  }
+
   // ---- instant navigation ----
   // Links to pages of the site load in place: the page, the list (unless
   // it shows the same notes) and the head's metadata are swapped, the
@@ -833,24 +1019,6 @@
     }, { passive: true });
 
     var headSel = 'meta[name="description"], meta[name="robots"], link[rel="canonical"], meta[property^="og:"], meta[property^="article:"], meta[name^="twitter:"]';
-    var sameNode = function (a, b) {
-      return a.tagName === b.tagName && (a.getAttribute("href") || a.getAttribute("src")) === (b.getAttribute("href") || b.getAttribute("src"));
-    };
-    // Stylesheets and scripts the new page needs (KaTeX, Mermaid, code
-    // styles) and this one lacks. Resolves when the scripts have loaded.
-    var addAssets = function (doc) {
-      var waits = [];
-      doc.head.querySelectorAll('link[rel="stylesheet"], script[src]').forEach(function (n) {
-        var have = Array.prototype.some.call(document.head.querySelectorAll(n.tagName), function (o) { return sameNode(o, n); });
-        if (have) return;
-        if (n.tagName === "LINK") { document.head.appendChild(document.importNode(n, true)); return; }
-        var s = document.createElement("script");
-        Array.prototype.forEach.call(n.attributes, function (a) { if (a.name !== "defer") s.setAttribute(a.name, a.value); });
-        waits.push(new Promise(function (resolve) { s.onload = s.onerror = resolve; }));
-        document.head.appendChild(s);
-      });
-      return Promise.all(waits);
-    };
     // Mark the current page in the menu as the new page does, and open
     // the folders it opens. Folders the reader opened stay open.
     var syncNav = function (doc) {
