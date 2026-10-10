@@ -79,12 +79,19 @@ func funcMap(t *Theme, site *model.Site) template.FuncMap {
 			return v
 		},
 		// recent returns the n most recently updated notes, without
-		// unlisted ones.
+		// unlisted ones and without the home note, which is the home
+		// page itself.
 		"recent": func(nv any) []*model.Note {
 			if site == nil {
 				return nil
 			}
-			return byUpdated(toInt(nv), listed(site.Notes))
+			notes := make([]*model.Note, 0, len(site.Notes))
+			for _, n := range listed(site.Notes) {
+				if n != site.Home {
+					notes = append(notes, n)
+				}
+			}
+			return byUpdated(toInt(nv), notes)
 		},
 		// newest returns the n most recently updated of the given notes
 		// (all of them for n <= 0): {{range newest 3 .Tag.Notes}}.

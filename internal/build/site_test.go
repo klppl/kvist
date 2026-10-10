@@ -247,6 +247,30 @@ func TestUnlistedOutput(t *testing.T) {
 	}
 }
 
+// TestHomeNoteNotInRecent checks that a note set as home in the settings
+// note is the home page and not also an entry in its recent list.
+func TestHomeNoteNotInRecent(t *testing.T) {
+	out := writeVault(t, map[string]string{
+		"_site.md":        "---\nhome: \"[[Start]]\"\n---\n",
+		"Garden/Start.md": "Startword text.",
+		"Garden/Other.md": "Other text.",
+	})
+	b, err := os.ReadFile(filepath.Join(out, "index.html"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	home := string(b)
+	if !strings.Contains(home, "Startword") {
+		t.Error("home page lacks the home note's text")
+	}
+	if !strings.Contains(home, `href="/garden/other/"`) {
+		t.Error("recent list lacks the other note")
+	}
+	if strings.Contains(home, `href="/garden/start/"`) {
+		t.Error("recent list includes the home note")
+	}
+}
+
 // TestStackedPagesSetting checks that the garden theme marks pages for
 // stacked pages only when the setting is on (garden.js does the rest).
 func TestStackedPagesSetting(t *testing.T) {
