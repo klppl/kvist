@@ -54,20 +54,20 @@ func TestFolderSort(t *testing.T) {
 		t.Errorf("weight as text: %v", o)
 	}
 
-	// Books.md is listed in its own folder; templates leave it out.
-	if got, want := folderTitles(folders["Books"]), []string{"Books", "Note 2", "Note 10", "zebra", "Åar", "Ängar", "Öar"}; !reflect.DeepEqual(got, want) {
+	// Books.md is the folder's page, not one of its notes.
+	if got, want := folderTitles(folders["Books"]), []string{"Note 2", "Note 10", "zebra", "Åar", "Ängar", "Öar"}; !reflect.DeepEqual(got, want) {
 		t.Errorf("Books: %v, want %v", got, want)
 	}
 	if folders["Books"].Sort != "title" {
 		t.Errorf("Books sort: %q", folders["Books"].Sort)
 	}
 
-	if got, want := folderTitles(folders["Log"]), []string{"index", "New", "Old"}; !reflect.DeepEqual(got, want) {
+	if got, want := folderTitles(folders["Log"]), []string{"New", "Old"}; !reflect.DeepEqual(got, want) {
 		t.Errorf("Log: %v, want %v", got, want)
 	}
 
-	if got, want := folderTitles(folders["Odd"])[:2], []string{"Odd", "B"}; !reflect.DeepEqual(got, want) {
-		t.Errorf("Odd: %v, want %v first", folderTitles(folders["Odd"]), want)
+	if got, want := folderTitles(folders["Odd"]), []string{"B", "A"}; !reflect.DeepEqual(got, want) {
+		t.Errorf("Odd: %v, want %v", got, want)
 	}
 	warned := false
 	for _, w := range site.Warnings {
@@ -77,5 +77,24 @@ func TestFolderSort(t *testing.T) {
 	}
 	if !warned {
 		t.Errorf("no warning for sort: random: %v", site.Warnings)
+	}
+}
+
+// TestFolderNoteOnly checks that a folder holding only its folder note
+// keeps its place in the tree, with no notes of its own.
+func TestFolderNoteOnly(t *testing.T) {
+	site := buildVault(t, map[string]string{
+		"Kvist/About/index.md":  "About.",
+		"Kvist/Hidden/index.md": "---\nunlisted: true\n---\nHidden.",
+	})
+	var names []string
+	for _, f := range site.Root.Children[0].Children {
+		names = append(names, f.Name)
+		if len(f.Notes) != 0 || f.Index == nil {
+			t.Errorf("%s: %d notes, index %v", f.Name, len(f.Notes), f.Index)
+		}
+	}
+	if !reflect.DeepEqual(names, []string{"About"}) {
+		t.Errorf("folders: %v, want [About]", names)
 	}
 }

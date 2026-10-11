@@ -780,11 +780,11 @@ func (b *builder) makeFolders(s *Site) {
 	for _, n := range s.Notes {
 		f := get(dirOf(b.sitePath(n.Path)), dirOf(n.Path))
 		n.Folder, n.FolderPath = f, f.Path
-		if !n.Unlisted {
-			f.Notes = append(f.Notes, n)
-		}
+		// The folder note is the folder's page, not one of its notes.
 		if n.URL == f.URL {
 			f.Index, f.IndexID = n, n.ID
+		} else if !n.Unlisted {
+			f.Notes = append(f.Notes, n)
 		}
 	}
 	// A folder with nothing listed in it or below it is unlisted too: it
@@ -798,7 +798,7 @@ func (b *builder) makeFolders(s *Site) {
 			}
 		}
 		f.Children = kept
-		f.Unlisted = len(f.Notes) == 0 && len(f.Children) == 0 && f.Parent != nil
+		f.Unlisted = len(f.Notes) == 0 && len(f.Children) == 0 && (f.Index == nil || f.Index.Unlisted) && f.Parent != nil
 		return !f.Unlisted
 	}
 	prune(s.Root)

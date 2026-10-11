@@ -211,7 +211,7 @@ accent = "#3f7d4e"</code></pre>
   <tbody>
     <tr><td><code>asset</code></td><td><code>{{asset "style.css"}}</code></td><td>Address of a file in <code>static/</code>, fingerprinted</td></tr>
     <tr><td><code>param</code></td><td><code>{{param "accent"}}</code></td><td>A theme setting: the site's value, else the theme's default</td></tr>
-    <tr><td><code>recent</code></td><td><code>{{range recent 10}}</code></td><td>The most recently updated notes, without unlisted ones or the home note</td></tr>
+    <tr><td><code>recent</code></td><td><code>{{range recent 10}}</code></td><td>The most recently updated notes, without unlisted ones, the home note or folder notes</td></tr>
     <tr><td><code>newest</code></td><td><code>{{range newest 3 .Tag.Notes}}</code></td><td>Any list of notes, most recently updated first (<code>0</code> for all)</td></tr>
     <tr><td><code>dateFormat</code></td><td><code>{{dateFormat "2 Jan 2006" .Note.Updated}}</code></td><td>Format a date: write 2 January 2006 the way you want dates to look</td></tr>
     <tr><td><code>isoDate</code></td><td><code>{{isoDate .Note.Created}}</code></td><td>For <code>&lt;time datetime&gt;</code></td></tr>

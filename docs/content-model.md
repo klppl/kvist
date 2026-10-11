@@ -201,7 +201,7 @@ it is in an `exclude_folders` folder.
 
 ## Folder
 
-`Name`, `Path` (the vault path), `URL`, `Notes` (listed notes only),
+`Name`, `Path` (the vault path), `URL`, `Notes` (listed notes only, without the folder note),
 `Children` (A–Z by name), `Index` (the folder note, if any), `Parent`, `Sort`.
 `Notes` start with the notes that have an `Order`, lowest first; the rest
 follow by `Sort`, which comes from the folder note's `sort` property:

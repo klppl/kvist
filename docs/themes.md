@@ -104,7 +104,7 @@ a `Page`:
 | `dateFormat` | `{{dateFormat "2 Jan 2006" .Note.Updated}}` | Go time layout; month and day names in the site's language |
 | `isoDate` | `{{isoDate .Note.Created}}` | RFC 3339 |
 | `param` | `{{param "accent"}}` | site `theme_params` over theme defaults |
-| `recent` | `{{range recent 10}}` | most recently updated notes, without unlisted ones or the home note (`0` for all) |
+| `recent` | `{{range recent 10}}` | most recently updated notes, without unlisted ones, the home note or folder notes (`0` for all) |
 | `newest` | `{{range newest 3 .Tag.Notes}}` | the given notes, most recently updated first (`0` for all) |
 | `markdownify` | `{{markdownify (str (param "footer"))}}` | Markdown → HTML (internal links are not resolved) |
 | `truncate` | `{{truncate 160 .Description}}` | at a word boundary |

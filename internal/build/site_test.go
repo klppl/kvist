@@ -271,6 +271,26 @@ func TestHomeNoteNotInRecent(t *testing.T) {
 	}
 }
 
+// TestFolderNoteNotInRecent checks that a folder note is the folder's
+// page and not also an entry in the home page's recent list.
+func TestFolderNoteNotInRecent(t *testing.T) {
+	out := writeVault(t, map[string]string{
+		"Garden/index.md": "Folderword text.",
+		"Garden/Other.md": "Other text.",
+	})
+	b, err := os.ReadFile(filepath.Join(out, "index.html"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	home := string(b)
+	if !strings.Contains(home, `href="/garden/other/"`) {
+		t.Error("recent list lacks the other note")
+	}
+	if strings.Contains(home, "Folderword") {
+		t.Error("recent list includes the folder note")
+	}
+}
+
 // TestStackedPagesSetting checks that the garden theme marks pages for
 // stacked pages only when the setting is on (garden.js does the rest).
 func TestStackedPagesSetting(t *testing.T) {
