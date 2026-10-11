@@ -253,3 +253,19 @@ profile_links:
 		t.Error("no warning for the javascript: profile link")
 	}
 }
+
+// TestHomeNoteNotInFolder checks that the home note is the home page and
+// not also one of its folder's notes.
+func TestHomeNoteNotInFolder(t *testing.T) {
+	site := buildVault(t, map[string]string{
+		"Kvist/_site.md":   "---\nhome: \"[[Start]]\"\n---\n",
+		"Kvist/Start.md":   "Start.",
+		"Kvist/Kontakt.md": "Kontakt.",
+	})
+	if site.Home == nil || site.Home.Title != "Start" {
+		t.Fatalf("home = %v", site.Home)
+	}
+	if got, want := folderTitles(site.Root.Children[0]), []string{"Kontakt"}; !reflect.DeepEqual(got, want) {
+		t.Errorf("folder notes: %v, want %v", got, want)
+	}
+}

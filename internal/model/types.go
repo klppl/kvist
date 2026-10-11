@@ -166,7 +166,7 @@ type Folder struct {
 	Name    string   `json:"name"`
 	Path    string   `json:"path"`
 	URL     string   `json:"url"`
-	Notes   []*Note  `json:"-"` // listed notes only, without the folder note, in Sort order
+	Notes   []*Note  `json:"-"` // listed notes only, without the folder note or the home note, in Sort order
 	NoteIDs []string `json:"notes"`
 	// Sort is how Notes are ordered after the notes with an Order:
 	// "updated" (newest first, the default), "created" (newest first) or

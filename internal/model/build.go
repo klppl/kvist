@@ -156,6 +156,7 @@ func Build(site *config.Site, snap source.Snapshot) (*Site, error) {
 	}
 	b.render(s)
 	b.siteImages(s, settings)
+	b.homeNote(s, settings)
 	b.makeFolders(s)
 	b.makeTags(s)
 	b.makeAssets(s)
@@ -780,10 +781,11 @@ func (b *builder) makeFolders(s *Site) {
 	for _, n := range s.Notes {
 		f := get(dirOf(b.sitePath(n.Path)), dirOf(n.Path))
 		n.Folder, n.FolderPath = f, f.Path
-		// The folder note is the folder's page, not one of its notes.
+		// The folder note is the folder's page, not one of its notes, and
+		// the home note is the home page.
 		if n.URL == f.URL {
 			f.Index, f.IndexID = n, n.ID
-		} else if !n.Unlisted {
+		} else if !n.Unlisted && n != s.Home {
 			f.Notes = append(f.Notes, n)
 		}
 	}

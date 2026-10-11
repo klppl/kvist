@@ -368,13 +368,10 @@ func (b *builder) siteImages(s *Site, st siteSettings) {
 	}
 }
 
-// finishSettings resolves the home page and the menu links once every
-// published note has its URL. Links to notes that aren't published are
-// dropped with a warning, so the menu never hints at a private note.
-func (b *builder) finishSettings(s *Site, st siteSettings) {
-	if root := s.Root; root != nil && root.Index != nil {
-		s.Home, s.HomeID = root.Index, root.Index.ID
-	}
+// homeNote resolves the settings note's home note once every published
+// note has its URL, before the folders are made, so they can leave it
+// out: it is the home page, not one of its folder's notes.
+func (b *builder) homeNote(s *Site, st siteSettings) {
 	if st.Home != nil && strings.TrimSpace(*st.Home) != "" {
 		ref := strings.TrimSpace(*st.Home)
 		var n *Note
@@ -391,6 +388,15 @@ func (b *builder) finishSettings(s *Site, st siteSettings) {
 		} else {
 			s.Home, s.HomeID = n, n.ID
 		}
+	}
+}
+
+// finishSettings falls back to the root folder note as the home page and
+// resolves the menu links. Links to notes that aren't published are
+// dropped with a warning, so the menu never hints at a private note.
+func (b *builder) finishSettings(s *Site, st siteSettings) {
+	if root := s.Root; s.Home == nil && root != nil && root.Index != nil {
+		s.Home, s.HomeID = root.Index, root.Index.ID
 	}
 	if !st.NavSet {
 		return
