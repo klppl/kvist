@@ -139,13 +139,13 @@ api_token_env = "CF_API_TOKEN"</code></pre></li>
     <tr><td><code>kvist site list|delete</code></td><td>Lists sites with their stored data and tokens; deletes a site that's no longer in <code>kvist.toml</code> (<a href="#delete-site">details</a>).</td></tr>
     <tr><td><code>kvist rollback SITE REVISION</code></td><td>Makes an earlier revision live again.</td></tr>
     <tr><td><code>kvist gc</code></td><td>Cleans up unused uploads now (the server also does it by itself).</td></tr>
-    <tr><td><code>kvist dev --dir VAULT --config kvist.toml</code></td><td>Previews a vault at <code>http://127.0.0.1:1313</code>, reloading on every change.</td></tr>
-    <tr><td><code>kvist build --dir VAULT --out DIR</code></td><td>Builds the site into a folder, without a server.</td></tr>
-    <tr><td><code>kvist push --server URL --site ID --dir VAULT</code></td><td>Publishes a folder from the terminal, like the plugin does. The token goes in <code>KVIST_TOKEN</code>, and <code>KVIST_SERVER</code> and <code>KVIST_SITE</code> can stand in for the flags; <code>-v</code> shows the decision for every note, and <code>--no-wait</code> returns without waiting for the build.</td></tr>
+    <tr><td><code>kvist dev --dir VAULT --config kvist.toml</code></td><td>Previews a vault at <code>http://127.0.0.1:1313</code>, reloading on every change. <code>--listen</code> picks another address. Without a config, only notes tagged <code>#public</code> or with <code>publish: true</code> are shown; <code>--public Kvist</code> makes a folder public too.</td></tr>
+    <tr><td><code>kvist build --dir VAULT --out DIR</code></td><td>Builds the site into a folder, without a server. <code>--emit-model FILE</code> writes what the theme receives as JSON instead (or as well), for debugging a theme.</td></tr>
+    <tr><td><code>kvist push --server URL --site ID --dir VAULT</code></td><td>Publishes a folder from the terminal, like the plugin does. The token goes in <code>KVIST_TOKEN</code>, and <code>KVIST_SERVER</code> and <code>KVIST_SITE</code> can stand in for the flags; <code>-v</code> shows the decision for every note, <code>--device</code> sets the name shown in the server's log, and <code>--no-wait</code> returns without waiting for the build. <code>--force</code> publishes even when the server has <a href="troubleshooting.html#newer-content">newer content</a>; check first.</td></tr>
     <tr><td><code>kvist version</code></td><td>Prints the version.</td></tr>
   </tbody>
 </table>
-<p>Commands that need the config look for <code>kvist.toml</code> in the current folder, or the path in <code>KVIST_CONFIG</code>, or <code>--config</code>.</p>
+<p>Commands that need the config look for <code>kvist.toml</code> in the current folder, or the path in <code>KVIST_CONFIG</code>, or <code>--config</code>. On a server with several sites, <code>dev</code>, <code>build</code> and <code>token create</code> take <code>--site</code>. <code>kvist &lt;command&gt; -h</code> lists a command's flags.</p>
 
 <h2 id="without-docker">Without Docker</h2>
 <p>kvist is a single program, so it also runs directly under systemd, behind Caddy or nginx. The <a href="https://github.com/klppl/kvist/blob/main/docs/deploy.md">deployment notes</a> have a ready-made systemd unit and an nginx example that serves the built files directly.</p>

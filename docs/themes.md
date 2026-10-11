@@ -103,7 +103,7 @@ a `Page`:
 | `absURL` | `{{absURL .URL}}` | absolute URL with the site's base URL |
 | `dateFormat` | `{{dateFormat "2 Jan 2006" .Note.Updated}}` | Go time layout; month and day names in the site's language |
 | `isoDate` | `{{isoDate .Note.Created}}` | RFC 3339 |
-| `param` | `{{param "accent"}}` | site `theme_params` over theme defaults |
+| `param` | `{{param "accent"}}` | the settings note, then the site's `theme_params`, then the theme's default |
 | `recent` | `{{range recent 10}}` | most recently updated notes, without unlisted ones, the home note or folder notes (`0` for all) |
 | `newest` | `{{range newest 3 .Tag.Notes}}` | the given notes, most recently updated first (`0` for all) |
 | `markdownify` | `{{markdownify (str (param "footer"))}}` | Markdown → HTML (internal links are not resolved) |
@@ -163,7 +163,7 @@ reused from the previous build.
 
 ## The garden theme
 
-Params (set them in `theme_params`):
+Params (set them in the settings note `_site.md`, or in `theme_params` on the server):
 
 | Param | Default | |
 |---|---|---|

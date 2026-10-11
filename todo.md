@@ -54,6 +54,9 @@ list: update it too when an item is done or added.
 - [x] **Unlisted notes.** `unlisted: true` publishes a note but leaves it
   out of lists, search, the graph, feeds and the sitemap. Also `noindex`
   for search engines.
+- [x] **Note order per folder.** Newest first, with a `sort` property on
+  the folder note (`updated`, `created`, `title`) and `order` to pin a
+  note. (Publish, Quartz's Explorer sort)
 - [x] **Search by tag.** `#tag` in the search box filters the results.
   (Quartz)
 - [ ] **Citations.** `[@key]` resolved from a BibTeX file in the vault,

@@ -27,7 +27,7 @@ Publish, and your site updates. Private notes never leave your device.
   name stays out of every address. Folders list their newest notes first;
   a `sort` property makes one A–Z or by date planted, and `order` pins a
   note to the top.
-- **Search, backlinks and a graph,** in a three-pane theme with light and
+- **Search, backlinks, link previews and a graph,** in a three-pane theme with light and
   dark mode, breadcrumbs, a reader mode, instant page loads and optional
   stacked pages that open linked notes side by side. Search filters by
   `#tag`, and images open full size with a click.
@@ -77,6 +77,8 @@ run **kvist: Publish now**. Step by step:
   from an empty server to your first published notes, in about 30 minutes.
 - [Publishing notes](https://klppl.github.io/kvist/publishing.html): what
   becomes public, and what stays private.
+- [Writing notes](https://klppl.github.io/kvist/writing.html): the
+  Obsidian features that work on the site, note properties and addresses.
 - [Customizing the site](https://klppl.github.io/kvist/customizing.html):
   title, home page, menu groups and colors.
 - [Domains and HTTPS](https://klppl.github.io/kvist/https.html): your
@@ -84,6 +86,11 @@ run **kvist: Publish now**. Step by step:
   and several sites on one server.
 - [Running the server](https://klppl.github.io/kvist/server.html):
   updates, tokens, rollbacks, removing a site and backups.
+- [Configuration](https://klppl.github.io/kvist/configuration.html) and
+  [Troubleshooting](https://klppl.github.io/kvist/troubleshooting.html):
+  every setting, and fixes for common problems.
+- [Writing a theme](https://klppl.github.io/kvist/themes.html): your own
+  CSS, changed templates or a whole new look.
 - [Roadmap](https://klppl.github.io/kvist/roadmap.html): what doesn't work
   yet, and what's planned.
 

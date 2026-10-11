@@ -153,6 +153,9 @@ stage: budding
 <p>A note can't take an address the site uses itself, like <code>/tags/</code>: a note called <em>Tags</em> right in your published folder stops the build with a message saying so. Rename it or give it a <code>permalink</code>. To keep the folder in addresses instead, set <a href="configuration.html#server-site"><code>root_folder = "/"</code></a> on the server.</p>
 <p>Renaming or moving a note changes its address. The server remembers the old one and sends visitors on to the new address, so links from elsewhere keep working. It finds the note again by its path (when only a <code>permalink</code> or a folder changed), by its unchanged text, or by its file name if no other new note has that name. A note that is no longer published isn't redirected to, and writing a new note at an old address replaces the redirect. If two notes would get the same address, the build stops and names both, and your site keeps showing the previous version until you fix it.</p>
 
+<h2 id="folder-notes">Folder notes</h2>
+<p>A note named like its folder (<code>Recipes/Recipes.md</code>) or called <code>index.md</code> is the folder's <em>folder note</em>. It becomes the folder's page: instead of a plain list of notes, <code>/recipes/</code> shows the folder note, with the folder's notes in the list beside it. The folder note isn't one of those notes, so it isn't in that list, in the folder's count or among the recent notes on the home page. Its <code>sort</code> property sets <a href="#order">the order</a> of the folder's notes. A folder without a folder note still gets a page, with its notes listed.</p>
+
 <h2 id="order">The order of notes</h2>
 <p>A folder lists its newest notes first, by their “Tended” date (<code>updated</code>), like tag pages and the home page do. A note without an <code>updated</code> property uses the time its file last changed, which can move when you sync or copy the vault, so give it one to keep its place.</p>
 <p>To choose another order for a folder, set <code>sort</code> on its folder note (<code>Recipes/Recipes.md</code> or <code>Recipes/index.md</code>):</p>
@@ -175,6 +178,7 @@ order: 1
 <pre data-label="Kvist/_site.md"><code>---
 home: "[[Welcome]]"
 ---</code></pre>
+<p>The home note is the home page, so it isn't listed in its folder or among the recent notes.</p>
 
 <h2 id="tags">Tags</h2>
 <p>Every tag on a published note gets a page at <code>/tags/&lt;tag&gt;/</code> listing its notes, newest first. <code>/tags/</code> shows every topic as a card with its size, its newest notes and its sub-tags, with a filter and an A–Z or “most notes” order. Nested tags like <code>#projects/kvist</code> get their own page, and the parent tag's page includes them. Tags can also <a href="customizing.html#groups">group the menu</a>.</p>
