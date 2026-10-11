@@ -95,15 +95,16 @@ plugin works on desktop and mobile: download
 ## Development
 
 ```sh
+make check          # everything CI runs
 make build          # bin/kvist
 make test           # Go tests
 make plugin-test    # plugin tests
-./bin/kvist dev --dir example-vault --config kvist.example.toml   # preview the demo site
+make dev            # preview the demo site on http://127.0.0.1:1313
 ```
 
 Requires Go 1.26 or later, and Node 20+ for the plugin. Read
-[CONTRIBUTING.md](CONTRIBUTING.md) before changing anything that affects
-what gets published. Developer notes: [design](docs/design.md),
+[AGENTS.md](AGENTS.md) and [CONTRIBUTING.md](CONTRIBUTING.md) before
+changing anything that affects what gets published. Developer notes: [design](docs/design.md),
 [sync protocol](docs/protocol.md), [content model](docs/content-model.md),
 [themes](docs/themes.md), [deployment](docs/deploy.md). The user guide's
 source is `docs/*.html`.

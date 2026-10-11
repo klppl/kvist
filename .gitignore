@@ -5,7 +5,9 @@
 
 # OS and editor files
 .DS_Store
-.claude/
+.claude/*
+!.claude/settings.json
+!.claude/hooks/
 .vscode/
 .idea/
 *.swp

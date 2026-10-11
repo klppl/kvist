@@ -2,7 +2,8 @@
 
 Thanks for helping. Start with [docs/design.md](docs/design.md): it explains
 the architecture and, more importantly, the leak-prevention rules every
-change must keep.
+change must keep. [AGENTS.md](AGENTS.md) is the short version: a map of the
+code, the invariants, and which files to update together for common changes.
 
 ## Layout
 
@@ -20,9 +21,11 @@ docs/               the user guide (*.html, GitHub Pages) and the developer
 ## Develop
 
 ```sh
-make test                 # gofmt check is in CI: run `make fmt` first
+make check                # everything CI runs (gofmt check, vet, tests, plugin)
+make fmt                  # gofmt; CI fails on unformatted Go
+make test                 # Go vet and tests
 make plugin-test          # plugin type check, unit and end-to-end tests
-go run ./cmd/kvist dev --dir example-vault --config kvist.example.toml
+make dev                  # preview example-vault with live reload on :1313
 ```
 
 You don't need Obsidian to work on the server: `kvist push --dir` is a
@@ -64,5 +67,6 @@ English.
 
 ## Commits and pull requests
 
-Small, focused commits with a message that says why. Run the tests before
-opening a pull request; CI runs the same checks.
+Small, focused commits with a message that says why, with a subject like
+`Area: what changed`. Run `make check` before opening a pull request; CI
+runs the same checks.

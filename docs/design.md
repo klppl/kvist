@@ -557,23 +557,31 @@ kvist/
     config/               load + validate TOML
     protocol/             wire types, version constants (shared with test client)
     api/                  HTTP handlers, auth middleware, errors
+    auth/                 per-site push tokens
+    syncer/               server side of a sync: manifest, commit, base/regression checks
     store/                CAS blobs, revisions, sessions, GC
-    source/               Source interface; source/push
-    markdown/             goldmark extensions (wikilink, embed, callout, tag, comment, highlight, blockid, math)
-    vault/                parse notes → ParsedNote (pure)
+    source/               Source interface; source/push (the store), source/dir (a folder, dev and tests)
+    markdown/             goldmark extensions (wikilink, embed, callout, tag, comment, highlight, blockid, math, video, code blocks)
+    vault/                parse notes → ParsedNote (pure); canvases, image properties
     publish/              rules + reachability (gate 2)
     resolve/              Obsidian link resolution
-    model/                content model types + builder (+ derive: backlinks, graph, search, feeds)
-    render/               theme loading, template funcs, page rendering
-    build/                orchestration, incremental cache, atomic output
+    slug/                 URL slugs and heading anchors
+    model/                content model types + builder (+ derive: backlinks, graph, search, feeds, settings note)
+    render/               theme loading, template funcs, page rendering, generated files, social images, i18n
+    build/                orchestration, build queue, redirects, atomic output
+    serve/                static serving of each site's public/
+    imagemeta/            strip EXIF/GPS from images
+    cdn/                  Cloudflare cache purge after builds
     devserver/            live reload
     pushclient/           reference protocol client (used by `kvist push` and tests)
   themes/garden/
   plugin/                 Obsidian plugin (TypeScript, own package.json)
   example-vault/          demo vault: every feature + deliberate private notes
   testdata/leaks/         leak-prevention fixture vaults
+  testdata/parity/        fixtures shared by the Go and plugin tests
+  deploy/                 Docker Compose, Caddyfile, systemd unit, sample config
   docs/                   design.md, protocol.md, content-model.md, themes.md, deploy.md
-  Dockerfile  Makefile  CONTRIBUTING.md  LICENSE (Lagom License)
+  Dockerfile  Makefile  AGENTS.md  CONTRIBUTING.md  LICENSE (Lagom License)
 ```
 
 `internal/` keeps the Go API surface small; the public contracts are the
