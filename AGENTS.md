@@ -60,12 +60,12 @@ Pipeline: plugin/`kvist push` → `api` → `syncer` → `store` → `source/pus
 | `internal/publish/` | Publish rules, gate 2 (mirrored by `plugin/src/rules.ts`) |
 | `internal/resolve/` | Obsidian link resolution |
 | `internal/slug/` | URL slugs and heading anchors (mirrored by `plugin/src/slug.ts`) |
-| `internal/model/` | Content model v1: the only thing themes see. Builder, backlinks, graph, search, feeds, `_site.md` settings, analytics, canvases |
-| `internal/render/` | Theme loading, template funcs, page rendering, generated files (RSS, sitemap, search index), social images, i18n |
+| `internal/model/` | Content model v1: the only thing themes see. Builder, backlinks, related notes, graph, search, feeds, `_site.md` settings, analytics, canvases |
+| `internal/render/` | Theme loading, template funcs, page rendering, generated files (RSS, sitemap, search index), SEO (canonical, structured data), social images, i18n |
 | `internal/build/` | Build orchestration, per-site queue, redirects for moved notes, atomic output |
 | `internal/devserver/` | `kvist dev`: build a folder, serve it, poll for changes, live reload |
 | `internal/serve/` | Static serving of each site's `public/` |
-| `internal/imagemeta/` | Strip EXIF/GPS from images |
+| `internal/imagemeta/` | Strip EXIF/GPS from images, read image sizes |
 | `internal/thumb/` | Small copies of note images (cropped, upright, no metadata) for lists and cards; made in `build/thumbs.go` |
 | `internal/cdn/` | Cloudflare cache purge after builds |
 | `internal/pushclient/` | Go reference client: scan a folder like the plugin does, push it |

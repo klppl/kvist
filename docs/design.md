@@ -270,7 +270,7 @@ Snapshot ─► Parse ─► Publish filter ─► Resolve ─► Model ─► R
 | Parse | `vault` | bytes → `ParsedNote` (frontmatter, tags, links, embeds, headings, block IDs, AST) | Pure, cached by content hash. Obsidian-flavored goldmark extensions live in `markdown`. |
 | Publish filter | `publish` | parsed notes + rules → published set, attachment set, warnings | Gate 2. Note-local rules, then attachment reachability from published notes only. |
 | Resolve | `resolve` | links/embeds → targets within the published set | Obsidian semantics: path, basename, aliases, `#heading`, `#^block`, `|alias`. Unresolved ⇒ treated identically whether missing or private. |
-| Model | `model` | everything → `content model v1` (§6) | Backlinks, tags, folder tree, graph, search docs derived here, from published data only. |
+| Model | `model` | everything → `content model v1` (§6) | Backlinks, related notes, tags, folder tree, graph, search docs derived here, from published data only. |
 | Thumbnails | `build`, `thumb` | each note's `image`/`cover` → 128×128 and 640×360 copies | Before rendering, so themes get the URLs. Cropped from the middle, turned upright, re-encoded without metadata; named by the source hash, so unchanged ones are linked from the previous build without decoding. |
 | Render | `render` | model + theme → files | `html/template`, chroma highlighting, theme static assets. |
 | Output | `build` | files → `builds/<id>` → swap `public` | Atomic; unchanged files hard-linked from the previous build. |
