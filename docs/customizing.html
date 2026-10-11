@@ -83,7 +83,7 @@ Settings for my website.
     <tr><td><code>home</code></td><td>A published note to use as the home page, as a link: <code>"[[Welcome]]"</code>. Obsidian keeps it up to date if you rename the note. Without it, the published folder's own note is the home page, if it has one (<a href="writing.html#home">The home page</a>).</td></tr>
     <tr><td><code>groups</code></td><td>Tags that group the menu (<a href="#groups">below</a>).</td></tr>
     <tr><td><code>avatar</code>, <code>bio</code>, <code>profile_links</code></td><td>A profile at the top of the menu (<a href="#profile">below</a>).</td></tr>
-    <tr><td><code>image</code></td><td>The picture shown when a page is shared on social media or in chats, unless the note has its own <code>image</code> or <code>cover</code>: <code>"[[preview.png]]"</code> or a web address. About 1200×630 pixels works everywhere. Notes get a generated picture instead (see <code>social_images</code> below), so this one shows for the home page, folders and tags.</td></tr>
+    <tr><td><code>image</code></td><td>The picture shown when a page is shared on social media or in chats, unless the note has its own <code>image</code> or <code>cover</code>: <code>"[[preview.png]]"</code> or a web address. About 1200×630 pixels works everywhere. Notes get a generated picture instead (see <code>social_images</code> below), so this one shows for the home page, folders and tags. Use PNG, JPEG or WebP: social media don't show SVG or AVIF, so those are skipped.</td></tr>
     <tr><td><code>favicon</code></td><td>The small icon in browser tabs and bookmarks: <code>"[[icon.png]]"</code> or a web address. A square PNG or SVG of at least 64×64 pixels. Without it, the theme shows a green sprout.</td></tr>
     <tr><td><code>analytics</code>, <code>analytics_id</code>, <code>analytics_url</code></td><td>Visitor statistics with Plausible, Umami or GoatCounter (<a href="#analytics">below</a>).</td></tr>
     <tr><td><code>strict_line_breaks</code></td><td><code>true</code> to treat a single line break as a space, like Obsidian's <em>Strict line breaks</em>. By default it is kept as a line break.</td></tr>
@@ -204,6 +204,23 @@ analytics_id: garden.example.com
   </tbody>
 </table>
 <p>If you run the service yourself, set <code>analytics_url</code> to its script, for example <code>https://stats.example.com/js/script.js</code>; for a self-hosted GoatCounter, <code>analytics_id</code> is its count address, <code>https://stats.example.com/count</code>. Addresses must start with <code>https://</code>. A setting kvist can't use is left out with a warning in the publish report, and <code>analytics: none</code> turns counting off. The same settings work in the server's <code>[site.theme_params]</code>.</p>
+
+<h2 id="search-engines">Search engines and sharing</h2>
+<p>kvist describes every page for search engines and social media, with nothing to set up:</p>
+<ul>
+  <li>A title, a description and a canonical address on every page, and a preview picture with Open Graph and X (Twitter) tags.</li>
+  <li>Structured data (schema.org) that tells search engines a note is an article, with its dates, author, tags and its place in your folders.</li>
+  <li><code>/sitemap.xml</code> with the date each page last changed, and <code>/robots.txt</code> pointing to it.</li>
+  <li>Permanent redirects when a note moves, so old links and search results keep working.</li>
+  <li><code>noindex</code> on unlisted notes and on the “not found” page, so they stay out of search results.</li>
+</ul>
+<p>What helps most is in your notes:</p>
+<ul>
+  <li><strong>Give important notes a <code>description</code>.</strong> Search results show about 155 characters. Without one, kvist uses the note's first paragraph.</li>
+  <li><strong>Describe your images</strong> after a <code>|</code>: <code>![[tomatoes.jpg|Ripe tomatoes on the vine]]</code>. This is what search engines and screen readers read.</li>
+  <li><strong>Set <code>author</code> and <code>description</code></strong> in the settings note, and <code>profile_links</code> to your other profiles: search engines use them to know who writes the site.</li>
+  <li><strong>Tell search engines about your sitemap</strong> once: add your site in <a href="https://search.google.com/search-console">Google Search Console</a> and <a href="https://www.bing.com/webmasters">Bing Webmaster Tools</a> and submit <code>https://your-site/sitemap.xml</code>.</li>
+</ul>
 
 <h2 id="further">Going further</h2>
 <p>To change more than these settings, you can replace individual theme files, or write a whole theme. Both are done on the server; see <a href="themes.html">Writing a theme</a>.</p>

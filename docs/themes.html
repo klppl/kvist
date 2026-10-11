@@ -154,12 +154,14 @@ accent = "#3f7d4e"</code></pre>
   <thead><tr><th>Field</th><th></th></tr></thead>
   <tbody>
     <tr><td><code>.Kind</code></td><td><code>home</code>, <code>note</code>, <code>folder</code>, <code>tag</code>, <code>tags</code> or <code>404</code></td></tr>
-    <tr><td><code>.Title</code>, <code>.URL</code>, <code>.Description</code></td><td>For <code>&lt;title&gt;</code>, links and meta tags</td></tr>
+    <tr><td><code>.Title</code>, <code>.URL</code>, <code>.Description</code></td><td>For <code>&lt;title&gt;</code>, links and meta tags. Folder and tag pages get a description from what they list</td></tr>
+    <tr><td><code>.Canonical</code></td><td>The page's preferred address, for <code>&lt;link rel="canonical"&gt;</code>: the same as <code>.URL</code>, except on the home note's own page, which points to the home page</td></tr>
     <tr><td><code>.Note</code></td><td>The note, on note pages (and on the home page if it uses a note)</td></tr>
     <tr><td><code>.Folder</code>, <code>.Tag</code></td><td>The folder or tag, on their pages</td></tr>
     <tr><td><code>.Site</code></td><td>Everything published (below)</td></tr>
     <tr><td><code>.Features</code></td><td><code>.Math</code>, <code>.Mermaid</code>, <code>.Code</code>: load KaTeX, Mermaid and highlighting styles only when the page needs them</td></tr>
-    <tr><td><code>.SocialImage</code></td><td>On note pages without an <code>image</code>: the address of a generated preview picture, if the theme turns on <code>social_images</code> in its <code>[params]</code></td></tr>
+    <tr><td><code>.SocialImage</code></td><td>On note pages without an <code>image</code> (or with an SVG one, which social media don't show): the address of a generated preview picture, if the theme turns on <code>social_images</code> in its <code>[params]</code></td></tr>
+    <tr><td><code>.Image</code></td><td>The picture to use for <code>og:image</code>: the note's image, else <code>.SocialImage</code>, else the site's image; empty if none can be shown</td></tr>
   </tbody>
 </table>
 <p>A minimal <code>base.html</code> and <code>note.html</code>:</p>
@@ -216,6 +218,7 @@ accent = "#3f7d4e"</code></pre>
     <tr><td><code>dateFormat</code></td><td><code>{{dateFormat "2 Jan 2006" .Note.Updated}}</code></td><td>Format a date: write 2 January 2006 the way you want dates to look</td></tr>
     <tr><td><code>isoDate</code></td><td><code>{{isoDate .Note.Created}}</code></td><td>For <code>&lt;time datetime&gt;</code></td></tr>
     <tr><td><code>absURL</code></td><td><code>{{absURL .URL}}</code></td><td>Full address with the site's domain</td></tr>
+    <tr><td><code>structuredData</code></td><td><code>{{structuredData .}}</code></td><td>The page described for search engines (schema.org JSON-LD), for <code>&lt;script type="application/ld+json"&gt;</code>; empty on the 404 page</td></tr>
     <tr><td><code>markdownify</code></td><td><code>{{markdownify (str (param "footer"))}}</code></td><td>Markdown to HTML</td></tr>
     <tr><td><code>truncate</code></td><td><code>{{truncate 160 .Description}}</code></td><td>Shorten at a word boundary</td></tr>
     <tr><td><code>default</code></td><td><code>{{default "Untitled" .Title}}</code></td><td>A fallback for empty values</td></tr>
@@ -256,6 +259,7 @@ accent = "#3f7d4e"</code></pre>
   <li><strong>Work without JavaScript.</strong> Use scripts for extras like search, the graph and the theme toggle.</li>
   <li><strong>Keep private notes invisible.</strong> Style <code>.link-unpublished</code> like normal text, with no “locked” icons or hints.</li>
   <li><strong>Respect unlisted notes.</strong> The site's lists leave them out already; on their own page, add <code>&lt;meta name="robots" content="noindex"&gt;</code> when <code>.Note.Unlisted</code> is true.</li>
+  <li><strong>Describe pages for search engines.</strong> Use <code>.Canonical</code> for the canonical link, <code>.Image</code> for <code>og:image</code> and <code>structuredData</code> for JSON-LD, as the built-in theme's <code>partials/head-meta.html</code> does.</li>
   <li><strong>Load heavy things only when needed.</strong> Check <code>.Features.Math</code> and <code>.Features.Mermaid</code> before loading KaTeX or Mermaid.</li>
   <li><strong>Don't load from other websites.</strong> Put fonts and libraries in <code>static/</code>, so visitors aren't tracked and the site keeps working.</li>
   <li><strong>Keep pages small.</strong> Don't list every note on every page; big gardens have thousands. The built-in theme shows only the current folder or group.</li>

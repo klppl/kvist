@@ -99,6 +99,13 @@ func TestSiteOutput(t *testing.T) {
 		`<meta name="twitter:card" content="summary_large_image">`,
 		// breadcrumbs
 		`<nav class="crumbs" aria-label="Folder path"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/garden/">Garden</a></nav>`,
+		// search engine metadata
+		`<meta name="robots" content="max-image-preview:large">`,
+		`<meta property="og:type" content="article">`,
+		`<meta property="article:published_time" content="`,
+		`<script type="application/ld+json">[{"@context":"https://schema.org","@type":"Article",`,
+		`"headline":"Hub"`,
+		`{"@type":"ListItem","item":"https://garden.example.com/garden/","name":"Garden","position":2}`,
 	} {
 		if !strings.Contains(string(hub), frag) {
 			t.Errorf("hub page lacks %q", frag)
@@ -108,6 +115,12 @@ func TestSiteOutput(t *testing.T) {
 	// the other pages.
 	if home, _ := os.ReadFile(filepath.Join(out, "index.html")); !bytes.Contains(home, []byte(`<meta property="og:image" content="https://garden.example.com/_assets/`)) {
 		t.Error("home page lacks the site's image")
+	}
+	if home, _ := os.ReadFile(filepath.Join(out, "index.html")); !bytes.Contains(home, []byte(`<meta property="og:type" content="website">`)) || !bytes.Contains(home, []byte(`"@type":"WebSite"`)) {
+		t.Error("home page is not described as the website")
+	}
+	if nf, _ := os.ReadFile(filepath.Join(out, "404.html")); !bytes.Contains(nf, []byte(`<meta name="robots" content="noindex">`)) || bytes.Contains(nf, []byte("ld+json")) {
+		t.Error("404 page should be noindex, without structured data")
 	}
 	if social, _ := filepath.Glob(filepath.Join(out, "_kvist", "social", "*.png")); len(social) == 0 {
 		t.Error("no social images written")
@@ -139,7 +152,9 @@ func TestSiteOutput(t *testing.T) {
 	if s := read("index.xml"); !strings.Contains(s, "<link>https://garden.example.com/garden/hub/</link>") || !strings.Contains(s, `<rss version="2.0"`) {
 		t.Errorf("feed: %.400s", s)
 	}
-	if s := read("sitemap.xml"); !strings.Contains(s, "<loc>https://garden.example.com/tags/garden/leaf/</loc>") {
+	// Folder and tag pages carry the date of their newest note.
+	if s := read("sitemap.xml"); !strings.Contains(s, "<loc>https://garden.example.com/tags/garden/leaf/</loc>\n    <lastmod>") ||
+		!strings.Contains(s, "<loc>https://garden.example.com/tags/</loc>\n    <lastmod>") {
 		t.Errorf("sitemap: %.400s", s)
 	}
 	if s := read("robots.txt"); !strings.Contains(s, "Sitemap: https://garden.example.com/sitemap.xml") {

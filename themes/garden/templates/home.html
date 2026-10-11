@@ -1,6 +1,7 @@
 {{define "main" -}}
 {{- with .Note}}
 <article class="note home-note">
+  <header class="note-header"><h1>{{.Title}}</h1></header>
   <div class="content">{{.Content}}</div>
 </article>
 {{- else}}

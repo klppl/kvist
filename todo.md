@@ -57,6 +57,9 @@ list: update it too when an item is done or added.
 - [x] **Note order per folder.** Newest first, with a `sort` property on
   the folder note (`updated`, `created`, `title`) and `order` to pin a
   note. (Publish, Quartz's Explorer sort)
+- [x] **Search engine metadata.** schema.org JSON-LD (articles,
+  breadcrumbs), Open Graph article dates and tags, sitemap dates for folder
+  and tag pages, descriptions for list pages, one address per page.
 - [x] **Search by tag.** `#tag` in the search box filters the results.
   (Quartz)
 - [ ] **Citations.** `[@key]` resolved from a BibTeX file in the vault,

@@ -21,7 +21,8 @@ import (
 	"golang.org/x/image/math/fixed"
 )
 
-// Social preview images: for notes without an image property, when the
+// Social preview images: for notes without an image property (or with
+// one social networks don't show, like SVG; see previewable), when the
 // theme's social_images param is on, a 1200×630 PNG with the note's title,
 // description and the site's name. They are named by a hash of what they
 // show, so an unchanged image is reused from the previous build and can be
@@ -54,8 +55,8 @@ type socialCard struct {
 	Accent                           color.RGBA
 }
 
-// socialImages writes an image for every note page without an image
-// property and returns their URLs by note path.
+// socialImages writes an image for every note page without a previewable
+// image property and returns their URLs by note path.
 func (r *renderer) socialImages() (map[string]string, error) {
 	if on, _ := lookupParam(r.theme, r.site, "social_images").(bool); !on {
 		return nil, nil
@@ -76,7 +77,7 @@ func (r *renderer) socialImages() (map[string]string, error) {
 	urls := map[string]string{}
 	done := map[string]bool{}
 	for _, n := range r.site.Notes {
-		if n.Image != "" || n.URL == "/" {
+		if previewable(n.Image) || n.URL == "/" {
 			continue
 		}
 		c := socialCard{Site: r.site.Config.Title, Title: n.Title, Description: n.Description, Domain: domain, Accent: accent}

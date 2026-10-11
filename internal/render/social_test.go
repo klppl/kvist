@@ -31,6 +31,7 @@ func TestSocialImages(t *testing.T) {
 		{Path: "d.md", URL: "/d/", Title: "Own image", Image: "/_assets/x/y.png"},
 		{Path: "e.md", URL: "/e/", Title: "東京の庭"},
 		{Path: "f.md", URL: "/f/", Title: "Short", Description: "Some words."}, // same picture as a.md
+		{Path: "g.md", URL: "/g/", Title: "Vector", Image: "/_assets/x/y.svg"}, // social networks don't show SVG
 		{Path: "index.md", URL: "/", Title: "Home"},
 	}
 	out := &memOutput{files: map[string][]byte{}}
@@ -39,7 +40,7 @@ func TestSocialImages(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, p := range []string{"a.md", "b.md", "c.md"} {
+	for _, p := range []string{"a.md", "b.md", "c.md", "g.md"} {
 		u := urls[p]
 		b := out.files[strings.TrimPrefix(u, "/")]
 		if !strings.HasPrefix(u, "/_kvist/social/") || b == nil {
@@ -55,7 +56,7 @@ func TestSocialImages(t *testing.T) {
 			t.Errorf("%s should have no generated image, got %s", p, u)
 		}
 	}
-	if urls["a.md"] != urls["f.md"] || len(out.files) != 3 {
+	if urls["a.md"] != urls["f.md"] || len(out.files) != 4 {
 		t.Errorf("identical cards should share a file: %v, %d files", urls, len(out.files))
 	}
 
@@ -70,7 +71,7 @@ func TestSocialImages(t *testing.T) {
 	if urls2["b.md"] != urls["b.md"] || !bytes.Equal(again.files[strings.TrimPrefix(urls["b.md"], "/")], out.files[strings.TrimPrefix(urls["b.md"], "/")]) {
 		t.Error("social images are not deterministic")
 	}
-	if len(again.files) != 2 {
+	if len(again.files) != 3 {
 		t.Errorf("reused image written again: %d files", len(again.files))
 	}
 

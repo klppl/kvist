@@ -112,6 +112,19 @@ func (s *Static) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, to, http.StatusMovedPermanently)
 		return
 	}
+	// /notes/index.html → /notes/: one address per page for search engines.
+	if esc := path.Clean("/" + r.URL.EscapedPath()); path.Base(clean) == "index.html" && strings.HasSuffix(esc, "/index.html") {
+		if f, _, err := open(dir, strings.TrimPrefix(clean, "/")); err == nil {
+			f.Close()
+			target := strings.TrimSuffix(esc, "index.html")
+			if r.URL.RawQuery != "" {
+				target += "?" + r.URL.RawQuery
+			}
+			h.Set("Cache-Control", cacheShort)
+			http.Redirect(w, r, target, http.StatusMovedPermanently)
+			return
+		}
+	}
 	rel := strings.TrimPrefix(clean, "/")
 	if rel == redirectsFile {
 		s.notFound(w, r, dir) // read from disk only; it changes on every build

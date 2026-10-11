@@ -20,19 +20,26 @@ type Output interface {
 
 // Page is the data every page template receives.
 type Page struct {
-	Kind        string // home, note, folder, tag, tags, 404
-	Site        *model.Site
-	Theme       *Theme
-	Title       string
-	URL         string
+	Kind  string // home, note, folder, tag, tags, 404
+	Site  *model.Site
+	Theme *Theme
+	Title string
+	URL   string
+	// Canonical is the page's preferred address: its URL, except for the
+	// home note's own page, whose content is the home page ("/").
+	Canonical   string
 	Description string
 	Note        *model.Note   // note pages, and home when a home note exists
 	Folder      *model.Folder // folder pages
 	Tag         *model.Tag    // tag pages
 	Features    markdown.Features
 	// SocialImage is the generated preview image of a note page without
-	// an image property, when the theme's social_images param is on.
+	// an image property (or with one social networks don't show, like
+	// SVG), when the theme's social_images param is on.
 	SocialImage string
+	// Image is the page's preview image for og:image: the note's image,
+	// else SocialImage, else the site's image; "" when none can be shown.
+	Image string
 }
 
 // Render writes every page and the theme's static files. It does not copy
@@ -46,8 +53,8 @@ func Render(site *model.Site, t *Theme, out Output) error {
 		}
 		pages[kind] = c.Funcs(funcMap(t, site))
 	}
-	r := &renderer{site: site, theme: t, pages: pages, out: out, written: map[string]string{}}
 	msg := t.Messages(site.Config.Language)
+	r := &renderer{site: site, theme: t, pages: pages, out: out, msg: msg, written: map[string]string{}}
 	social, err := r.socialImages()
 	if err != nil {
 		return err
@@ -75,11 +82,16 @@ func Render(site *model.Site, t *Theme, out Output) error {
 	if err := r.folders(site.Root); err != nil {
 		return err
 	}
-	if err := r.page("/tags/", &Page{Kind: "tags", Title: msg.T("tags"), URL: "/tags/"}); err != nil {
+	var tagNames []string
+	for _, tag := range site.Tags {
+		tagNames = append(tagNames, "#"+tag.Name)
+	}
+	if err := r.page("/tags/", &Page{Kind: "tags", Title: msg.T("tags"), URL: "/tags/", Description: listDescription(msg.T("tag_count", len(site.AllTags)), tagNames)}); err != nil {
 		return err
 	}
 	for _, tag := range site.AllTags {
-		if err := r.page(tag.URL, &Page{Kind: "tag", Title: "#" + tag.Name, URL: tag.URL, Tag: tag}); err != nil {
+		desc := listDescription(msg.T("notes", len(tag.Notes)), noteTitles(byUpdated(0, tag.Notes)))
+		if err := r.page(tag.URL, &Page{Kind: "tag", Title: "#" + tag.Name, URL: tag.URL, Tag: tag, Description: desc}); err != nil {
 			return err
 		}
 	}
@@ -97,12 +109,21 @@ type renderer struct {
 	theme   *Theme
 	pages   map[string]*template.Template
 	out     Output
+	msg     messages
 	written map[string]string // output path → URL, to catch collisions
 }
 
 func (r *renderer) folders(f *model.Folder) error {
 	if f.URL != "/" && f.Index == nil {
-		if err := r.page(f.URL, &Page{Kind: "folder", Title: f.Name, URL: f.URL, Folder: f}); err != nil {
+		desc := listDescription(r.msg.T("notes", len(f.Notes)), noteTitles(f.Notes))
+		if len(f.Notes) == 0 {
+			var names []string
+			for _, c := range f.Children {
+				names = append(names, c.Name)
+			}
+			desc = listDescription(r.msg.T("folders", len(f.Children)), names)
+		}
+		if err := r.page(f.URL, &Page{Kind: "folder", Title: f.Name, URL: f.URL, Folder: f, Description: desc}); err != nil {
 			return err
 		}
 	}
@@ -121,6 +142,11 @@ func (r *renderer) page(url string, p *Page) error {
 
 func (r *renderer) file(p, kind string, page *Page) error {
 	page.Site, page.Theme = r.site, r.theme
+	page.Image = pageImage(page)
+	page.Canonical = page.URL
+	if page.Kind == "note" && page.Note != nil && page.Note == r.site.Home {
+		page.Canonical = "/"
+	}
 	rel, err := outputPath(p)
 	if err != nil {
 		return err

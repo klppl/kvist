@@ -30,12 +30,17 @@ func funcMap(t *Theme, site *model.Site) template.FuncMap {
 		// asset returns the URL of a theme static file: {{asset "style.css"}}.
 		"asset": func(p string) string { return t.AssetURL(p) },
 		// absURL makes a site URL absolute with the base URL.
+		// Unsafe characters (spaces, non-ASCII letters) are percent-encoded;
+		// http(s) URLs are kept as they are.
 		"absURL": func(u string) string {
 			if site == nil {
 				return u
 			}
-			return site.Config.BaseURL + "/" + strings.TrimPrefix(u, "/")
+			return absoluteURL(site, u)
 		},
+		// structuredData returns the page's schema.org JSON-LD for
+		// <script type="application/ld+json">, or "" (404 pages).
+		"structuredData": structuredData(msg, site),
 		// dateFormat formats a time with a Go layout: {{dateFormat "2 Jan 2006" .Updated}}.
 		// Month and day names are in the site's language.
 		"dateFormat": msg.FormatDate,
@@ -59,16 +64,7 @@ func funcMap(t *Theme, site *model.Site) template.FuncMap {
 			return template.HTML(out), err
 		},
 		// truncate shortens text to n characters on a word boundary.
-		"truncate": func(n int, s string) string {
-			if utf8.RuneCountInString(s) <= n {
-				return s
-			}
-			r := string([]rune(s)[:n])
-			if i := strings.LastIndexByte(r, ' '); i > len(r)/2 {
-				r = r[:i]
-			}
-			return strings.TrimRight(r, " ,.;:") + "…"
-		},
+		"truncate": truncateText,
 		// param reads a theme parameter (site config over theme defaults).
 		"param": func(key string) any { return lookupParam(t, site, key) },
 		// default returns v unless it is empty, else def: {{default "x" .Value}}.
@@ -135,6 +131,18 @@ func funcMap(t *Theme, site *model.Site) template.FuncMap {
 		"sub":       func(a, b int) int { return a - b },
 		"str":       func(v any) string { return fmt.Sprint(v) },
 	}
+}
+
+// truncateText shortens s to n characters on a word boundary.
+func truncateText(n int, s string) string {
+	if utf8.RuneCountInString(s) <= n {
+		return s
+	}
+	r := string([]rune(s)[:n])
+	if i := strings.LastIndexByte(r, ' '); i > len(r)/2 {
+		r = r[:i]
+	}
+	return strings.TrimRight(r, " ,.;:") + "…"
 }
 
 func propertyValues(msg messages, layout string, v any) []string {

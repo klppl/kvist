@@ -85,12 +85,14 @@ a `Page`:
 |---|---|
 | `.Kind` | `home`, `note`, `folder`, `tag`, `tags` or `404` |
 | `.Site` | the whole content model (`.Site.Notes`, `.Site.Config.Title`, `.Site.Root`, …) |
-| `.Title`, `.URL`, `.Description` | for `<title>`, canonical links and meta tags |
+| `.Title`, `.URL`, `.Description` | for `<title>` and meta tags. Folder and tag pages get a description from what they list ("3 notes: Soil, Tomatoes, Watering") |
+| `.Canonical` | the page's preferred address, for `<link rel="canonical">` and `og:url`: `.URL`, except on the home note's own page, which points to `/` |
 | `.Note` | the note (note pages; home when a home note exists) |
 | `.Folder` | folder pages |
 | `.Tag` | tag pages |
 | `.Features` | `{Math, Mermaid, Code}`: load scripts and styles only where needed |
-| `.SocialImage` | note pages without an image property, when the theme's `social_images` param is `true`: the URL of a generated 1200×630 PNG with the title, description and site name (below) |
+| `.SocialImage` | note pages without an image property (or with an SVG, AVIF, … one, which social networks don't show), when the theme's `social_images` param is `true`: the URL of a generated 1200×630 PNG with the title, description and site name (below) |
+| `.Image` | the page's preview image for `og:image`: the note's image, else `.SocialImage`, else the site's image; empty when none can be shown |
 | `.Theme` | name and version |
 
 ### Functions
@@ -100,7 +102,8 @@ a `Page`:
 | `asset` | `{{asset "style.css"}}` | URL of a file in `static/`, content-hashed |
 | `t` | `{{t "search"}}`, `{{t "notes" (len .Notes)}}` | a word in the site's language (below) |
 | `i18n` | `<body data-i18n="{{json (i18n "script")}}">` | a table of words, e.g. for a script |
-| `absURL` | `{{absURL .URL}}` | absolute URL with the site's base URL |
+| `absURL` | `{{absURL .URL}}` | absolute URL with the site's base URL, percent-encoded (`http(s)` URLs stay as they are) |
+| `structuredData` | `<script type="application/ld+json">{{structuredData .}}</script>` | the page's [schema.org](https://schema.org) JSON-LD: an `Article` for notes, the `WebSite` for home, a `CollectionPage` for folders and tags, with a `BreadcrumbList`; empty on 404 |
 | `dateFormat` | `{{dateFormat "2 Jan 2006" .Note.Updated}}` | Go time layout; month and day names in the site's language |
 | `isoDate` | `{{isoDate .Note.Created}}` | RFC 3339 |
 | `param` | `{{param "accent"}}` | the settings note, then the site's `theme_params`, then the theme's default |
@@ -154,7 +157,8 @@ a test keeps their keys in step with `en.toml`.
 HTML comments are removed from every page.
 
 A theme whose `[params]` has `social_images = true` gets a preview image
-for every note page without an image property (not the home page): the
+for every note page without an image property, or with one social networks
+don't show (SVG, AVIF, …), but not the home page: the
 site's name with a dot in the `accent` color, the title (as large as fits
 in three lines), the description and the site's domain, drawn with the Go
 fonts. Notes whose text those fonts can't show (Chinese, Japanese, …) get
@@ -185,7 +189,7 @@ Params (set them in the settings note `_site.md`, or in `theme_params` on the se
 | `reader_mode` | `true` | a button in the page's top corner that hides the nav pane, the list pane and the aside (wide screens only); the reader's choice is kept in `localStorage` |
 | `show_profile` | `true` | the profile (`Site.Config.Profile`: avatar, author, bio, links) at the top of the menu |
 | `show_properties` | `false` | the note's properties under its title; only keys listed in `expose_frontmatter` exist, so nothing new reaches the page |
-| `social_images` | `true` | generate `.SocialImage` for notes without an `image`; the `og:image` is the note's image, else this, else the site's |
+| `social_images` | `true` | generate `.SocialImage` for notes without a usable `image`; the `og:image` is the note's image, else this, else the site's (SVG and AVIF images are skipped: social networks don't show them) |
 | `code_style_light`, `code_style_dark` | `github`, `github-dark` | highlighting |
 | `footer` | `""` | Markdown at the bottom of the menu |
 | `mermaid_url`, `mermaid_integrity` | jsDelivr, pinned with an SRI hash | see below |
@@ -260,5 +264,9 @@ Without JavaScript, math and diagrams show their source.
   notes, so don't style it to suggest that something hidden exists.
 - Load KaTeX and Mermaid only when `.Features.Math` / `.Features.Mermaid`
   are set.
+- Describe pages for search engines: `.Canonical` for the canonical link,
+  `.Image` for `og:image`, `structuredData` for JSON-LD, and `noindex` on
+  unlisted notes and the 404 page, as `partials/head-meta.html` and
+  `base.html` of the garden theme do.
 - Not fetch anything from third-party hosts: vendor fonts and libraries in
   `static/`.

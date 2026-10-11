@@ -137,7 +137,7 @@ func feed(s *model.Site) ([]byte, error) {
 	}
 	ch := rssChannel{
 		Title:         s.Config.Title,
-		Link:          base + "/",
+		Link:          absoluteURL(s, "/"),
 		Description:   desc,
 		Language:      s.Config.Language,
 		LastBuildDate: s.BuiltAt.UTC().Format(time.RFC1123Z),
@@ -150,8 +150,8 @@ func feed(s *model.Site) ([]byte, error) {
 		}
 		ch.Items = append(ch.Items, rssItem{
 			Title:       n.Title,
-			Link:        base + n.URL,
-			GUID:        rssGUID{Value: base + n.URL, IsPermaLink: true},
+			Link:        absoluteURL(s, n.URL),
+			GUID:        rssGUID{Value: absoluteURL(s, n.URL), IsPermaLink: true},
 			PubDate:     n.Created.UTC().Format(time.RFC1123Z),
 			Description: n.Description,
 			Categories:  n.TagNames,
@@ -177,8 +177,9 @@ type sitemapURL struct {
 	LastMod string `xml:"lastmod,omitempty"`
 }
 
+// sitemap lists every listed page. Folder and tag pages are as new as
+// the newest note they list, so crawlers revisit them when a note changes.
 func sitemap(s *model.Site) ([]byte, error) {
-	base := s.Config.BaseURL
 	seen := map[string]bool{}
 	var urls []sitemapURL
 	add := func(u string, t time.Time) {
@@ -186,7 +187,7 @@ func sitemap(s *model.Site) ([]byte, error) {
 			return
 		}
 		seen[u] = true
-		e := sitemapURL{Loc: base + u}
+		e := sitemapURL{Loc: absoluteURL(s, u)}
 		if !t.IsZero() {
 			e.LastMod = t.UTC().Format("2006-01-02")
 		}
@@ -198,23 +199,33 @@ func sitemap(s *model.Site) ([]byte, error) {
 	}
 	add("/", homeTime)
 	for _, n := range listed(s.Notes) {
-		add(n.URL, n.Updated)
+		if n != s.Home { // its content is the home page's; its own page points there
+			add(n.URL, n.Updated)
+		}
 	}
-	var folders func(f *model.Folder)
-	folders = func(f *model.Folder) {
-		if f.URL != "/" {
-			add(f.URL, time.Time{})
-		}
+	var folders func(f *model.Folder) time.Time
+	folders = func(f *model.Folder) time.Time {
+		t := latest(f.Notes)
 		for _, c := range f.Children {
-			folders(c)
+			if ct := folders(c); ct.After(t) {
+				t = ct
+			}
 		}
+		if f.URL != "/" {
+			add(f.URL, t)
+		}
+		return t
 	}
 	if s.Root != nil {
 		folders(s.Root)
 	}
-	add("/tags/", time.Time{})
+	var tagged []*model.Note
+	for _, t := range s.Tags {
+		tagged = append(tagged, t.Notes...)
+	}
+	add("/tags/", latest(tagged))
 	for _, t := range s.AllTags {
-		add(t.URL, time.Time{})
+		add(t.URL, latest(t.Notes))
 	}
 	sort.Slice(urls, func(i, j int) bool { return urls[i].Loc < urls[j].Loc })
 	b, err := xml.MarshalIndent(urlset{NS: "http://www.sitemaps.org/schemas/sitemap/0.9", URLs: urls}, "", "  ")
@@ -222,6 +233,17 @@ func sitemap(s *model.Site) ([]byte, error) {
 		return nil, err
 	}
 	return append([]byte(xml.Header), append(b, '\n')...), nil
+}
+
+// latest returns the newest update time of notes, zero for none.
+func latest(notes []*model.Note) time.Time {
+	var t time.Time
+	for _, n := range notes {
+		if n.Updated.After(t) {
+			t = n.Updated
+		}
+	}
+	return t
 }
 
 // listed returns a copy of notes without the unlisted ones.
@@ -236,5 +258,5 @@ func listed(notes []*model.Note) []*model.Note {
 }
 
 func robots(s *model.Site) ([]byte, error) {
-	return []byte("User-agent: *\nAllow: /\n\nSitemap: " + s.Config.BaseURL + "/sitemap.xml\n"), nil
+	return []byte("User-agent: *\nAllow: /\n\nSitemap: " + absoluteURL(s, "/sitemap.xml") + "\n"), nil
 }

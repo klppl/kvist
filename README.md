@@ -43,8 +43,8 @@ Publish, and your site updates. Private notes never leave your device.
   Obsidian's language (English and Swedish).
 - **Self-hosted:** one small Go server in Docker, with a ready-made Caddy
   setup for HTTPS and room for several sites. RSS,
-  a sitemap, photo metadata stripping and optional cookie-free analytics
-  included.
+  a sitemap, search engine metadata (Open Graph, schema.org), photo
+  metadata stripping and optional cookie-free analytics included.
 
 ## TLDR
 
