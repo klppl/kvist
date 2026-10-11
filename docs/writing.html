@@ -113,6 +113,7 @@ updated: 2026-10-02
 tags: [articles, writing]
 aliases: [Another name]
 permalink: /about/
+order: 1
 publish: true
 stage: budding
 ---</code></pre>
@@ -125,6 +126,8 @@ stage: budding
     <tr><td><code>updated</code>, <code>modified</code> or <code>lastmod</code></td><td>The “Tended” date, and the order of “Recently tended”. Without it, the time the file was last changed.</td></tr>
     <tr><td><code>tags</code></td><td>Tags, in addition to the ones written in the text.</td></tr>
     <tr><td><code>aliases</code></td><td>Other names for the note. Search finds the note by them, and a link to an alias, <code>[[Another name]]</code>, goes to the note, even where Obsidian shows it as unresolved.</td></tr>
+    <tr><td><code>order</code> or <code>weight</code></td><td>A number that puts the note at the top of its folder's list, lowest first, ahead of the notes without one. See <a href="#order">The order of notes</a>.</td></tr>
+    <tr><td><code>sort</code></td><td>On a folder note: how the folder's notes are ordered, <code>updated</code>, <code>created</code> or <code>title</code>. See <a href="#order">The order of notes</a>.</td></tr>
     <tr><td><code>permalink</code></td><td>A custom address, such as <code>/about/</code>.</td></tr>
     <tr><td><code>publish</code></td><td><code>true</code> or <code>false</code>; see <a href="publishing.html">Publishing notes</a>.</td></tr>
     <tr><td><code>unlisted</code></td><td><code>true</code> publishes the note at its address but leaves it out of the menu, lists, tag pages, search, the graph, backlinks, the RSS feed and the sitemap, and asks search engines not to index it (<code>noindex</code>). Links to it still work. A folder with only unlisted notes leaves the menu too. Tags that only unlisted notes carry get no page.</td></tr>
@@ -149,6 +152,23 @@ stage: budding
 </table>
 <p>A note can't take an address the site uses itself, like <code>/tags/</code>: a note called <em>Tags</em> right in your published folder stops the build with a message saying so. Rename it or give it a <code>permalink</code>. To keep the folder in addresses instead, set <a href="configuration.html#server-site"><code>root_folder = "/"</code></a> on the server.</p>
 <p>Renaming or moving a note changes its address. The server remembers the old one and sends visitors on to the new address, so links from elsewhere keep working. It finds the note again by its path (when only a <code>permalink</code> or a folder changed), by its unchanged text, or by its file name if no other new note has that name. A note that is no longer published isn't redirected to, and writing a new note at an old address replaces the redirect. If two notes would get the same address, the build stops and names both, and your site keeps showing the previous version until you fix it.</p>
+
+<h2 id="order">The order of notes</h2>
+<p>A folder lists its newest notes first, by their “Tended” date (<code>updated</code>), like tag pages and the home page do. A note without an <code>updated</code> property uses the time its file last changed, which can move when you sync or copy the vault, so give it one to keep its place.</p>
+<p>To choose another order for a folder, set <code>sort</code> on its folder note (<code>Recipes/Recipes.md</code> or <code>Recipes/index.md</code>):</p>
+<table>
+  <thead><tr><th><code>sort</code></th><th>Order</th></tr></thead>
+  <tbody>
+    <tr><td><code>updated</code></td><td>Newest “Tended” date first. The default.</td></tr>
+    <tr><td><code>created</code></td><td>Newest “Planted” date first, so editing an old note doesn't move it. Good for a journal or a blog.</td></tr>
+    <tr><td><code>title</code></td><td>A to Z by title, in the site's <code>language</code> (so Swedish puts Å, Ä and Ö after Z), with numbers in number order: “Part 2” before “Part 10”. Good for reference lists.</td></tr>
+  </tbody>
+</table>
+<p>To pin a note to the top, give it an <code>order</code> (or <code>weight</code>) number. Notes with one come first, lowest number first, and the rest follow in the folder's order:</p>
+<pre data-label="Recipes/Start here.md"><code>---
+order: 1
+---</code></pre>
+<p>The order is used by the list beside a note, the folder's page and the menu. Subfolders are listed A to Z. A <code>sort</code> value kvist doesn't know is ignored, with a warning in the publish report.</p>
 
 <h2 id="home">The home page</h2>
 <p>By default the home page shows your site's title and description, cards for your folders or <a href="customizing.html#groups">menu groups</a>, and a list of recently updated notes. To use one of your notes instead, put a note named <code>index.md</code> at the top of your published folder (<code>Kvist/index.md</code>, or <code>Kvist/Kvist.md</code>, named like the folder), or set <code>home</code> in the <a href="customizing.html#settings-note">settings note</a>:</p>

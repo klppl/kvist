@@ -420,7 +420,9 @@ Note
 
 Asset   Path, URL, Size, MediaType, Hash
 Tag     Name, Slug, URL, Notes, Children, Parent
-Folder  Name, Path, URL, Notes, Children, Index *Note (folder note, if any)
+Folder  Name, Path, URL, Notes, Children, Index *Note (folder note, if any),
+        Sort (updated | created | title, from the folder note; Notes in
+        that order after the ones with frontmatter `order`)
 ```
 
 URLs: `Kvist/My Note.md` → `/my-note/` when `Kvist` is the root folder

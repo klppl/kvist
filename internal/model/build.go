@@ -8,6 +8,7 @@ import (
 	"mime"
 	"path"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -21,6 +22,8 @@ import (
 	"github.com/klppl/kvist/internal/slug"
 	"github.com/klppl/kvist/internal/source"
 	"github.com/klppl/kvist/internal/vault"
+	"golang.org/x/text/collate"
+	"golang.org/x/text/language"
 )
 
 // Warning codes produced while building the model.
@@ -32,6 +35,7 @@ const (
 	WarnPermalink        = "permalink"
 	WarnHome             = "home"
 	WarnImage            = "image"
+	WarnSort             = "sort"
 )
 
 // BuildError lists the problems that make a build fail.
@@ -243,6 +247,8 @@ func (b *builder) makeNotes(s *Site) {
 		if n.Created.After(n.Updated) {
 			n.Updated = n.Created
 		}
+		n.Order = firstNumber(fm, "order", "weight")
+		n.folderSort = firstString(fm, "sort")
 		n.Description = firstString(fm, "description", "summary") // else the first paragraph, once resolved (render)
 		for k, v := range fm {
 			if expose[k] {
@@ -361,6 +367,34 @@ func firstBool(fm map[string]any, key string) bool {
 		}
 	}
 	return false
+}
+
+// firstNumber reads a number property: a YAML number, or text that is one.
+func firstNumber(fm map[string]any, keys ...string) *float64 {
+	for _, k := range keys {
+		for _, v := range vault.FrontmatterValue(fm, k) {
+			var f float64
+			switch v := v.(type) {
+			case int:
+				f = float64(v)
+			case int64:
+				f = float64(v)
+			case uint64:
+				f = float64(v)
+			case float64:
+				f = v
+			case string:
+				var err error
+				if f, err = strconv.ParseFloat(strings.TrimSpace(v), 64); err != nil {
+					continue
+				}
+			default:
+				continue
+			}
+			return &f
+		}
+	}
+	return nil
 }
 
 var dateLayouts = []string{time.RFC3339, "2006-01-02T15:04:05", "2006-01-02T15:04", "2006-01-02 15:04:05", "2006-01-02 15:04", "2006-01-02"}
@@ -768,10 +802,21 @@ func (b *builder) makeFolders(s *Site) {
 		return !f.Unlisted
 	}
 	prune(s.Root)
+	col := collate.New(language.Make(s.Config.Language), collate.IgnoreCase, collate.Numeric)
 	var finish func(f *Folder)
 	finish = func(f *Folder) {
 		sort.Slice(f.Children, func(i, j int) bool { return strings.ToLower(f.Children[i].Name) < strings.ToLower(f.Children[j].Name) })
-		sort.Slice(f.Notes, func(i, j int) bool { return f.Notes[i].URL < f.Notes[j].URL })
+		f.Sort = "updated"
+		if f.Index != nil {
+			switch v := strings.ToLower(f.Index.folderSort); v {
+			case "", "updated":
+			case "created", "title":
+				f.Sort = v
+			default:
+				b.warn(WarnSort, f.Index.Path, "sort %q ignored; use updated, created or title", f.Index.folderSort)
+			}
+		}
+		sortNotes(f.Notes, f.Sort, col)
 		f.NoteIDs = make([]string, len(f.Notes))
 		for i, n := range f.Notes {
 			f.NoteIDs[i] = n.ID
@@ -781,6 +826,36 @@ func (b *builder) makeFolders(s *Site) {
 		}
 	}
 	finish(s.Root)
+}
+
+// sortNotes orders a folder's notes: those with an Order first, lowest
+// first, then the rest by mode (see Folder.Sort). Ties go by URL, so builds
+// stay deterministic.
+func sortNotes(notes []*Note, mode string, col *collate.Collator) {
+	sort.SliceStable(notes, func(i, j int) bool {
+		a, b := notes[i], notes[j]
+		if (a.Order == nil) != (b.Order == nil) {
+			return a.Order != nil
+		}
+		if a.Order != nil && *a.Order != *b.Order {
+			return *a.Order < *b.Order
+		}
+		switch mode {
+		case "title":
+			if c := col.CompareString(a.Title, b.Title); c != 0 {
+				return c < 0
+			}
+		case "created":
+			if !a.Created.Equal(b.Created) {
+				return a.Created.After(b.Created)
+			}
+		default:
+			if !a.Updated.Equal(b.Updated) {
+				return a.Updated.After(b.Updated)
+			}
+		}
+		return a.URL < b.URL
+	})
 }
 
 func dirOf(p string) string {

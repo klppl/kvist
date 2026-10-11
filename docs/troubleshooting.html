@@ -108,6 +108,9 @@
 <h3 id="old-link">An old link to a renamed note shows “Nothing grows here”</h3>
 <p>kvist redirects a renamed or moved note's old address when it can tell which note it became. It can't when the note was renamed <em>and</em> edited <em>and</em> another new note shares its new file name, or when it was renamed while private. Publishing after each rename gives it the best chance.</p>
 
+<h3 id="note-order">Notes in a folder are in the wrong order</h3>
+<p>Folders list the newest notes first, by the <code>updated</code> property, or by when the file last changed if a note has none. Syncing or copying the vault can change those file times, so give the notes an <code>updated</code> date. To list a folder A to Z or by <code>created</code> date instead, or to pin a note to the top, see <a href="writing.html#order">The order of notes</a>.</p>
+
 <h3 id="still-visible">A page is still visible after I unpublished it</h3>
 <p>Pages are cached for up to 60 seconds. With Cloudflare, set up the <a href="server.html#purge">cache purge</a> so it disappears immediately.</p>
 

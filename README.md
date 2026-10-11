@@ -24,7 +24,9 @@ Publish, and your site updates. Private notes never leave your device.
   become plain text.
 - **Your folder is the site:** publish one folder from your vault and it
   becomes the site's root, so its subfolders are the menu and the folder's
-  name stays out of every address.
+  name stays out of every address. Folders list their newest notes first;
+  a `sort` property makes one A–Z or by date planted, and `order` pins a
+  note to the top.
 - **Search, backlinks and a graph,** in a three-pane theme with light and
   dark mode, breadcrumbs, a reader mode, instant page loads and optional
   stacked pages that open linked notes side by side. Search filters by

@@ -17,6 +17,10 @@ Properties at the top of a note set:
 | `image` or `cover` | the picture when the page is shared |
 | `permalink` | a custom address, like [[About]] at `/about/` |
 | `aliases` | other names to find and link the note by |
+| `order` | a number that pins the note to the top of its folder |
+| `sort` | on a folder note: `updated`, `created` or `title` order for the folder |
+
+This folder's note, [[Features|Feature tour]], has `sort: title`, so the features are listed A to Z instead of newest first.
 
 This note's description is set by hand; others use their first paragraph.
 

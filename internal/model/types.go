@@ -82,22 +82,26 @@ type NavItem struct {
 
 // Note is a published note.
 type Note struct {
-	ID          string         `json:"id"`
-	Path        string         `json:"path"`
-	URL         string         `json:"url"`
-	Slug        string         `json:"slug"`
-	Title       string         `json:"title"`
-	Aliases     []string       `json:"aliases,omitempty"`
-	Tags        []*Tag         `json:"-"`
-	TagNames    []string       `json:"tags"`
-	Created     time.Time      `json:"created"`
-	Updated     time.Time      `json:"updated"`
+	ID       string    `json:"id"`
+	Path     string    `json:"path"`
+	URL      string    `json:"url"`
+	Slug     string    `json:"slug"`
+	Title    string    `json:"title"`
+	Aliases  []string  `json:"aliases,omitempty"`
+	Tags     []*Tag    `json:"-"`
+	TagNames []string  `json:"tags"`
+	Created  time.Time `json:"created"`
+	Updated  time.Time `json:"updated"`
+	// Order: frontmatter order (or weight). Notes with one come first in
+	// their folder, lowest first; nil for the rest.
+	Order       *float64       `json:"order,omitempty"`
 	Description string         `json:"description,omitempty"`
 	Params      map[string]any `json:"params,omitempty"`
 	Image       string         `json:"image,omitempty"` // social preview image, like SiteConfig.Image
 	// Unlisted: published, but left out of folders, tags, the graph,
 	// backlinks, search, the feed and the sitemap (frontmatter unlisted).
-	Unlisted bool `json:"unlisted,omitempty"`
+	Unlisted   bool   `json:"unlisted,omitempty"`
+	folderSort string // frontmatter sort, read when this is a folder note
 	// Canvas: the page is an Obsidian canvas (a .canvas file). Content is
 	// then a board of cards and arrows, and there are no properties,
 	// aliases or TOC.
@@ -159,11 +163,15 @@ type Tag struct {
 
 // Folder is a folder containing published notes.
 type Folder struct {
-	Name     string    `json:"name"`
-	Path     string    `json:"path"`
-	URL      string    `json:"url"`
-	Notes    []*Note   `json:"-"` // listed notes only
-	NoteIDs  []string  `json:"notes"`
+	Name    string   `json:"name"`
+	Path    string   `json:"path"`
+	URL     string   `json:"url"`
+	Notes   []*Note  `json:"-"` // listed notes only, in Sort order
+	NoteIDs []string `json:"notes"`
+	// Sort is how Notes are ordered after the notes with an Order:
+	// "updated" (newest first, the default), "created" (newest first) or
+	// "title" (A–Z), from the folder note's sort property.
+	Sort     string    `json:"sort"`
 	Children []*Folder `json:"children,omitempty"`
 	Index    *Note     `json:"-"` // folder note, if any
 	IndexID  string    `json:"index,omitempty"`

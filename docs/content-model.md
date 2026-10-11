@@ -77,6 +77,7 @@ code blocks don't count.
 | `Aliases` | []string | Frontmatter `aliases`. |
 | `Tags` | []*Tag | Frontmatter tags plus tags in the body, without the control tags and without tags inside comments. |
 | `Created`, `Updated` | time | `Updated`: frontmatter `updated`/`modified`/`lastmod`, else the file's modification time. `Created`: `created`/`date`, else `Updated`. |
+| `Order` | *float64 | Frontmatter `order`, else `weight` (a number, or text that is one); nil without. Puts the note first in its folder, lowest first. |
 | `Description` | string | Frontmatter `description`/`summary`, else the first paragraph (≤ 200 characters). |
 | `Params` | map | Only the frontmatter keys listed in `expose_frontmatter`. Other keys never reach a theme. |
 | `Image` | string | Social preview image from the `image` or `cover` property: the URL of a published image (`/_assets/…`), or an http(s) URL; empty if unset or not a published image. The value may be `"[[cover.png]]"`, a vault path, or a URL. |
@@ -201,7 +202,13 @@ it is in an `exclude_folders` folder.
 ## Folder
 
 `Name`, `Path` (the vault path), `URL`, `Notes` (listed notes only),
-`Children`, `Index` (the folder note, if any), `Parent`. Only folders that
+`Children` (A–Z by name), `Index` (the folder note, if any), `Parent`, `Sort`.
+`Notes` start with the notes that have an `Order`, lowest first; the rest
+follow by `Sort`, which comes from the folder note's `sort` property:
+`updated` (newest `Updated` first, the default), `created` (newest
+`Created` first) or `title` (A–Z, collated for the site's `Language`, with
+numbers in number order). Ties go by URL. An unknown `sort` is ignored with
+a `sort` warning. Only folders that
 contain published notes exist. Folders follow the URLs: the root folder is
 `Site.Root` (its `Path` is the root folder's vault path), and its subfolders
 are the top-level folders. A folder with only unlisted notes, in it and below it, has
