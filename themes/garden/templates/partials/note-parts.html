@@ -62,6 +62,21 @@
 {{- end}}
 {{- end}}
 
+{{/* Notes with words, tags or links in common, worked out by the build
+     (Note.Related); never the ones already linked from or to this note. */}}
+{{define "related" -}}
+{{- if .Related}}
+<section class="backlinks related" aria-labelledby="related-title">
+  <h2 id="related-title">{{t "related"}}</h2>
+  <ul>
+    {{- range .Related}}
+    <li><a href="{{.URL}}">{{.Title}}</a>{{with .Description}}<p class="context">{{truncate 160 .}}</p>{{end}}</li>
+    {{- end}}
+  </ul>
+</section>
+{{- end}}
+{{- end}}
+
 {{/* The folders above a note, from the top: Home / Recipes / Soups. A
      folder note starts from its folder's parent. Folders without a page
      (only unlisted notes in them) show as text. */}}

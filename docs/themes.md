@@ -181,6 +181,7 @@ Params (set them in the settings note `_site.md`, or in `theme_params` on the se
 | `list_images` | `true` | `.ImageThumb` beside a note's title in the list pane, `.ImageCard` atop its card |
 | `groups` | `[]` | tags that group the sidebar instead of folders (below) |
 | `show_toc`, `show_backlinks`, `show_graph` | `true` | note page parts |
+| `show_related` | `true` | "Related notes" under a note (`.Note.Related`): notes with words, tags or links in common that it doesn't link to yet |
 | `show_breadcrumbs` | `true` | the folders above a note's title (and a folder's), each linking to its folder page |
 | `graph_orphans` | `true` | the global graph shows notes without links |
 | `graph_tags` | `false` | the global graph shows tags as nodes, linked to their notes (nested tags to their parent) |

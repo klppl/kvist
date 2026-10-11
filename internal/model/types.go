@@ -112,11 +112,16 @@ type Note struct {
 	// Canvas: the page is an Obsidian canvas (a .canvas file). Content is
 	// then a board of cards and arrows, and there are no properties,
 	// aliases or TOC.
-	Canvas      bool              `json:"canvas,omitempty"`
-	Content     template.HTML     `json:"content"`
-	TOC         []*Heading        `json:"toc,omitempty"`
-	Links       []*Link           `json:"links,omitempty"`
-	Backlinks   []*Backlink       `json:"backlinks,omitempty"`
+	Canvas    bool          `json:"canvas,omitempty"`
+	Content   template.HTML `json:"content"`
+	TOC       []*Heading    `json:"toc,omitempty"`
+	Links     []*Link       `json:"links,omitempty"`
+	Backlinks []*Backlink   `json:"backlinks,omitempty"`
+	// Related: up to five listed notes with words, tags or linked notes in
+	// common, best first, without the ones this note links to or is linked
+	// from. Empty for unlisted notes.
+	Related     []*Note           `json:"-"`
+	RelatedIDs  []string          `json:"related,omitempty"`
 	Folder      *Folder           `json:"-"`
 	FolderPath  string            `json:"folder"`
 	Features    markdown.Features `json:"features"`

@@ -162,6 +162,7 @@ func Build(site *config.Site, snap source.Snapshot) (*Site, error) {
 	b.makeTags(s)
 	b.makeAssets(s)
 	b.makeGraph(s)
+	b.makeRelated(s)
 	b.finishSettings(s, settings)
 	s.Warnings = b.warnings
 	if len(b.problems) > 0 {

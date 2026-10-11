@@ -14,6 +14,7 @@ groups           = []          # tags that group the sidebar, e.g. ["articles", 
 show_toc         = true
 show_breadcrumbs = true        # the folders above a note's title, and a folder's
 show_backlinks   = true
+show_related     = true        # "Related notes" under a note: notes with words, tags or links in common that it doesn't link to yet
 instant_navigation = true      # open pages in place: the menu keeps its scroll, search and the graph stay loaded
 stacked_pages    = false       # links in a note open their note in a pane beside it (wide screens)
 link_previews    = true        # hover a link to a note to preview it (tap on touch screens)

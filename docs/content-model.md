@@ -89,6 +89,7 @@ code blocks don't count.
 | `TOC` | []*Heading | Nested `{Level, Text, ID, Children}`. |
 | `Links` | []*Link | Outgoing links to published notes (`Target`, `Embed`), in order, without duplicates. |
 | `Backlinks` | []*Backlink | Incoming links: `Source` note and `Context` (text of the linking paragraph). |
+| `Related` | []*Note | Up to five listed notes with the most in common, best first: shared words (TF-IDF over title and text), shared tags (a nested tag counts for its parent) and shared linked notes. Notes this one links to or is linked from, the home note and unlisted notes are left out; an unlisted note has none. Worked out from published notes only, at build time, with no outside service. In JSON, `related` holds note ids. |
 | `Folder` | *Folder | |
 | `Features` | {Math, Mermaid, Code} | Load KaTeX, Mermaid or highlighting CSS only where needed. |
 | `WordCount`, `ReadingTime` | int | Reading time in minutes, at 200 words per minute and at least 1. |

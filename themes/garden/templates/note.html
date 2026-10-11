@@ -16,6 +16,7 @@
   </header>
   <div class="content">{{.Note.Content}}</div>
   {{- if param "show_backlinks"}}{{template "backlinks" .Note}}{{end}}
+  {{- if param "show_related"}}{{template "related" .Note}}{{end}}
 </article>
 {{- end}}
 

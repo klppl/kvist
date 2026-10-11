@@ -27,7 +27,7 @@ Publish, and your site updates. Private notes never leave your device.
   name stays out of every address. Folders list their newest notes first;
   a `sort` property makes one A–Z or by date planted, and `order` pins a
   note to the top.
-- **Search, backlinks, link previews and a graph,** in a three-pane theme with light and
+- **Search, backlinks, related notes, link previews and a graph,** in a three-pane theme with light and
   dark mode, breadcrumbs, a reader mode, instant page loads and optional
   stacked pages that open linked notes side by side. Search filters by
   `#tag`, images open full size with a click, and a note's `cover:`

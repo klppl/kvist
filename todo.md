@@ -46,6 +46,9 @@ list: update it too when an item is done or added.
   thumbnails made at build time. (Publish, Bases card view)
 - [x] **Image lightbox.** Click an image in a note to see it full size;
   ← and → step through the note's images. (Publish)
+- [x] **Related notes.** Notes with words, tags or linked notes in common,
+  under each note, worked out at build time without an outside service.
+  (Quartz has a similar plugin)
 - [ ] **Comments.** An optional giscus block under notes. (Quartz)
 - [x] **Code block extras.** A title (```` ```go title="main.go" ````),
   line numbers and highlighted lines. (Quartz)
