@@ -263,6 +263,7 @@ func (b *builder) makeNotes(s *Site) {
 		n.Unlisted = firstBool(fm, "unlisted")
 		if ref, ok := vault.ImageProperty(fm, vault.NoteImageKeys); ok {
 			n.Image = b.imageURL(p, p, ref)
+			n.ImageThumb, n.ImageCard = n.Image, n.Image
 		}
 		ns.doc.RemoveLeadingTitle(n.Title)
 		n.TOC = toc(ns.doc.Headings)

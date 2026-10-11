@@ -66,6 +66,7 @@ Pipeline: plugin/`kvist push` → `api` → `syncer` → `store` → `source/pus
 | `internal/devserver/` | `kvist dev`: build a folder, serve it, poll for changes, live reload |
 | `internal/serve/` | Static serving of each site's `public/` |
 | `internal/imagemeta/` | Strip EXIF/GPS from images |
+| `internal/thumb/` | Small copies of note images (cropped, upright, no metadata) for lists and cards; made in `build/thumbs.go` |
 | `internal/cdn/` | Cloudflare cache purge after builds |
 | `internal/pushclient/` | Go reference client: scan a folder like the plugin does, push it |
 | `internal/config/` | Server TOML config: load and validate |

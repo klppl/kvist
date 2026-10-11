@@ -271,6 +271,7 @@ Snapshot ─► Parse ─► Publish filter ─► Resolve ─► Model ─► R
 | Publish filter | `publish` | parsed notes + rules → published set, attachment set, warnings | Gate 2. Note-local rules, then attachment reachability from published notes only. |
 | Resolve | `resolve` | links/embeds → targets within the published set | Obsidian semantics: path, basename, aliases, `#heading`, `#^block`, `|alias`. Unresolved ⇒ treated identically whether missing or private. |
 | Model | `model` | everything → `content model v1` (§6) | Backlinks, tags, folder tree, graph, search docs derived here, from published data only. |
+| Thumbnails | `build`, `thumb` | each note's `image`/`cover` → 128×128 and 640×360 copies | Before rendering, so themes get the URLs. Cropped from the middle, turned upright, re-encoded without metadata; named by the source hash, so unchanged ones are linked from the previous build without decoding. |
 | Render | `render` | model + theme → files | `html/template`, chroma highlighting, theme static assets. |
 | Output | `build` | files → `builds/<id>` → swap `public` | Atomic; unchanged files hard-linked from the previous build. |
 | Redirects | `build` | previous pages + new pages → `redirects.json` | A note page whose URL is gone redirects to the note's new URL, found by vault path, then content hash, then a unique file name. Targets are published notes only; a URL with a page again stops redirecting. Written as `_kvist/redirects.json` (301s from the built-in server) and as refresh pages at the old URLs (for plain file servers). |

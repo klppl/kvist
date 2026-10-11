@@ -115,6 +115,33 @@ func stripJPEG(data []byte) ([]byte, error) {
 	}
 }
 
+// JPEGOrientation returns the EXIF orientation of a JPEG file (1–8), or 0
+// if it has none. Thumbnails, which are drawn again from the pixels, use it
+// to turn photos upright.
+func JPEGOrientation(data []byte) int {
+	if len(data) < 4 || data[0] != 0xFF || data[1] != 0xD8 {
+		return 0
+	}
+	for i := 2; i+4 <= len(data) && data[i] == 0xFF; {
+		marker := data[i+1]
+		if marker == 0xDA || marker == 0xD9 {
+			return 0
+		}
+		segLen := int(binary.BigEndian.Uint16(data[i+2 : i+4]))
+		end := i + 2 + segLen
+		if segLen < 2 || end > len(data) {
+			return 0
+		}
+		if marker == 0xE1 {
+			if o := exifOrientation(data[i+4 : end]); o >= 1 && o <= 8 {
+				return o
+			}
+		}
+		i = end
+	}
+	return 0
+}
+
 // exifOrientation reads the Orientation tag (0x0112) from an APP1 EXIF
 // payload, or returns 0.
 func exifOrientation(p []byte) int {

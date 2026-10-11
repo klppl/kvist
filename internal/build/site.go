@@ -150,12 +150,16 @@ func writeSite(ctx context.Context, site *config.Site, theme *render.Theme, snap
 		return nil, nil, err
 	}
 	out := &dirOutput{root: dir, prev: prev}
-	if err := render.Render(m, theme, out); err != nil {
-		return nil, nil, err
-	}
 	files := map[string]source.File{}
 	for _, f := range snap.Files() {
 		files[f.Path] = f
+	}
+	thumbWarnings, err := thumbnails(m, snap, files, out)
+	if err != nil {
+		return nil, nil, err
+	}
+	if err := render.Render(m, theme, out); err != nil {
+		return nil, nil, err
 	}
 	if hist != nil {
 		pages := make(map[string]Page, len(m.Notes))
@@ -176,7 +180,7 @@ func writeSite(ctx context.Context, site *config.Site, theme *render.Theme, snap
 			return nil, nil, err
 		}
 	}
-	warnings := m.Warnings
+	warnings := append(m.Warnings, thumbWarnings...)
 	strip := site.Publish.StripImageMetadata != nil && *site.Publish.StripImageMetadata
 	for _, a := range m.Assets {
 		f, ok := files[a.Path]

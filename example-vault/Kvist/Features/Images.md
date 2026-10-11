@@ -37,9 +37,11 @@ The Markdown form works too, with the same options in the alt text: `![A loaf|le
 ![A loaf|left|80](../../attachments/loaf.svg)
 <br clear="all">
 
-## Social preview image
+## Cover image
 
 This note sets `image: "[[garden-cover.png]]"` in its properties. When the page is shared in a chat or on social media, that picture is shown. Notes without one use the site's image from the settings note.
+
+The same picture shows, made small, beside the note's title in the list next to this page, and atop its card on folder pages. The server makes the small copies when it builds the site, so lists stay fast. They are cropped from the middle, so keep the subject there. `cover:` works the same as `image:`.
 
 ## Metadata
 

@@ -98,6 +98,13 @@ type Note struct {
 	Description string         `json:"description,omitempty"`
 	Params      map[string]any `json:"params,omitempty"`
 	Image       string         `json:"image,omitempty"` // social preview image, like SiteConfig.Image
+	// ImageThumb (a square) and ImageCard (16:9) are small copies of Image
+	// for note lists and cards, made by the build (internal/build). They are
+	// Image itself when it can't be made smaller (an SVG, a web address),
+	// and in a model that wasn't built into a site (kvist build
+	// --emit-model).
+	ImageThumb string `json:"image_thumb,omitempty"`
+	ImageCard  string `json:"image_card,omitempty"`
 	// Unlisted: published, but left out of folders, tags, the graph,
 	// backlinks, search, the feed and the sitemap (frontmatter unlisted).
 	Unlisted   bool   `json:"unlisted,omitempty"`

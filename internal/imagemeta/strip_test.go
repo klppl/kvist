@@ -81,6 +81,12 @@ func TestJPEG(t *testing.T) {
 	if i < 0 || exifOrientation(out[i:]) != 6 {
 		t.Errorf("orientation lost")
 	}
+	if o := JPEGOrientation(in.Bytes()); o != 6 {
+		t.Errorf("JPEGOrientation = %d, want 6", o)
+	}
+	if o := JPEGOrientation(orig); o != 0 {
+		t.Errorf("JPEGOrientation without EXIF = %d, want 0", o)
+	}
 	// Stripping is idempotent.
 	again, err := Strip("jpg", out)
 	if err != nil || !bytes.Equal(again, out) {

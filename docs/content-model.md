@@ -81,6 +81,8 @@ code blocks don't count.
 | `Description` | string | Frontmatter `description`/`summary`, else the first paragraph (≤ 200 characters). |
 | `Params` | map | Only the frontmatter keys listed in `expose_frontmatter`. Other keys never reach a theme. |
 | `Image` | string | Social preview image from the `image` or `cover` property: the URL of a published image (`/_assets/…`), or an http(s) URL; empty if unset or not a published image. The value may be `"[[cover.png]]"`, a vault path, or a URL. |
+| `ImageThumb` | string | A small copy of `Image` for note lists: 128×128, cropped from the middle, never enlarged, as JPEG (PNG if it has transparency) without metadata. Empty when `Image` is. It is `Image` itself when that can't be made smaller (an SVG, a web address, a file that can't be read) and in `kvist build --emit-model`, which doesn't build the site. |
+| `ImageCard` | string | Like `ImageThumb`, 640×360 (16:9), for cards. |
 | `Unlisted` | bool | Frontmatter `unlisted: true`. The note has its page, but no folder, tag, graph, backlink, search index, feed or sitemap lists it; a theme should add `<meta name="robots" content="noindex">`. Its `Tags` are only the ones listed notes carry too. |
 | `Canvas` | bool | The page is an Obsidian canvas (a `.canvas` file), not a Markdown note; see [Canvases](#canvases). |
 | `Content` | HTML | The rendered body. |

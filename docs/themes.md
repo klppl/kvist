@@ -178,6 +178,7 @@ Params (set them in the settings note `_site.md`, or in `theme_params` on the se
 | `home_recent` | `12` | notes in the home page's list |
 | `show_list` | `true` | the list pane (below) |
 | `list_max` | `100` | notes in the list pane before a "more…" link |
+| `list_images` | `true` | `.ImageThumb` beside a note's title in the list pane, `.ImageCard` atop its card |
 | `groups` | `[]` | tags that group the sidebar instead of folders (below) |
 | `show_toc`, `show_backlinks`, `show_graph` | `true` | note page parts |
 | `show_breadcrumbs` | `true` | the folders above a note's title (and a folder's), each linking to its folder page |

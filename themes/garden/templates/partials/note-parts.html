@@ -20,6 +20,9 @@
 {{define "card" -}}
 <li class="card">
   <a class="card-link" href="{{.URL}}">
+    {{- if param "list_images"}}{{with .ImageCard}}
+    <img class="card-cover" src="{{.}}" alt="" width="640" height="360" loading="lazy" decoding="async">
+    {{- end}}{{end}}
     <span class="card-title">{{.Title}}</span>
     {{- with .Description}}<span class="card-desc">{{truncate 160 .}}</span>{{end}}
     <span class="card-meta">

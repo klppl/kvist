@@ -3,6 +3,8 @@
   if it has one, else its folder; a folder page its notes (in the folder's
   order: see Folder.Sort), a tag page the tagged notes (newest first) and
   the home page the most recent ones.
+  With list_images on, a note's image or cover shows as a small square
+  beside its title (Note.ImageThumb).
   Long lists stop at list_max and link to the full folder or tag page, so
   pages stay small in big folders.
 */}}
@@ -45,12 +47,17 @@
   {{- range $i, $n := .Notes}}{{if and (ne $n.URL $.URL) (ne $n.URL "/") (or (lt $i $.Max) (eq $n.URL $.Cur))}}
   <li class="list-note">
     <a href="{{$n.URL}}"{{if eq $n.URL $.Cur}} aria-current="page"{{end}}>
-      <span class="list-title">{{$n.Title}}</span>
-      {{- with $n.Description}}<span class="list-desc">{{truncate 110 .}}</span>{{end}}
-      <span class="list-meta">
-        {{- with $n.Params}}{{with .stage}}{{template "stage" .}}{{end}}{{end}}
-        <time datetime="{{isoDate $n.Updated}}">{{dateFormat (param "date_format") $n.Updated}}</time>
+      <span class="list-text">
+        <span class="list-title">{{$n.Title}}</span>
+        {{- with $n.Description}}<span class="list-desc">{{truncate 110 .}}</span>{{end}}
+        <span class="list-meta">
+          {{- with $n.Params}}{{with .stage}}{{template "stage" .}}{{end}}{{end}}
+          <time datetime="{{isoDate $n.Updated}}">{{dateFormat (param "date_format") $n.Updated}}</time>
+        </span>
       </span>
+      {{- if param "list_images"}}{{with $n.ImageThumb}}
+      <img class="list-thumb" src="{{.}}" alt="" width="44" height="44" loading="lazy" decoding="async">
+      {{- end}}{{end}}
     </a>
   </li>
   {{- end}}{{end}}
