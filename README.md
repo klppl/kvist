@@ -30,7 +30,7 @@ Publish, and your site updates. Private notes never leave your device.
 - **Search, backlinks and a graph,** in a three-pane theme with light and
   dark mode, breadcrumbs, a reader mode, instant page loads and optional
   stacked pages that open linked notes side by side. Search filters by
-  `#tag`.
+  `#tag`, and images open full size with a click.
 - **Shares well:** every note gets a preview image with its title for
   chats and social media, and `unlisted: true` publishes a note without
   listing it anywhere.

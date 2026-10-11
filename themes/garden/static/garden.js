@@ -817,6 +817,52 @@
       gdialog.showModal();
     });
   }
+
+  // ---- lightbox: click an image in a note to see it full size ----
+  // One listener on the document, so it covers instant navigation and
+  // stacked panes too. Images inside a link keep their link. ← and →
+  // step through the other images of the same note.
+  if (window.HTMLDialogElement) {
+    var lbox = null, lbImg, lbCap, lbList = [], lbAt = 0;
+    var zoomable = function (t) {
+      return t.tagName === "IMG" && t.closest(".content") && !t.closest("a, .link-preview");
+    };
+    var lbShow = function (i) {
+      lbAt = (i + lbList.length) % lbList.length;
+      var img = lbList[lbAt];
+      lbImg.src = img.src;
+      lbImg.alt = img.alt;
+      lbCap.textContent = img.alt;
+      lbCap.hidden = !img.alt;
+    };
+    document.addEventListener("click", function (e) {
+      var t = e.target;
+      if (!zoomable(t)) return;
+      e.preventDefault();
+      if (!lbox) {
+        lbox = el("dialog", "lightbox");
+        lbImg = el("img");
+        lbCap = el("p", "lightbox-caption");
+        var close = el("button", "icon-button lightbox-close", "×");
+        close.type = "button";
+        close.setAttribute("aria-label", tr("close", "Close"));
+        lbox.appendChild(close);
+        lbox.appendChild(lbImg);
+        lbox.appendChild(lbCap);
+        lbox.addEventListener("click", function () { lbox.close(); });
+        lbox.addEventListener("keydown", function (ev) {
+          if (lbList.length < 2) return;
+          if (ev.key === "ArrowRight") lbShow(lbAt + 1);
+          else if (ev.key === "ArrowLeft") lbShow(lbAt - 1);
+        });
+        document.body.appendChild(lbox);
+      }
+      lbList = Array.prototype.filter.call(t.closest(".content").querySelectorAll("img"), zoomable);
+      lbShow(lbList.indexOf(t));
+      lbox.showModal();
+    });
+  }
+
   // ---- the parts of a page ----
   function initPage() {
     var page = $(".page") || document;

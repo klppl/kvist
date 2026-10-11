@@ -41,6 +41,8 @@ list: update it too when an item is done or added.
   for a folder. (Publish)
 - [x] **Generated social images.** A preview image with the note's title
   and the site's name, for notes without `image:`. (Quartz)
+- [x] **Image lightbox.** Click an image in a note to see it full size;
+  ← and → step through the note's images. (Publish)
 - [ ] **Comments.** An optional giscus block under notes. (Quartz)
 - [x] **Code block extras.** A title (```` ```go title="main.go" ````),
   line numbers and highlighted lines. (Quartz)
