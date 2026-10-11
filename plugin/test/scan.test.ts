@@ -16,12 +16,13 @@ const rules: Rules = {
 
 test("scan publishes notes, their attachments and safe hints", async () => {
   const v = new MemVault();
-  v.write("Garden/Welcome.md", "See [[Leaf]], [[Diary]] and ![[pic.png]] and ![[secret.png]]");
+  v.write("Garden/Welcome.md", "See [[Leaf]], [[Diary]] and ![[pic.png]] and ![[secret.png]] and ![[key.txt]]");
   v.write("Garden/Leaf.md", "leaf");
   v.write("Journal/Diary.md", "SECRET");
   v.write("Garden/pic.png", "PNG");
   v.write("Private/secret.png", "PNG2");
   v.write("unused.png", "PNG3");
+  v.write("Garden/key.txt", "KEY"); // not in attachment_extensions
   v.write(".kvist/site.toml", "title = 'x'"); // a stray dot file stays home
   const r = await scan(v, rules, new HashCache());
   assert.deepEqual(r.files.map((f) => f.path), [
@@ -33,6 +34,7 @@ test("scan publishes notes, their attachments and safe hints", async () => {
   assert.deepEqual(r.leaks.map((l) => [l.kind, l.target]).sort(), [
     ["excluded_attachment", "Private/secret.png"],
     ["unpublished_link", "Journal/Diary.md"],
+    ["unsupported_attachment", "Garden/key.txt"],
   ]);
 });
 

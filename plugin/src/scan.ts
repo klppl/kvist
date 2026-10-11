@@ -8,7 +8,7 @@ import { t } from "./i18n";
 import { HINTS_PATH, ManifestFile, Rules, SETTINGS_NOTE_NAME, SITE_NOTE_PATH } from "./protocol";
 import {
   Decision, NOTE_IMAGE_KEYS, SITE_AVATAR_KEYS, SITE_ICON_KEYS, SITE_IMAGE_KEYS, allowedPath, attachmentAllowed, canvasInPublicFolder,
-  evaluate, imageProperty, isCanvas, isImage, isNote, isSettingsNote,
+  evaluate, hiddenPath, imageProperty, isCanvas, isImage, isNote, isSettingsNote,
 } from "./rules";
 import { canvasLinks, stripCanvas } from "./canvas";
 
@@ -41,7 +41,7 @@ export interface VaultLike {
 }
 
 export interface LeakItem {
-  kind: "unpublished_link" | "unpublished_embed" | "excluded_attachment";
+  kind: "unpublished_link" | "unpublished_embed" | "excluded_attachment" | "unsupported_attachment";
   from: string;
   /** Vault path of the target. Shown locally, never sent to the server. */
   target: string;
@@ -128,7 +128,11 @@ export async function scan(vault: VaultLike, rules: Rules, cache: HashCache): Pr
       }
       return;
     }
-    if (!allowedPath(rules, dest)) return;
+    if (!allowedPath(rules, dest)) {
+      // Dot files stay home quietly; a file type the site doesn't take is worth saying.
+      if (!hiddenPath(dest)) leaks.push({ kind: "unsupported_attachment", from, target: dest });
+      return;
+    }
     if (!attachmentAllowed(rules, dest)) {
       leaks.push({ kind: "excluded_attachment", from, target: dest });
       return;

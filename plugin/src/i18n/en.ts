@@ -76,6 +76,8 @@ export const en = {
   "report.embedsDesc": "These embeds are left out of the page.",
   "report.attachments": "Attachments in excluded folders",
   "report.attachmentsDesc": "Published notes reference these, but they stay private.",
+  "report.types": "File types the site doesn't publish",
+  "report.typesDesc": "Published notes reference these, but their file type isn't in attachment_extensions in the server's config, so they stay private.",
   "report.server": "From the server",
   "report.serverDesc": "Warnings from the last publish and build.",
   "report.section": "{title} ({count})",

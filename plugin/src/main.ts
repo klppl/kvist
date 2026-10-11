@@ -501,6 +501,8 @@ class ReportView extends ItemView {
       this.plugin.lastLeaks.filter((l) => l.kind === "unpublished_embed"), (l) => [l.from, `→ ${l.target}`]);
     this.section(el, t("report.attachments"), t("report.attachmentsDesc"),
       this.plugin.lastLeaks.filter((l) => l.kind === "excluded_attachment"), (l) => [l.from, `→ ${l.target}`]);
+    this.section(el, t("report.types"), t("report.typesDesc"),
+      this.plugin.lastLeaks.filter((l) => l.kind === "unsupported_attachment"), (l) => [l.from, `→ ${l.target}`]);
     this.section(el, t("report.server"), t("report.serverDesc"),
       this.plugin.lastWarnings, (w) => [w.path === SITE_NOTE_PATH ? res.scan.settingsNote ?? "" : w.path ?? "", w.message]);
   }

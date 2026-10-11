@@ -71,6 +71,8 @@ export const sv: Catalog = {
   "report.embedsDesc": "De här inbäddningarna utelämnas från sidan.",
   "report.attachments": "Bilagor i undantagna mappar",
   "report.attachmentsDesc": "Publicerade anteckningar hänvisar till dessa, men de förblir privata.",
+  "report.types": "Filtyper som webbplatsen inte publicerar",
+  "report.typesDesc": "Publicerade anteckningar hänvisar till dessa, men filtypen finns inte i attachment_extensions i serverns konfiguration, så de förblir privata.",
   "report.server": "Från servern",
   "report.serverDesc": "Varningar från den senaste publiceringen och det senaste bygget.",
   "report.section": "{title} ({count})",

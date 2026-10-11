@@ -117,8 +117,17 @@ export function canvasInPublicFolder(rules: Rules, path: string): boolean {
 
 /** AllowedPath mirrors the server's manifest check. */
 export function allowedPath(rules: Rules, path: string): boolean {
-  if (path.split("/").some((seg) => seg.startsWith("."))) return false;
-  if (isNote(path)) return true;
+  if (hiddenPath(path)) return false;
+  return isNote(path) || allowedType(rules, path);
+}
+
+/** A path with a dot file or folder in it, which is never published. */
+export function hiddenPath(path: string): boolean {
+  return path.split("/").some((seg) => seg.startsWith("."));
+}
+
+/** Whether the file's extension is one of the site's attachment_extensions. */
+function allowedType(rules: Rules, path: string): boolean {
   const ext = extension(path);
   return rules.attachment_extensions.some((a) => a.replace(/^\./, "").toLowerCase() === ext);
 }
