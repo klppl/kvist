@@ -40,6 +40,9 @@ type Target struct {
 	Path  string // vault path of the target
 	Title string // note title, for embed headers
 	Media string // for assets
+	// Width and Height are an image's size in pixels, 0 when unknown, so
+	// its space is reserved before it loads.
+	Width, Height int
 }
 
 // Resolver decides what references point to. Implementations must only

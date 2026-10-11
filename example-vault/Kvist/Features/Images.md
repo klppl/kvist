@@ -12,6 +12,8 @@ Images are attachments in the vault. They are published only because a published
 
 ![[tomato.svg|60]] ![[tomato.svg|120x120]]
 
+With only a width, the height follows the image's shape. Without a size, the page still knows each image's size before it loads, so the text doesn't jump.
+
 ## Alignment
 
 `![[loaf.svg|right|150]]` floats the image right and lets the text flow around it:
@@ -21,6 +23,8 @@ Images are attachments in the vault. They are published only because a published
 `![[sprout.svg|A sprout, centered|center|80]]` centers it and sets the description for screen readers:
 
 ![[sprout.svg|A sprout, centered|center|80]]
+
+Without a description, the file name is used: `![[raised-beds.png]]` reads "Raised beds". Names a camera or a screenshot made up, like `IMG_2034.jpg` or `Pasted image 2024….png`, get none, so write one for those.
 
 ## Wide images
 

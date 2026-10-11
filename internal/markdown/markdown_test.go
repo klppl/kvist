@@ -22,6 +22,8 @@ func (f *fakeResolver) Resolve(ref Ref) Target {
 		return Target{Kind: NoteTarget, URL: "#" + strings.ToLower(ref.Subpath), Path: "Self.md"}
 	case "pic.png", "img/pic.png":
 		return Target{Kind: AssetTarget, URL: "/_assets/abc/pic.png", Path: "img/pic.png", Media: MediaImage}
+	case "beds.jpg":
+		return Target{Kind: AssetTarget, URL: "/_assets/abc/raised-beds-2.jpg", Path: "img/Raised beds-2.jpg", Media: MediaImage, Width: 800, Height: 600}
 	case "doc.pdf":
 		return Target{Kind: AssetTarget, URL: "/_assets/def/doc.pdf", Path: "doc.pdf", Media: MediaPDF}
 	}
@@ -234,6 +236,41 @@ func TestImageOptions(t *testing.T) {
 	for in, want := range cases {
 		out, _ := render(t, in)
 		contains(t, out, want)
+	}
+}
+
+// Known image sizes become width and height, so the page doesn't shift
+// while images load; images without alt text get one from the file name.
+func TestImageSizeAndAlt(t *testing.T) {
+	cases := map[string]string{
+		"![[beds.jpg]]":                 `<img src="/_assets/abc/raised-beds-2.jpg" alt="Raised beds 2" width="800" height="600" loading="lazy">`,
+		"![[beds.jpg|200]]":             `alt="Raised beds 2" width="200" height="150" loading="lazy">`,
+		"![[beds.jpg|Our beds|100x40]]": `alt="Our beds" width="100" height="40" loading="lazy">`,
+		"![](beds.jpg)":                 `alt="Raised beds 2" width="800" height="600"`,
+		"![[pic.png|300]]":              `alt="" width="300" loading="lazy">`,
+	}
+	for in, want := range cases {
+		out, _ := render(t, in)
+		contains(t, out, want)
+	}
+}
+
+func TestAltFromName(t *testing.T) {
+	for in, want := range map[string]string{
+		"img/Raised beds-2.jpg":                 "Raised beds 2",
+		"tomato.svg":                            "Tomato",
+		"räksmörgås_på_bordet.png":              "Räksmörgås på bordet",
+		"IMG_2034.JPG":                          "",
+		"Pasted image 20240512123456.png":       "",
+		"Screenshot 2024-05-12 at 10.11.12.png": "",
+		"PXL_20240512_101112345.MP.jpg":         "",
+		"3f9a1c0b7d2e.png":                      "",
+		"1200x630.png":                          "",
+		"Screenshot of the garden plan.png":     "Screenshot of the garden plan",
+	} {
+		if got := AltFromName(in); got != want {
+			t.Errorf("AltFromName(%q) = %q, want %q", in, got, want)
+		}
 	}
 }
 

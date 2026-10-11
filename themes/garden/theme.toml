@@ -20,6 +20,7 @@ show_properties  = false       # the note's properties under its title (only key
 reader_mode      = true        # a button that hides the menu, the list and the side panels
 show_profile     = true        # the profile from the settings note (avatar, bio, profile_links) atop the menu
 social_images    = true        # a preview image with the title for notes without image:
+tag_min_notes    = 2           # tag pages with fewer notes ask search engines not to index them (and leave the sitemap); 0 indexes all
 code_style_light = "github"
 code_style_dark  = "github-dark"
 footer           = ""          # Markdown, shown at the bottom of the menu

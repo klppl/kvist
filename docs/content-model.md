@@ -187,7 +187,11 @@ never output, since it names the vault paths of every card.
 
 ## Asset
 
-`Path`, `URL`, `Size`, `MediaType` (MIME), `Hash`. An attachment is
+`Path`, `URL`, `Size`, `MediaType` (MIME), `Hash`, and for images `Width`
+and `Height`: the size in pixels as browsers show it (EXIF orientation
+applied), omitted when it can't be told (AVIF, SVGs sized in relative
+units). Embedded images get these as `width` and `height` attributes, so
+the page doesn't shift while they load. An attachment is
 published only if the rendered content of a published note references it,
 or it is the image of an image property (a published note's
 `image`/`cover`, the settings note's `image`/`favicon`/`avatar`/`logo`), and never if

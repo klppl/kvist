@@ -93,6 +93,8 @@ a `Page`:
 | `.Features` | `{Math, Mermaid, Code}`: load scripts and styles only where needed |
 | `.SocialImage` | note pages without an image property (or with an SVG, AVIF, … one, which social networks don't show), when the theme's `social_images` param is `true`: the URL of a generated 1200×630 PNG with the title, description and site name (below) |
 | `.Image` | the page's preview image for `og:image`: the note's image, else `.SocialImage`, else the site's image; empty when none can be shown |
+| `.ImageWidth`, `.ImageHeight` | `.Image`'s size in pixels, `0` when unknown (external images) |
+| `.NoIndex` | search engines should leave the page out: unlisted notes, the 404 page, tag pages below `tag_min_notes`. Write `<meta name="robots" content="noindex">` |
 | `.Theme` | name and version |
 
 ### Functions
@@ -189,6 +191,7 @@ Params (set them in the settings note `_site.md`, or in `theme_params` on the se
 | `reader_mode` | `true` | a button in the page's top corner that hides the nav pane, the list pane and the aside (wide screens only); the reader's choice is kept in `localStorage` |
 | `show_profile` | `true` | the profile (`Site.Config.Profile`: avatar, author, bio, links) at the top of the menu |
 | `show_properties` | `false` | the note's properties under its title; only keys listed in `expose_frontmatter` exist, so nothing new reaches the page |
+| `tag_min_notes` | `2` | tag pages with fewer notes get `.NoIndex` and are left out of the sitemap (`0`: index all). The sitemap reads it with any theme |
 | `social_images` | `true` | generate `.SocialImage` for notes without a usable `image`; the `og:image` is the note's image, else this, else the site's (SVG and AVIF images are skipped: social networks don't show them) |
 | `code_style_light`, `code_style_dark` | `github`, `github-dark` | highlighting |
 | `footer` | `""` | Markdown at the bottom of the menu |
@@ -265,8 +268,8 @@ Without JavaScript, math and diagrams show their source.
 - Load KaTeX and Mermaid only when `.Features.Math` / `.Features.Mermaid`
   are set.
 - Describe pages for search engines: `.Canonical` for the canonical link,
-  `.Image` for `og:image`, `structuredData` for JSON-LD, and `noindex` on
-  unlisted notes and the 404 page, as `partials/head-meta.html` and
+  `.Image` for `og:image`, `structuredData` for JSON-LD, and `noindex` when
+  `.NoIndex` is set, as `partials/head-meta.html` and
   `base.html` of the garden theme do.
 - Not fetch anything from third-party hosts: vendor fonts and libraries in
   `static/`.

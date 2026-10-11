@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"html/template"
 	"path"
+	"sort"
 	"strings"
 	"time"
 
@@ -47,6 +48,26 @@ func pageImage(p *Page) string {
 		return p.Site.Config.Image
 	}
 	return ""
+}
+
+// thinTag reports whether a tag page lists too few notes to be worth a
+// search result (the tag_min_notes param; 0 or unset indexes all).
+func (r *renderer) thinTag(t *model.Tag) bool {
+	return len(t.Notes) < toInt(lookupParam(r.theme, r.site, "tag_min_notes"))
+}
+
+// imageSize returns the size of a published image or a generated social
+// image by URL, zeros when unknown (external images).
+func (r *renderer) imageSize(u string) (int, int) {
+	if strings.HasPrefix(u, "/_kvist/social/") {
+		return socialW, socialH
+	}
+	as := r.site.Assets
+	i := sort.Search(len(as), func(i int) bool { return as[i].URL >= u })
+	if i < len(as) && as[i].URL == u {
+		return as[i].Width, as[i].Height
+	}
+	return 0, 0
 }
 
 // escapePath percent-encodes what may not appear as-is in a URL (spaces,

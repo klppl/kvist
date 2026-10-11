@@ -39,7 +39,12 @@ type Page struct {
 	SocialImage string
 	// Image is the page's preview image for og:image: the note's image,
 	// else SocialImage, else the site's image; "" when none can be shown.
-	Image string
+	// ImageWidth and ImageHeight are its size in pixels, 0 when unknown.
+	Image                   string
+	ImageWidth, ImageHeight int
+	// NoIndex: search engines should leave the page out (unlisted notes,
+	// the 404 page, tag pages with fewer notes than tag_min_notes).
+	NoIndex bool
 }
 
 // Render writes every page and the theme's static files. It does not copy
@@ -143,6 +148,8 @@ func (r *renderer) page(url string, p *Page) error {
 func (r *renderer) file(p, kind string, page *Page) error {
 	page.Site, page.Theme = r.site, r.theme
 	page.Image = pageImage(page)
+	page.ImageWidth, page.ImageHeight = r.imageSize(page.Image)
+	page.NoIndex = page.Kind == "404" || (page.Note != nil && page.Note.Unlisted) || (page.Tag != nil && r.thinTag(page.Tag))
 	page.Canonical = page.URL
 	if page.Kind == "note" && page.Note != nil && page.Note == r.site.Home {
 		page.Canonical = "/"

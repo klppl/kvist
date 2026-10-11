@@ -99,6 +99,8 @@ func TestSiteOutput(t *testing.T) {
 		`<meta name="twitter:card" content="summary_large_image">`,
 		// breadcrumbs
 		`<nav class="crumbs" aria-label="Folder path"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/garden/">Garden</a></nav>`,
+		// the image's size, so the page doesn't shift as it loads
+		`width="1" height="1" loading="lazy">`,
 		// search engine metadata
 		`<meta name="robots" content="max-image-preview:large">`,
 		`<meta property="og:type" content="article">`,
@@ -118,6 +120,9 @@ func TestSiteOutput(t *testing.T) {
 	}
 	if home, _ := os.ReadFile(filepath.Join(out, "index.html")); !bytes.Contains(home, []byte(`<meta property="og:type" content="website">`)) || !bytes.Contains(home, []byte(`"@type":"WebSite"`)) {
 		t.Error("home page is not described as the website")
+	}
+	if home, _ := os.ReadFile(filepath.Join(out, "index.html")); !bytes.Contains(home, []byte(`<meta property="og:image:width" content="1">`)) {
+		t.Error("home page lacks the size of the site's image")
 	}
 	if nf, _ := os.ReadFile(filepath.Join(out, "404.html")); !bytes.Contains(nf, []byte(`<meta name="robots" content="noindex">`)) || bytes.Contains(nf, []byte("ld+json")) {
 		t.Error("404 page should be noindex, without structured data")
@@ -152,10 +157,18 @@ func TestSiteOutput(t *testing.T) {
 	if s := read("index.xml"); !strings.Contains(s, "<link>https://garden.example.com/garden/hub/</link>") || !strings.Contains(s, `<rss version="2.0"`) {
 		t.Errorf("feed: %.400s", s)
 	}
-	// Folder and tag pages carry the date of their newest note.
-	if s := read("sitemap.xml"); !strings.Contains(s, "<loc>https://garden.example.com/tags/garden/leaf/</loc>\n    <lastmod>") ||
+	// Folder and tag pages carry the date of their newest note. A tag
+	// with a single note (below tag_min_notes) is too thin to index.
+	if s := read("sitemap.xml"); strings.Contains(s, "/tags/garden/leaf/") ||
+		!strings.Contains(s, "<loc>https://garden.example.com/garden/</loc>\n    <lastmod>") ||
 		!strings.Contains(s, "<loc>https://garden.example.com/tags/</loc>\n    <lastmod>") {
 		t.Errorf("sitemap: %.400s", s)
+	}
+	if s := read("tags/garden/leaf/index.html"); !strings.Contains(s, `<meta name="robots" content="noindex">`) {
+		t.Error("thin tag page is not noindex")
+	}
+	if s := read("garden/hub/index.html"); !strings.Contains(s, `<meta name="robots" content="max-image-preview:large">`) {
+		t.Error("note page is noindex")
 	}
 	if s := read("robots.txt"); !strings.Contains(s, "Sitemap: https://garden.example.com/sitemap.xml") {
 		t.Errorf("robots: %s", s)

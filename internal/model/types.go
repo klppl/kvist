@@ -147,6 +147,9 @@ type Asset struct {
 	Size      int64  `json:"size"`
 	MediaType string `json:"media_type"` // MIME type
 	Hash      string `json:"hash"`
+	// Width and Height: an image's displayed size in pixels, when known.
+	Width  int `json:"width,omitempty"`
+	Height int `json:"height,omitempty"`
 }
 
 // Tag is a tag with the notes that carry it. Nested tags (#a/b) are

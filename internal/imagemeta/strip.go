@@ -2,7 +2,8 @@
 // details, XMP, IPTC, comments, text chunks) from JPEG, PNG and WebP files
 // without re-encoding the image. Color profiles are kept, and so is the
 // JPEG orientation, written back as a minimal EXIF block, so photos are not
-// shown rotated.
+// shown rotated. It also reads image sizes (size.go), so pages can reserve
+// an image's space before it loads.
 package imagemeta
 
 import (

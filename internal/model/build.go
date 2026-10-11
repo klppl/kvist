@@ -79,6 +79,7 @@ type builder struct {
 	assets   map[string]source.File
 	canvases map[string]source.File // canvas files that may be published (canvas.go)
 	used     map[string]bool        // assets referenced by rendered content
+	sizes    map[string][2]int      // image sizes by vault path (imageSize)
 	ix       *resolve.Index
 	aliases  map[string][]string // lower(alias) → note paths
 	warnings []protocol.Warning
@@ -573,7 +574,11 @@ func (r *noteResolver) Resolve(ref markdown.Ref) markdown.Target {
 	}
 	if f, ok := b.assets[target]; ok {
 		b.used[target] = true
-		return markdown.Target{Kind: markdown.AssetTarget, URL: b.assetURL(f), Path: target, Media: mediaKind(target)}
+		t := markdown.Target{Kind: markdown.AssetTarget, URL: b.assetURL(f), Path: target, Media: mediaKind(target)}
+		if t.Media == markdown.MediaImage {
+			t.Width, t.Height = b.imageSize(f)
+		}
+		return t
 	}
 	r.report(ref)
 	return markdown.Target{}
@@ -731,6 +736,27 @@ func (b *builder) assetURL(f source.File) string {
 	return "/_assets/" + h + "/" + stem + ext
 }
 
+// imageSize returns an image's displayed size in pixels, or zeros when it
+// can't be told. Each file is read once per build, only its start.
+func (b *builder) imageSize(f source.File) (int, int) {
+	if sz, ok := b.sizes[f.Path]; ok {
+		return sz[0], sz[1]
+	}
+	var w, h int
+	if r, err := b.snap.Open(f); err == nil {
+		head, err := io.ReadAll(io.LimitReader(r, imagemeta.SizeHeader))
+		r.Close()
+		if err == nil {
+			w, h, _ = imagemeta.Size(path.Ext(f.Path), head)
+		}
+	}
+	if b.sizes == nil {
+		b.sizes = map[string][2]int{}
+	}
+	b.sizes[f.Path] = [2]int{w, h}
+	return w, h
+}
+
 func mediaKind(p string) string {
 	switch protocol.Ext(p) {
 	case "png", "jpg", "jpeg", "gif", "webp", "svg", "avif", "bmp":
@@ -752,7 +778,11 @@ func (b *builder) makeAssets(s *Site) {
 		if mt == "" {
 			mt = "application/octet-stream"
 		}
-		s.Assets = append(s.Assets, &Asset{Path: p, URL: b.assetURL(f), Size: f.Size, MediaType: mt, Hash: f.Hash})
+		a := &Asset{Path: p, URL: b.assetURL(f), Size: f.Size, MediaType: mt, Hash: f.Hash}
+		if vault.IsImage(p) {
+			a.Width, a.Height = b.imageSize(f)
+		}
+		s.Assets = append(s.Assets, a)
 	}
 	sort.Slice(s.Assets, func(i, j int) bool { return s.Assets[i].URL < s.Assets[j].URL })
 }

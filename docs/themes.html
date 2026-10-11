@@ -161,7 +161,8 @@ accent = "#3f7d4e"</code></pre>
     <tr><td><code>.Site</code></td><td>Everything published (below)</td></tr>
     <tr><td><code>.Features</code></td><td><code>.Math</code>, <code>.Mermaid</code>, <code>.Code</code>: load KaTeX, Mermaid and highlighting styles only when the page needs them</td></tr>
     <tr><td><code>.SocialImage</code></td><td>On note pages without an <code>image</code> (or with an SVG one, which social media don't show): the address of a generated preview picture, if the theme turns on <code>social_images</code> in its <code>[params]</code></td></tr>
-    <tr><td><code>.Image</code></td><td>The picture to use for <code>og:image</code>: the note's image, else <code>.SocialImage</code>, else the site's image; empty if none can be shown</td></tr>
+    <tr><td><code>.Image</code></td><td>The picture to use for <code>og:image</code>: the note's image, else <code>.SocialImage</code>, else the site's image; empty if none can be shown. <code>.ImageWidth</code> and <code>.ImageHeight</code> are its size, <code>0</code> if unknown</td></tr>
+    <tr><td><code>.NoIndex</code></td><td>True when search engines should leave the page out: unlisted notes, the 404 page and tag pages with fewer notes than <code>tag_min_notes</code></td></tr>
   </tbody>
 </table>
 <p>A minimal <code>base.html</code> and <code>note.html</code>:</p>
@@ -258,7 +259,7 @@ accent = "#3f7d4e"</code></pre>
 <ul>
   <li><strong>Work without JavaScript.</strong> Use scripts for extras like search, the graph and the theme toggle.</li>
   <li><strong>Keep private notes invisible.</strong> Style <code>.link-unpublished</code> like normal text, with no “locked” icons or hints.</li>
-  <li><strong>Respect unlisted notes.</strong> The site's lists leave them out already; on their own page, add <code>&lt;meta name="robots" content="noindex"&gt;</code> when <code>.Note.Unlisted</code> is true.</li>
+  <li><strong>Respect unlisted notes.</strong> The site's lists leave them out already; on their own page, add <code>&lt;meta name="robots" content="noindex"&gt;</code> when <code>.NoIndex</code> is true (it is for unlisted notes).</li>
   <li><strong>Describe pages for search engines.</strong> Use <code>.Canonical</code> for the canonical link, <code>.Image</code> for <code>og:image</code> and <code>structuredData</code> for JSON-LD, as the built-in theme's <code>partials/head-meta.html</code> does.</li>
   <li><strong>Load heavy things only when needed.</strong> Check <code>.Features.Math</code> and <code>.Features.Mermaid</code> before loading KaTeX or Mermaid.</li>
   <li><strong>Don't load from other websites.</strong> Put fonts and libraries in <code>static/</code>, so visitors aren't tracked and the site keeps working.</li>

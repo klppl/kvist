@@ -28,7 +28,7 @@ func (r *renderer) generated() error {
 		{"search-index.json", searchIndex},
 		{"graph.json", graphJSON},
 		{"index.xml", feed},
-		{"sitemap.xml", sitemap},
+		{"sitemap.xml", func(s *model.Site) ([]byte, error) { return sitemap(s, r.thinTag) }},
 		{"robots.txt", robots},
 	} {
 		b, err := g.fn(r.site)
@@ -177,9 +177,10 @@ type sitemapURL struct {
 	LastMod string `xml:"lastmod,omitempty"`
 }
 
-// sitemap lists every listed page. Folder and tag pages are as new as
-// the newest note they list, so crawlers revisit them when a note changes.
-func sitemap(s *model.Site) ([]byte, error) {
+// sitemap lists every listed page, except tag pages too thin to index.
+// Folder and tag pages are as new as the newest note they list, so
+// crawlers revisit them when a note changes.
+func sitemap(s *model.Site, thin func(*model.Tag) bool) ([]byte, error) {
 	seen := map[string]bool{}
 	var urls []sitemapURL
 	add := func(u string, t time.Time) {
@@ -225,7 +226,9 @@ func sitemap(s *model.Site) ([]byte, error) {
 	}
 	add("/tags/", latest(tagged))
 	for _, t := range s.AllTags {
-		add(t.URL, latest(t.Notes))
+		if !thin(t) {
+			add(t.URL, latest(t.Notes))
+		}
 	}
 	sort.Slice(urls, func(i, j int) bool { return urls[i].Loc < urls[j].Loc })
 	b, err := xml.MarshalIndent(urlset{NS: "http://www.sitemaps.org/schemas/sitemap/0.9", URLs: urls}, "", "  ")

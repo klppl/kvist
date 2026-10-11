@@ -6,9 +6,10 @@
 <title>{{if eq .Kind "home"}}{{.Site.Config.Title}}{{else}}{{.Title}} · {{.Site.Config.Title}}{{end}}</title>
 {{- with .Description}}
 <meta name="description" content="{{.}}">{{end}}
-{{- /* Unlisted notes and the 404 page stay out of search results; other
-     pages allow large image previews (Google Discover, image search). */}}
-{{- if or (eq .Kind "404") (and .Note .Note.Unlisted)}}
+{{- /* Unlisted notes, the 404 page and thin tag pages (.NoIndex) stay
+     out of search results; other pages allow large image previews
+     (Google Discover, image search). */}}
+{{- if .NoIndex}}
 <meta name="robots" content="noindex">{{else}}
 <meta name="robots" content="max-image-preview:large">{{end}}
 {{- with .Site.Config.Author}}

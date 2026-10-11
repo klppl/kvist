@@ -5,9 +5,13 @@ import (
 	"bytes"
 	"fmt"
 	"html"
+	"math"
+	"path"
 	"regexp"
 	"strconv"
 	"strings"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/alecthomas/chroma/v2"
 	chromahtml "github.com/alecthomas/chroma/v2/formatters/html"
@@ -118,14 +122,12 @@ func writeAsset(w util.BufWriter, t Target, alias, name string) {
 	switch t.Media {
 	case MediaImage:
 		var alt []string
-		var size, align string
+		var align string
+		wd, ht, sized := 0, 0, false
 		for _, part := range strings.Split(alias, "|") {
 			part = strings.TrimSpace(strings.TrimSuffix(part, `\`)) // a\|b inside tables
-			if wd, ht, ok := parseSize(part); ok && size == "" {
-				size = fmt.Sprintf(` width="%d"`, wd)
-				if ht > 0 {
-					size += fmt.Sprintf(` height="%d"`, ht)
-				}
+			if pw, ph, ok := parseSize(part); ok && !sized {
+				wd, ht, sized = pw, ph, true
 				continue
 			}
 			if a := strings.ToLower(part); align == "" && (a == "left" || a == "center" || a == "right") {
@@ -136,7 +138,27 @@ func writeAsset(w util.BufWriter, t Target, alias, name string) {
 				alt = append(alt, part)
 			}
 		}
-		fmt.Fprintf(w, `<img src="%s" alt="%s"%s%s loading="lazy">`, esc(t.URL), esc(strings.Join(alt, "|")), align, size)
+		// Width and height let the browser reserve the image's space
+		// (the theme scales it with height: auto). A width alone keeps
+		// the image's proportions.
+		switch {
+		case !sized:
+			wd, ht = t.Width, t.Height
+		case ht == 0 && t.Width > 0 && t.Height > 0:
+			ht = int(math.Round(float64(wd) * float64(t.Height) / float64(t.Width)))
+		}
+		size := ""
+		if wd > 0 {
+			size = fmt.Sprintf(` width="%d"`, wd)
+			if ht > 0 {
+				size += fmt.Sprintf(` height="%d"`, ht)
+			}
+		}
+		text := strings.Join(alt, "|")
+		if text == "" {
+			text = AltFromName(t.Path)
+		}
+		fmt.Fprintf(w, `<img src="%s" alt="%s"%s%s loading="lazy">`, esc(t.URL), esc(text), align, size)
 	case MediaAudio:
 		fmt.Fprintf(w, `<audio controls preload="metadata" src="%s"></audio>`, esc(t.URL))
 	case MediaVideo:
@@ -450,4 +472,56 @@ func HighlightCSS(style string) (string, error) {
 		return "", err
 	}
 	return buf.String(), nil
+}
+
+// genericNameWords are words of file names cameras, phones and Obsidian
+// give images; a name of only these, numbers and dates says nothing.
+var genericNameWords = map[string]bool{
+	"img": true, "image": true, "pasted": true, "screenshot": true, "screen": true, "shot": true,
+	"at": true, "photo": true, "pic": true, "picture": true, "scan": true, "untitled": true, "file": true,
+	"dsc": true, "dscn": true, "dscf": true, "pxl": true, "mvimg": true, "cimg": true, "gopr": true,
+	"dji": true, "wp": true, "whatsapp": true, "signal": true, "copy": true, "edited": true,
+	"am": true, "pm": true, "jpeg": true, "jpg": true, "png": true, "heic": true,
+	"mp": true, "hdr": true, "pano": true, "burst": true, "vid": true, "edit": true,
+}
+
+// AltFromName makes alt text from an image's file name, for images
+// embedded without one: "Raised beds-2.jpg" → "Raised beds 2". Names
+// cameras and screenshots make up ("IMG_2034", "Pasted image
+// 20240512…") give "", since a meaningless alt is worse than none.
+func AltFromName(p string) string {
+	base := path.Base(p)
+	base = strings.TrimSuffix(base, path.Ext(base))
+	words := strings.FieldsFunc(base, func(r rune) bool {
+		return r == '_' || r == '-' || r == '.' || r == '+' || r == ' ' || r == '(' || r == ')' || r == ','
+	})
+	meaningful := false
+	for _, w := range words {
+		lw := strings.ToLower(w)
+		if genericNameWords[lw] || !strings.ContainsFunc(lw, unicode.IsLetter) || isHexID(lw) {
+			continue
+		}
+		meaningful = true
+	}
+	if !meaningful {
+		return ""
+	}
+	s := strings.Join(words, " ")
+	r, n := utf8.DecodeRuneInString(s)
+	return string(unicode.ToUpper(r)) + s[n:]
+}
+
+// isHexID reports whether s looks like a hash or id ("3f9a1c0b", "1x2").
+func isHexID(s string) bool {
+	digits := 0
+	for _, r := range s {
+		switch {
+		case r >= '0' && r <= '9':
+			digits++
+		case r >= 'a' && r <= 'f', r == 'x', r == 't', r == 'z':
+		default:
+			return false
+		}
+	}
+	return digits > 0 && (len(s) >= 8 || digits*2 >= len(s))
 }
