@@ -56,6 +56,23 @@ them. Use one token per device, so you can revoke one without the others.
   server's "newer content" check; it stops and the status bar shows ◆. Run
   **Publish now** to review and confirm.
 
+## Language
+
+The plugin speaks the language Obsidian is set to (*Settings → General →
+Language*): English and Swedish so far, with English for any other
+language and for words a translation doesn't have yet. A new settings note
+is written in that language too, though its property names stay English:
+they are what the server reads. The site's own words follow the
+`language` property in the settings note, not Obsidian.
+
+To translate the plugin, copy `src/i18n/sv.ts` to a file named after
+Obsidian's code for the language (`de.ts`, `pt-BR.ts`, …), translate the
+words and add it to `CATALOGS` in `src/i18n/index.ts`. Words name their
+values, like `{count}`, so a sentence can put them in any order, and a
+word that depends on a count lists the plural forms the language has
+(`one`, `few`, `many`, `other`…). `npm test` checks that every language has
+every word, the same values and only plural forms it uses.
+
 ## What gets published
 
 The server decides the rules (see

@@ -46,6 +46,22 @@ complete client, and `kvist dev` previews a folder with live reload.
 - Keep dependencies few. The server uses goldmark, chroma, yaml.v3,
   BurntSushi/toml, x/text and x/image (for social images); the plugin uses only the Obsidian API.
 
+## Translations
+
+There are two sets of words, translated separately:
+
+- **The site** (the theme's menus, dates and search) follows the site's
+  `language`. Its words are in `themes/garden/i18n/<lang>.toml`, with
+  `en.toml` as the source; see [docs/themes.md](docs/themes.md).
+- **The plugin** follows Obsidian's language. Its words are in
+  `plugin/src/i18n/<lang>.ts`, with `en.ts` as the source; see the
+  [plugin README](plugin/README.md#language).
+
+Add a new word to English first, then to every other language; the tests
+in `internal/render` and `plugin/test/i18n.test.ts` fail until each
+language has it. The CLI and the server's log and error messages stay in
+English.
+
 ## Commits and pull requests
 
 Small, focused commits with a message that says why. Run the tests before

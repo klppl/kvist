@@ -3,6 +3,7 @@
 import { Client } from "./client";
 import { HashCache } from "./hash";
 import { BuildStatus, PROTOCOL_VERSION, ProtocolError, Regression, SiteInfo, Warning } from "./protocol";
+import { t } from "./i18n";
 import { ScanResult, VaultLike, scan } from "./scan";
 
 /** Device-local state (never synced between devices). */
@@ -20,6 +21,7 @@ export interface PublishOptions {
   /** Skip the request entirely if nothing changed since the last push. */
   skipIfUnchanged?: boolean;
   waitForBuild?: boolean;
+  /** A short, lowercase status in the plugin's language, for the status bar. */
   onProgress?: (msg: string) => void;
 }
 
@@ -36,7 +38,7 @@ export interface PublishResult {
 
 export class StaleCancelled extends Error {
   constructor(public regressions: Regression[]) {
-    super("Publishing was cancelled: the server has newer content.");
+    super(t("error.staleCancelled"));
     this.name = "StaleCancelled";
   }
 }
@@ -59,8 +61,8 @@ export class Publisher {
     const progress = opts.onProgress ?? (() => {});
     const info = await this.client.info();
     if (PROTOCOL_VERSION < info.protocol.min || PROTOCOL_VERSION > info.protocol.max) {
-      const side = PROTOCOL_VERSION < info.protocol.min ? "the kvist plugin" : "the kvist server";
-      throw new Error(`The server speaks protocol ${info.protocol.min}–${info.protocol.max}; update ${side}.`);
+      const key = PROTOCOL_VERSION < info.protocol.min ? "error.protocolPlugin" : "error.protocolServer";
+      throw new Error(t(key, { min: info.protocol.min, max: info.protocol.max }));
     }
     let lastErr: unknown;
     for (let attempt = 0; attempt < 3; attempt++) {
@@ -79,13 +81,13 @@ export class Publisher {
 
   private async once(opts: PublishOptions, progress: (m: string) => void): Promise<PublishResult> {
     const site = await this.client.siteInfo();
-    progress("Checking notes…");
+    progress(t("status.checking"));
     const result = await scan(this.vault, site.rules, this.cache);
     if (result.files.length > site.limits.max_files) {
-      throw new Error(`${result.files.length} files to publish; the server allows ${site.limits.max_files}.`);
+      throw new Error(t("error.tooManyFiles", { count: result.files.length, max: site.limits.max_files }));
     }
     const big = result.files.find((f) => f.size > site.limits.max_file_size);
-    if (big) throw new Error(`${big.path} is too large to publish (limit ${Math.round(site.limits.max_file_size / 1048576)} MB).`);
+    if (big) throw new Error(t("error.tooLarge", { path: big.path, limit: Math.round(site.limits.max_file_size / 1048576) }));
 
     const signature = site.rules_hash + "\n" + result.files.map((f) => f.path + "\0" + f.hash).join("\n");
     if (opts.skipIfUnchanged && !opts.force && signature === this.state.lastSignature && site.revision === this.state.baseRevision) {
@@ -100,7 +102,7 @@ export class Publisher {
     });
     await this.upload(sync.sync_id, sync.missing, result, progress);
 
-    progress("Publishing…");
+    progress(t("status.committing"));
     let commit;
     try {
       commit = await this.client.commit(sync.sync_id, !!opts.force);
@@ -120,7 +122,7 @@ export class Publisher {
       uploaded: sync.missing.length, warnings: commit.warnings ?? [],
     };
     if (opts.waitForBuild && commit.build_id) {
-      progress("Building the site…");
+      progress(t("status.building"));
       res.build = await this.client.waitBuild(commit.build_id);
     }
     return res;
@@ -137,10 +139,10 @@ export class Publisher {
         const hash = missing[next++];
         const path = byHash.get(hash);
         const read = path ? result.content.get(path) : undefined;
-        if (!path || !read) throw new Error(`The server asked for an unknown file (${hash}).`);
+        if (!path || !read) throw new Error(t("error.unknownBlob", { hash }));
         await this.client.putBlob(syncId, hash, await read());
         done++;
-        progress(`Uploading ${done}/${missing.length}…`);
+        progress(t("status.uploading", { done, total: missing.length }));
       }
     };
     await Promise.all(Array.from({ length: Math.min(4, missing.length) }, worker));

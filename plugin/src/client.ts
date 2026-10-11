@@ -4,6 +4,7 @@
 import {
   BuildStatus, CommitResponse, Info, Manifest, PROTOCOL_VERSION, ProtocolError, SiteInfo, SyncResponse, WireError,
 } from "./protocol";
+import { t } from "./i18n";
 
 export interface HttpRequest {
   url: string;
@@ -28,11 +29,11 @@ export class Client {
     try {
       u = new URL(serverURL);
     } catch {
-      throw new Error(`Invalid server URL: ${serverURL}`);
+      throw new Error(t("error.invalidURL", { url: serverURL }));
     }
     const local = ["localhost", "127.0.0.1", "[::1]"].includes(u.hostname);
     if (u.protocol !== "https:" && !(u.protocol === "http:" && local)) {
-      throw new Error("The server URL must use https:// (plain http is only allowed for localhost).");
+      throw new Error(t("error.https"));
     }
     this.base = serverURL.replace(/\/+$/, "");
   }
@@ -86,6 +87,6 @@ export class Client {
       }
       if (st.state === "succeeded" || st.state === "failed") return st;
     }
-    throw new Error("The build is taking long; check again later.");
+    throw new Error(t("error.buildSlow"));
   }
 }

@@ -4,6 +4,7 @@
 // tested; main.ts adapts the real vault to VaultLike.
 
 import { HashCache, sha256 } from "./hash";
+import { t } from "./i18n";
 import { HINTS_PATH, ManifestFile, Rules, SETTINGS_NOTE_NAME, SITE_NOTE_PATH } from "./protocol";
 import {
   Decision, NOTE_IMAGE_KEYS, SITE_AVATAR_KEYS, SITE_ICON_KEYS, SITE_IMAGE_KEYS, allowedPath, attachmentAllowed, canvasInPublicFolder,
@@ -58,7 +59,7 @@ export interface ScanResult {
 /** Finds the settings note; throws if there are several. */
 export function findSettingsNote(paths: Iterable<string>): string | undefined {
   const found = [...paths].filter(isSettingsNote).sort();
-  if (found.length > 1) throw new Error(`found ${found.length} settings notes (${found.join(", ")}); keep one`);
+  if (found.length > 1) throw new Error(t("error.settingsNotes", { count: found.length, paths: found.join(", ") }));
   return found[0];
 }
 
@@ -82,7 +83,7 @@ export async function scan(vault: VaultLike, rules: Rules, cache: HashCache): Pr
     const k = p.toLowerCase();
     const other = folded.get(k);
     if (other !== undefined && other !== p) {
-      throw new Error(`"${other}" and "${p}" differ only by case; rename one`);
+      throw new Error(t("error.caseClash", { a: other, b: p }));
     }
     folded.set(k, p);
     all.set(p, { ...f, path: p });

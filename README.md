@@ -39,7 +39,8 @@ Publish, and your site updates. Private notes never leave your device.
 - **Links keep working:** a renamed or moved note's old address redirects
   to the new one.
 - **In your language:** the theme's menus, dates and search speak English,
-  Swedish, German, French or Spanish.
+  Swedish, German, French or Spanish, and the Obsidian plugin follows
+  Obsidian's language (English and Swedish).
 - **Self-hosted:** one small Go server in Docker, with a ready-made Caddy
   setup for HTTPS and room for several sites. RSS,
   a sitemap, photo metadata stripping and optional cookie-free analytics
