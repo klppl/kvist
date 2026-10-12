@@ -28,7 +28,7 @@
   <ul class="cards">
     {{- range .}}
     <li class="card"><a class="card-link" href="{{.URL}}">
-      <span class="card-title">{{.Name}}</span>
+      <span class="card-title">{{if or .Icon .IconText}}{{template "folder-icon" .}} {{end}}{{.Name}}</span>
       <span class="card-meta">{{t "notes" (len .Notes)}}{{with .Children}} · {{t "folders" (len .)}}{{end}}</span>
     </a></li>
     {{- end}}

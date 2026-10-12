@@ -207,7 +207,10 @@ the notes around the page: a note's folder, a folder's notes, a tag's notes,
 or the most recent notes on the home page. It has a filter box, and on
 small screens it moves below the page. The folder tree holds folders, not
 notes: folders on the way to the page start open, and so does the only
-top-level folder of a garden that has one. Neither pane lists every note,
+top-level folder of a garden that has one. A folder shows the icon its
+folder note names (`Folder.Icon`, drawn by the `icon` template in
+`partials/nav.html`) or its emoji (`Folder.IconText`), else the plain
+folder; the `folder-icon` template picks. Neither pane lists every note,
 and the list stops at `list_max`, because a full tree of notes on every
 page made a 5 000-note site 2 GB. On wide screens the table of contents and the local
 graph sit to the right of a note; otherwise they follow it.

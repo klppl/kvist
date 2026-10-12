@@ -26,7 +26,7 @@ Publish, and your site updates. Private notes never leave your device.
   becomes the site's root, so its subfolders are the menu and the folder's
   name stays out of every address. Folders list their newest notes first;
   a `sort` property makes one A–Z or by date planted, and `order` pins a
-  note to the top.
+  note to the top. An `icon` property gives a folder an emoji or icon.
 - **Search, backlinks, related notes, link previews and a graph,** in a three-pane theme with light and
   dark mode, breadcrumbs, a reader mode, instant page loads and optional
   stacked pages that open linked notes side by side. Search filters by

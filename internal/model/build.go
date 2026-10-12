@@ -36,6 +36,7 @@ const (
 	WarnHome             = "home"
 	WarnImage            = "image"
 	WarnSort             = "sort"
+	WarnIcon             = "icon"
 )
 
 // BuildError lists the problems that make a build fail.
@@ -252,6 +253,7 @@ func (b *builder) makeNotes(s *Site) {
 		}
 		n.Order = firstNumber(fm, "order", "weight")
 		n.folderSort = firstString(fm, "sort")
+		n.folderIcon = firstString(fm, "icon")
 		n.Description = firstString(fm, "description", "summary") // else the first paragraph, once resolved (render)
 		for k, v := range fm {
 			if expose[k] {
@@ -849,6 +851,11 @@ func (b *builder) makeFolders(s *Site) {
 			default:
 				b.warn(WarnSort, f.Index.Path, "sort %q ignored; use updated, created or title", f.Index.folderSort)
 			}
+			if v := f.Index.folderIcon; len(v) > maxIconLen {
+				b.warn(WarnIcon, f.Index.Path, "icon ignored; use an icon name or an emoji")
+			} else {
+				f.Icon, f.IconText = folderIcon(v)
+			}
 		}
 		sortNotes(f.Notes, f.Sort, col)
 		f.NoteIDs = make([]string, len(f.Notes))
@@ -860,6 +867,44 @@ func (b *builder) makeFolders(s *Site) {
 		}
 	}
 	finish(s.Root)
+}
+
+// maxIconLen is the longest icon property kept, in bytes: room for an
+// icon name or an emoji sequence (a family emoji is 25 bytes), not for
+// a sentence.
+const maxIconLen = 32
+
+// folderIcon sorts a folder note's icon property into an icon name or
+// text to show as is. Names are case-insensitive, and Iconize's Lucide
+// names ("LiBookOpen") become plain ones ("book-open"), so notes that
+// already use that plugin's icon property work.
+func folderIcon(v string) (name, text string) {
+	if len(v) > 2 && strings.HasPrefix(v, "Li") && v[2] >= 'A' && v[2] <= 'Z' && isIconName(strings.ToLower(v[2:])) {
+		var b strings.Builder
+		for i, r := range v[2:] {
+			if r >= 'A' && r <= 'Z' && i > 0 {
+				b.WriteByte('-')
+			}
+			b.WriteRune(r)
+		}
+		return strings.ToLower(b.String()), ""
+	}
+	if l := strings.ToLower(v); isIconName(l) {
+		return l, ""
+	}
+	return "", v
+}
+
+func isIconName(s string) bool {
+	if s == "" || s[0] == '-' {
+		return false
+	}
+	for _, r := range s {
+		if !(r >= 'a' && r <= 'z' || r >= '0' && r <= '9' || r == '-') {
+			return false
+		}
+	}
+	return true
 }
 
 // sortNotes orders a folder's notes: those with an Order first, lowest

@@ -39,10 +39,10 @@
 </header>
 <ul class="list-items">
   {{- with .Parent}}{{if ne .URL "/"}}
-  <li class="list-folder"><a href="{{.URL}}">{{template "icon" "folder"}}<span>{{.Name}}</span><span class="list-up">↑</span></a></li>
+  <li class="list-folder"><a href="{{.URL}}">{{template "folder-icon" .}}<span>{{.Name}}</span><span class="list-up">↑</span></a></li>
   {{- end}}{{end}}
   {{- range .Folders}}
-  <li class="list-folder"><a href="{{.URL}}">{{template "icon" "folder"}}<span>{{.Name}}</span><span class="count">{{len .Notes}}</span></a></li>
+  <li class="list-folder"><a href="{{.URL}}">{{template "folder-icon" .}}<span>{{.Name}}</span><span class="count">{{len .Notes}}</span></a></li>
   {{- end}}
   {{- range $i, $n := .Notes}}{{if and (ne $n.URL $.URL) (ne $n.URL "/") (or (lt $i $.Max) (eq $n.URL $.Cur))}}
   <li class="list-note">

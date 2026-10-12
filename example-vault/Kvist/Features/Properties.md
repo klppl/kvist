@@ -19,8 +19,9 @@ Properties at the top of a note set:
 | `aliases` | other names to find and link the note by |
 | `order` | a number that pins the note to the top of its folder |
 | `sort` | on a folder note: `updated`, `created` or `title` order for the folder |
+| `icon` | on a folder note: the folder's icon in the menu and lists, an emoji or an icon name |
 
-This folder's note, [[Features|Feature tour]], has `sort: title`, so the features are listed A to Z instead of newest first.
+This folder's note, [[Features|Feature tour]], has `sort: title`, so the features are listed A to Z instead of newest first, and `icon: ✨`, which shows beside the folder in the menu.
 
 This note's description is set by hand; others use their first paragraph.
 

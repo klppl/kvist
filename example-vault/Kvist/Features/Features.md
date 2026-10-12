@@ -5,6 +5,7 @@ created: 2026-09-01
 updated: 2026-10-04
 tags: [kvist/features]
 sort: title
+icon: ✨
 ---
 One note per feature. Each shows the Markdown and how it looks on the site. Everything here is written the way you'd write it in Obsidian.
 

@@ -209,13 +209,18 @@ it is in an `exclude_folders` folder.
 ## Folder
 
 `Name`, `Path` (the vault path), `URL`, `Notes` (listed notes only, without the folder note or the home note),
-`Children` (A–Z by name), `Index` (the folder note, if any), `Parent`, `Sort`.
+`Children` (A–Z by name), `Index` (the folder note, if any), `Parent`, `Sort`, `Icon`, `IconText`.
 `Notes` start with the notes that have an `Order`, lowest first; the rest
 follow by `Sort`, which comes from the folder note's `sort` property:
 `updated` (newest `Updated` first, the default), `created` (newest
 `Created` first) or `title` (A–Z, collated for the site's `Language`, with
 numbers in number order). Ties go by URL. An unknown `sort` is ignored with
-a `sort` warning. Only folders that
+a `sort` warning. `Icon` and `IconText` come from the folder note's `icon`
+property, and at most one is set: `Icon` is an icon name for the theme to
+draw (lowercase letters, digits and hyphens; matched case-insensitively,
+and Iconize's `LiBookOpen` becomes `book-open`), `IconText` is anything
+else, such as an emoji, to show as it is. A value over 32 bytes is ignored
+with an `icon` warning. Only folders that
 contain published notes exist. Folders follow the URLs: the root folder is
 `Site.Root` (its `Path` is the root folder's vault path), and its subfolders
 are the top-level folders. A folder with only unlisted notes, in it and below it, has

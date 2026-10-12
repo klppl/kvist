@@ -79,6 +79,8 @@ main:focus { outline: none; }
 }
 @keyframes nav-progress { from { transform: scaleX(.05); } to { transform: scaleX(.85); } }
 .icon { flex: none; }
+/* A folder's emoji icon, in the same 16px box as a drawn one. */
+.icon-text { display: inline-block; width: 16px; font-size: 14px; line-height: 16px; text-align: center; }
 .icon-button {
   border: 1px solid var(--border); background: var(--bg); color: var(--fg);
   border-radius: 7px; width: 2rem; height: 2rem; cursor: pointer;

@@ -109,6 +109,7 @@ type Note struct {
 	// backlinks, search, the feed and the sitemap (frontmatter unlisted).
 	Unlisted   bool   `json:"unlisted,omitempty"`
 	folderSort string // frontmatter sort, read when this is a folder note
+	folderIcon string // frontmatter icon, read when this is a folder note
 	// Canvas: the page is an Obsidian canvas (a .canvas file). Content is
 	// then a board of cards and arrows, and there are no properties,
 	// aliases or TOC.
@@ -186,7 +187,13 @@ type Folder struct {
 	// Sort is how Notes are ordered after the notes with an Order:
 	// "updated" (newest first, the default), "created" (newest first) or
 	// "title" (A–Z), from the folder note's sort property.
-	Sort     string    `json:"sort"`
+	Sort string `json:"sort"`
+	// Icon and IconText come from the folder note's icon property; at
+	// most one is set. Icon is the name of an icon for the theme to draw
+	// (lowercase letters, digits and hyphens, e.g. "book"); IconText is
+	// anything else, such as an emoji, shown as it is.
+	Icon     string    `json:"icon,omitempty"`
+	IconText string    `json:"icon_text,omitempty"`
 	Children []*Folder `json:"children,omitempty"`
 	Index    *Note     `json:"-"` // folder note, if any
 	IndexID  string    `json:"index,omitempty"`
