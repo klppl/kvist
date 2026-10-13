@@ -10,6 +10,7 @@ home_recent      = 12          # notes in the home page list
 show_list        = true        # list pane: the notes in the current folder
 list_max         = 100         # notes in the list pane before "more…"
 list_images      = true        # a note's image or cover property: a small square in the list pane, a wide picture atop its card
+generated_covers = false       # cards without an image get a soft color cover (note, folder and tag cards)
 groups           = []          # tags that group the sidebar, e.g. ["articles", "projects"]; empty: folders
 show_toc         = true
 show_breadcrumbs = true        # the folders above a note's title, and a folder's

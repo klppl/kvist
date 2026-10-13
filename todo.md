@@ -44,6 +44,8 @@ list: update it too when an item is done or added.
 - [x] **Cover images in lists.** A note's `image:` or `cover:` shows as a
   small square beside its title in the list and atop its card, from
   thumbnails made at build time. (Publish, Bases card view)
+- [x] **Generated covers.** Cards without an image get a cover in soft
+  colors, the same for a note in every build (`generated_covers`).
 - [x] **Image lightbox.** Click an image in a note to see it full size;
   ← and → step through the note's images. (Publish)
 - [x] **Related notes.** Notes with words, tags or linked notes in common,

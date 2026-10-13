@@ -20,9 +20,10 @@
 {{define "card" -}}
 <li class="card">
   <a class="card-link" href="{{.URL}}">
-    {{- if param "list_images"}}{{with .ImageCard}}
-    <img class="card-cover" src="{{.}}" alt="" width="640" height="360" loading="lazy" decoding="async">
-    {{- end}}{{end}}
+    {{- $img := ""}}{{if param "list_images"}}{{$img = .ImageCard}}{{end}}
+    {{- if $img}}
+    <img class="card-cover" src="{{$img}}" alt="" width="640" height="360" loading="lazy" decoding="async">
+    {{- else if param "generated_covers"}}{{template "card-art" (dict "seed" .URL)}}{{end}}
     <span class="card-title">{{.Title}}</span>
     {{- with .Description}}<span class="card-desc">{{truncate 160 .}}</span>{{end}}
     <span class="card-meta">
@@ -31,6 +32,13 @@
     </span>
   </a>
 </li>
+{{- end}}
+
+{{/* A generated cover for a card without an image (generated_covers):
+     a color picked from the card's URL, so it stays the same in every
+     build. band: a low strip for folder and tag cards. */}}
+{{define "card-art" -}}
+<span class="card-art art-{{hash .seed 8}}{{if .band}} card-art-band{{end}}" style="--x: {{hash (print .seed "x") 5}}; --y: {{hash (print .seed "y") 3}}" aria-hidden="true"></span>
 {{- end}}
 
 {{define "note-list" -}}

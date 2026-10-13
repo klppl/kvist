@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"hash/fnv"
 	"html/template"
 	"sort"
 	"strings"
@@ -130,7 +131,20 @@ func funcMap(t *Theme, site *model.Site) template.FuncMap {
 		"add":       func(a, b int) int { return a + b },
 		"sub":       func(a, b int) int { return a - b },
 		"str":       func(v any) string { return fmt.Sprint(v) },
+		// hash picks a number from 0 to n-1 from s, the same for the same
+		// s in every build: {{hash .URL 9}} gives a note a steady color.
+		"hash": hashMod,
 	}
+}
+
+// hashMod maps s to 0..n-1 with FNV-1a, so builds stay deterministic.
+func hashMod(s string, n int) int {
+	if n <= 0 {
+		return 0
+	}
+	h := fnv.New32a()
+	h.Write([]byte(s))
+	return int(h.Sum32() % uint32(n))
 }
 
 // truncateText shortens s to n characters on a word boundary.

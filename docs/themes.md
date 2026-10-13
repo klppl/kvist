@@ -113,6 +113,7 @@ a `Page`:
 | `newest` | `{{range newest 3 .Tag.Notes}}` | the given notes, most recently updated first (`0` for all) |
 | `markdownify` | `{{markdownify (str (param "footer"))}}` | Markdown → HTML (internal links are not resolved) |
 | `truncate` | `{{truncate 160 .Description}}` | at a word boundary |
+| `hash` | `art-{{hash .URL 8}}` | a number from 0 to n−1 picked from a string, the same in every build: a steady color or pattern per note |
 | `default` | `{{default "Untitled" .Title}}` | |
 | `dict` | `{{template "x" (dict "A" 1 "B" .)}}` | pass several values |
 | `json` | `<script>var d = {{json .Site.Graph}}</script>` | |
@@ -179,6 +180,7 @@ Params (set them in the settings note `_site.md`, or in `theme_params` on the se
 | `show_list` | `true` | the list pane (below) |
 | `list_max` | `100` | notes in the list pane before a "more…" link |
 | `list_images` | `true` | `.ImageThumb` beside a note's title in the list pane, `.ImageCard` atop its card |
+| `generated_covers` | `false` | cards without an image get a cover in soft colors: one of eight hues, picked from the card's URL with `hash`, as CSS gradients (no image files). Note cards get a 16:9 cover, folder and tag cards on the home page a low strip |
 | `groups` | `[]` | tags that group the sidebar instead of folders (below) |
 | `show_toc`, `show_backlinks`, `show_graph` | `true` | note page parts |
 | `show_related` | `true` | "Related notes" under a note (`.Note.Related`): notes with words, tags or links in common that it doesn't link to yet |

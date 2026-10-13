@@ -31,7 +31,8 @@ Publish, and your site updates. Private notes never leave your device.
   dark mode, breadcrumbs, a reader mode, instant page loads and optional
   stacked pages that open linked notes side by side. Search filters by
   `#tag`, images open full size with a click, and a note's `cover:`
-  shows beside its title in lists.
+  shows beside its title in lists (cards without one can get a generated
+  color cover).
 - **Shares well:** every note gets a preview image with its title for
   chats and social media, and `unlisted: true` publishes a note without
   listing it anywhere.

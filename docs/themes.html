@@ -223,6 +223,7 @@ accent = "#3f7d4e"</code></pre>
     <tr><td><code>structuredData</code></td><td><code>{{structuredData .}}</code></td><td>The page described for search engines (schema.org JSON-LD), for <code>&lt;script type="application/ld+json"&gt;</code>; empty on the 404 page</td></tr>
     <tr><td><code>markdownify</code></td><td><code>{{markdownify (str (param "footer"))}}</code></td><td>Markdown to HTML</td></tr>
     <tr><td><code>truncate</code></td><td><code>{{truncate 160 .Description}}</code></td><td>Shorten at a word boundary</td></tr>
+    <tr><td><code>hash</code></td><td><code>art-{{hash .URL 8}}</code></td><td>A number from 0 to n−1 picked from a text, the same in every build, e.g. to give each note its own color</td></tr>
     <tr><td><code>default</code></td><td><code>{{default "Untitled" .Title}}</code></td><td>A fallback for empty values</td></tr>
     <tr><td><code>dict</code></td><td><code>{{template "card" (dict "Note" . "Big" true)}}</code></td><td>Pass several values to a template</td></tr>
     <tr><td><code>json</code></td><td><code>{{json .Site.Graph}}</code></td><td>A value as JSON</td></tr>

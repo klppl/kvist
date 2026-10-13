@@ -13,6 +13,7 @@ profile_links:
   - mailto:hello@example.com
 footer: Text in this demo is free to copy. Made with notes in Obsidian.
 groups: []
+generated_covers: true
 ---
 Settings for the example site. This note configures the website and is never published as a page. See the docs: *Customizing the site*.
 

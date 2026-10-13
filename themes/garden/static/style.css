@@ -482,6 +482,26 @@ pre.mermaid { background: none; text-align: center; }
   display: block; width: calc(100% + 2.2rem); max-width: none; height: auto; aspect-ratio: 16 / 9;
   margin: -1rem -1.1rem .45rem; border-radius: 9px 9px 0 0; object-fit: cover; background: var(--hover);
 }
+/* Generated covers: one of eight hues (.art-0 to .art-7, picked from the
+   card's URL) at the same lightness and chroma, so they look like one set.
+   Yellow and orange are left out: at these lightnesses they turn brown.
+   --x and --y move the light spot. */
+.card-art {
+  --art-l: .83; --art-c: .065; --h: 160;
+  display: block; flex: none; width: calc(100% + 2.2rem); aspect-ratio: 16 / 9;
+  margin: -1rem -1.1rem .45rem; border-radius: 9px 9px 0 0;
+  background:
+    radial-gradient(ellipse 75% 110% at calc(var(--x) * 20% + 10%) calc(var(--y) * 25%), oklch(calc(var(--art-l) + .07) calc(var(--art-c) * .7) calc(var(--h) + 25)), transparent 70%),
+    linear-gradient(160deg, oklch(var(--art-l) var(--art-c) var(--h)), oklch(calc(var(--art-l) - .05) var(--art-c) calc(var(--h) - 20)));
+}
+.card-art-band { aspect-ratio: auto; height: 3.25rem; }
+.art-0 { --h: 20; }  .art-1 { --h: 150; } .art-2 { --h: 180; }
+.art-3 { --h: 215; } .art-4 { --h: 250; } .art-5 { --h: 280; }
+.art-6 { --h: 310; } .art-7 { --h: 345; }
+:root[data-theme="dark"] .card-art { --art-l: .52; --art-c: .075; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .card-art { --art-l: .52; --art-c: .075; }
+}
 .card-title { font-size: 1.02rem; font-weight: 650; line-height: 1.35; }
 .card-desc { color: var(--muted); font-size: .9rem; }
 .card-meta { margin-top: auto; display: flex; gap: .6rem; align-items: center; color: var(--muted); font-size: .8rem; }
