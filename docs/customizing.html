@@ -82,6 +82,7 @@ Settings for my website.
     <tr><td><code>author</code>, <code>language</code></td><td>Used in page metadata and feeds. <code>language</code> is a code like <code>en</code> or <code>sv</code>, and it also sets the language of the site's own words (menu, dates, search). The built-in theme speaks English, Swedish (<code>sv</code>), German (<code>de</code>), French (<code>fr</code>) and Spanish (<code>es</code>); other languages show English.</td></tr>
     <tr><td><code>home</code></td><td>A published note to use as the home page, as a link: <code>"[[Welcome]]"</code>. Obsidian keeps it up to date if you rename the note. Without it, the published folder's own note is the home page, if it has one (<a href="writing.html#home">The home page</a>).</td></tr>
     <tr><td><code>groups</code></td><td>Tags that group the menu (<a href="#groups">below</a>).</td></tr>
+    <tr><td><code>primary_links</code>, <code>secondary_links</code></td><td>Links at the top of the menu, and under <em>Links</em> at the bottom (<a href="#menu-links">below</a>).</td></tr>
     <tr><td><code>avatar</code>, <code>bio</code>, <code>profile_links</code></td><td>A profile at the top of the menu (<a href="#profile">below</a>).</td></tr>
     <tr><td><code>image</code></td><td>The picture shown when a page is shared on social media or in chats, unless the note has its own <code>image</code> or <code>cover</code>: <code>"[[preview.png]]"</code> or a web address. About 1200×630 pixels works everywhere. Notes get a generated picture instead (see <code>social_images</code> below), so this one shows for the home page, folders and tags. Use PNG, JPEG or WebP: social media don't show SVG or AVIF, so those are skipped.</td></tr>
     <tr><td><code>favicon</code></td><td>The small icon in browser tabs and bookmarks: <code>"[[icon.png]]"</code> or a web address. A square PNG or SVG of at least 64×64 pixels. Without it, the theme shows a green sprout.</td></tr>
@@ -90,7 +91,18 @@ Settings for my website.
     <tr><td>Anything else</td><td>A theme setting, such as <code>accent</code> or <code>footer</code>. See <a href="#theme">Theme settings</a>.</td></tr>
   </tbody>
 </table>
-<p><strong>Menu links</strong> come from the note's text: each list item that is a single link becomes a link under <em>Links</em> in the menu, in order. Links can go to other websites (they get an arrow), to addresses on your site like <code>/about/</code>, or to published notes with <code>[[wikilinks]]</code> or <code>[text](Note.md)</code>. A link to a note that isn't published is left out, with a warning in the publish report. Other text in the note is ignored, so you can keep notes to yourself there.</p>
+<p id="menu-links"><strong>Menu links</strong> come from two list properties. <code>primary_links</code> go at the top of the menu, next to Home, Search, Graph and Tags. <code>secondary_links</code> go under <em>Links</em>, below your folders.</p>
+<pre data-label="Kvist/_site.md"><code>---
+primary_links:
+  - "[[About]]"
+  - https://mastodon.social/@ada
+secondary_links:
+  - "[[Reading list]]"
+  - "Blog: https://ada.example.com"
+---</code></pre>
+<p>Each item is a link to a published note (<code>"[[About]]"</code> or <code>"[[About|Me]]"</code>), a Markdown link (<code>"[Code](https://…)"</code>), <code>Name: https://…</code>, or a bare address. Mastodon, GitHub and the other services from <code>profile_links</code> are named for you. Links to other websites get an arrow, and addresses on your site like <code>/about/</code> work too. A link to a note that isn't published is left out, with a warning in the publish report.</p>
+<p>Put the items in quotes, so YAML doesn't read the square brackets as a list. In Obsidian's properties view, both must be <em>List</em> properties, so each link is its own item: if one shows as <em>Text</em>, click the icon next to its name and choose <em>Property type → List</em>.</p>
+<p>Older settings notes list the <em>Links</em> in the note's text instead: each list item that is a single link. That still works when there is no <code>secondary_links</code> property.</p>
 <p>Publish rules, the theme and the site's address can only be set on the server, so a synced vault can't change what's public. If the settings note tries, the publish report shows a warning.</p>
 <div class="callout">
   <p class="callout-title">Only one settings note</p>

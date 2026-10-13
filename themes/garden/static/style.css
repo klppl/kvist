@@ -121,6 +121,8 @@ main { min-width: 0; }
 .nav-list [aria-current] .icon { color: var(--fg); }
 .nav-list kbd { margin-left: auto; font: .72rem var(--font-mono); color: var(--muted); border: 1px solid var(--border); border-radius: 4px; padding: 0 .35rem; }
 .nav-external { justify-content: space-between; }
+.nav-main .nav-external { justify-content: flex-start; }
+.nav-main .nav-external .icon:last-child { margin-left: auto; }
 /* The folder tree: a chevron opens a folder, its name goes to it. */
 .nav-tree .nav-list { margin-left: 1.05rem; padding-left: .35rem; border-left: 1px solid var(--border); }
 .tree-folder > summary { display: flex; align-items: center; list-style: none; cursor: pointer; border-radius: 7px; }

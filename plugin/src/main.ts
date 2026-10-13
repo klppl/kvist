@@ -25,6 +25,8 @@ author:
 language:
 home:
 groups: []
+primary_links: []
+secondary_links: []
 accent:
 footer:
 image:

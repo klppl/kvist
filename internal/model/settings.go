@@ -20,11 +20,13 @@ import (
 type siteSettings struct {
 	Title, Description, Author, Language *string
 	StrictLineBreaks                     *bool
-	Home                                 *string // vault path or [[wikilink]]
-	HomeFrom                             string  // file that set Home, for warnings
-	Nav                                  []navRef
+	Home                                 *string  // vault path or [[wikilink]]
+	HomeFrom                             string   // file that set Home, for warnings
+	Nav                                  []navRef // secondary_links, or the list in the body
 	NavSet                               bool
 	NavFrom                              string
+	PrimaryNav                           []navRef // primary_links: the top of the menu
+	PrimaryNavSet                        bool
 	Params                               map[string]any
 
 	Image, Avatar, Favicon *vault.ImageRef // resolved once attachments are known
@@ -98,6 +100,7 @@ func (b *builder) readSiteNote(st *siteSettings, src []byte) {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
+	navProp := false // secondary_links replaces the list in the body
 	for _, k := range keys {
 		v := m.Frontmatter[k]
 		if isEmpty(v) {
@@ -128,6 +131,16 @@ func (b *builder) readSiteNote(st *siteSettings, src []byte) {
 				b.warn(WarnSiteConfig, protocol.SiteNotePath, "profile link %q is not a web or mailto: address; left out", x)
 			}
 			st.ProfileLinks = links
+		case lk == "primary_links" || lk == "secondary_links":
+			links, bad := parseLinkList(v)
+			for _, x := range bad {
+				b.warn(WarnSiteConfig, protocol.SiteNotePath, "%s: %q is not a link; left out", k, x)
+			}
+			if lk == "secondary_links" {
+				st.Nav, st.NavSet, st.NavFrom, navProp = links, true, protocol.SiteNotePath, true
+			} else {
+				st.PrimaryNav, st.PrimaryNavSet = links, true
+			}
 		case lk == "strict_line_breaks":
 			if on, ok := boolValue(v); ok {
 				st.StrictLineBreaks = &on
@@ -150,7 +163,7 @@ func (b *builder) readSiteNote(st *siteSettings, src []byte) {
 	if r, ok := vault.ImageProperty(m.Frontmatter, vault.SiteIconKeys); ok {
 		st.Favicon = &r
 	}
-	if nav := parseNavList(src[m.BodyStart:]); nav != nil {
+	if nav := parseNavList(src[m.BodyStart:]); nav != nil && !navProp {
 		st.Nav, st.NavSet, st.NavFrom = nav, true, protocol.SiteNotePath
 	}
 }
@@ -242,6 +255,37 @@ func parseNavList(body []byte) []navRef {
 		}
 	}
 	return out
+}
+
+// parseLinkList reads primary_links and secondary_links: lists whose
+// items are written like the menu links in the body ("[[About]]",
+// "[Code](https://…)"), or like profile links ("Docs: https://…", a bare
+// https:// address).
+func parseLinkList(v any) (links []navRef, bad []string) {
+	items, ok := v.([]any)
+	if !ok {
+		items = []any{v}
+	}
+	for _, it := range items {
+		// - [[About]] without quotes is a list in a list to YAML.
+		if l, ok := it.([]any); ok && len(l) == 1 {
+			if inner, ok := l[0].([]any); ok && len(inner) == 1 {
+				it = "[[" + scalar(inner[0]) + "]]"
+			}
+		}
+		s := strings.TrimSpace(scalar(it))
+		if nav := parseNavList([]byte("- " + s)); len(nav) == 1 {
+			links = append(links, nav[0])
+		} else if m := profileTitled.FindStringSubmatch(s); m != nil && webOrMail.MatchString(m[2]) {
+			links = append(links, navRef{Title: strings.TrimSpace(m[1]), URL: m[2]})
+		} else if webOrMail.MatchString(s) && !strings.ContainsAny(s, " \t") {
+			_, name := linkKind(s)
+			links = append(links, navRef{Title: name, URL: s})
+		} else {
+			bad = append(bad, s)
+		}
+	}
+	return links, bad
 }
 
 var (
@@ -392,32 +436,41 @@ func (b *builder) homeNote(s *Site, st siteSettings) {
 }
 
 // finishSettings falls back to the root folder note as the home page and
-// resolves the menu links. Links to notes that aren't published are
-// dropped with a warning, so the menu never hints at a private note.
+// resolves the menu links: secondary_links (or the list in the body) and
+// primary_links. Links to notes that aren't published are dropped with a
+// warning, so the menu never hints at a private note.
 func (b *builder) finishSettings(s *Site, st siteSettings) {
 	if root := s.Root; s.Home == nil && root != nil && root.Index != nil {
 		s.Home, s.HomeID = root.Index, root.Index.ID
 	}
-	if !st.NavSet {
-		return
+	if st.NavSet {
+		s.Config.Nav = b.navItems(s, st.Nav, st.NavFrom)
 	}
-	s.Config.Nav = nil
-	for _, r := range st.Nav {
+	if st.PrimaryNavSet {
+		s.Config.PrimaryNav = b.navItems(s, st.PrimaryNav, protocol.SiteNotePath)
+	}
+}
+
+// navItems resolves menu links to URLs.
+func (b *builder) navItems(s *Site, refs []navRef, from string) []NavItem {
+	var out []NavItem
+	for _, r := range refs {
 		if r.Note == nil {
-			s.Config.Nav = append(s.Config.Nav, NavItem{Title: r.Title, URL: r.URL})
+			out = append(out, NavItem{Title: r.Title, URL: r.URL})
 			continue
 		}
 		n := b.noteFor(s, r.Note)
 		if n == nil {
-			b.warn(WarnSiteConfig, st.NavFrom, "menu link %q points to a note that is not published; left out", r.Note.Target)
+			b.warn(WarnSiteConfig, from, "menu link %q points to a note that is not published; left out", r.Note.Target)
 			continue
 		}
 		title := r.Title
 		if title == "" {
 			title = n.Title
 		}
-		s.Config.Nav = append(s.Config.Nav, NavItem{Title: title, URL: n.URL})
+		out = append(out, NavItem{Title: title, URL: n.URL})
 	}
+	return out
 }
 
 // noteFor resolves a link from the settings note to a published note.

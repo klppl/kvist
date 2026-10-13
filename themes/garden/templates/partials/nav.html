@@ -1,7 +1,7 @@
 {{/*
-  The nav pane: site title, the main links, the folder tree (or the
-  groups) and the site's nav links. It takes (dict "P" page "Group"
-  tag), where Group is the group of the current note. The tree holds
+  The nav pane: site title, the main links (with the settings note's
+  primary_links), the folder tree (or the groups) and the secondary
+  links. It takes (dict "P" page "Group" tag), where Group is the group of the current note. The tree holds
   folders only, so every page stays small however big the garden is; the
   list pane shows the notes of the current folder or group.
 */}}
@@ -25,6 +25,12 @@
       <li><button class="graph-toggle" type="button" hidden>{{template "icon" "graph"}}{{t "graph"}}</button></li>
       {{- end}}
       <li><a href="/tags/"{{if or (eq $cur "/tags/") (and (hasPrefix $cur "/tags/") (not (param "groups")))}} aria-current="page"{{end}}>{{template "icon" "tag"}}{{t "tags"}}</a></li>
+      {{- range .Site.Config.PrimaryNav}}
+      {{- $ext := or (hasPrefix .URL "https://") (hasPrefix .URL "http://")}}
+      <li class="nav-main"><a href="{{.URL}}"{{if $ext}} class="nav-external" rel="noopener"{{else if eq $cur .URL}} aria-current="page"{{end}}>
+        {{- if $ext}}{{template "icon" "globe"}}{{else if hasPrefix .URL "mailto:"}}{{template "icon" "mail"}}{{else}}{{template "icon" "note"}}{{end}}
+        {{- .Title}}{{if $ext}}{{template "icon" "external"}}{{end}}</a></li>
+      {{- end}}
     </ul>
     {{- $root := .Site.Root}}
     {{- $home := "/"}}{{with .Site.Home}}{{$home = .URL}}{{end}}

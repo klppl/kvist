@@ -138,20 +138,12 @@ export const en = {
 - **language**: a code such as \`en\` or \`sv\`, for the site's own words and dates.
 - **home**: a note to use as the home page, written as a link: \`[[Welcome]]\`. Empty: a generated home page.
 - **groups**: tags that group the menu, such as \`articles\` and \`projects\`. Empty: your folders.
+- **primary_links**: links at the top of the menu. **secondary_links**: links under Links, below your folders. Each item is a published note (\`[[About]]\`), a website (\`https://mastodon.social/@you\`) or \`Name: https://…\`. Make both List properties, so each link is its own item.
 - **accent**: the color of links, such as \`#3f7d4e\`.
 - **footer**: text at the bottom of the menu. Markdown works.
 - **image**: the picture shown when a page is shared, as a link: \`[[preview.png]]\`.
 - **favicon**: the icon in browser tabs, as a link: \`[[icon.png]]\`.
 
 More settings, such as a profile with your picture and links, or visitor statistics, are in the documentation: https://klppl.github.io/kvist/customizing.html
-
-## Links
-
-Each list item that is a single link becomes a menu link, in order. Links can point to websites, to addresses like /about/, or to published notes with \`[[wikilinks]]\`. For example:
-
-%%
-- [About](/about/)
-- [Mastodon](https://mastodon.social/@you)
-%%
 `,
 } satisfies Record<string, string | { other: string; one?: string }>;

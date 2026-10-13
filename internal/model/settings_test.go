@@ -68,6 +68,13 @@ groups: "articles, #projects"
 accent: "#8a4f9e"
 base_url: https://evil.example.com
 tags: [settings]
+primary_links:
+  - "[[About me|Me]]"
+  - [[Secret]]
+  - "[Code](https://github.com/ada)"
+  - "Docs: https://docs.example.com"
+  - https://mastodon.social/@ada
+  - not a link
 ---
 Settings text with an inline [[About me]] link that is not a menu entry.
 
@@ -112,6 +119,15 @@ Settings text with an inline [[About me]] link that is not a menu entry.
 	if !reflect.DeepEqual(c.Nav, want) {
 		t.Errorf("nav = %+v", c.Nav)
 	}
+	wantMain := []NavItem{
+		{Title: "Me", URL: "/kvist/about-me/"},
+		{Title: "Code", URL: "https://github.com/ada"},
+		{Title: "Docs", URL: "https://docs.example.com"},
+		{Title: "Mastodon", URL: "https://mastodon.social/@ada"},
+	}
+	if !reflect.DeepEqual(c.PrimaryNav, wantMain) {
+		t.Errorf("primary nav = %+v", c.PrimaryNav)
+	}
 	if site.Home == nil || site.Home.URL != "/kvist/welcome/" {
 		t.Errorf("home = %+v", site.Home)
 	}
@@ -128,7 +144,10 @@ Settings text with an inline [[About me]] link that is not a menu entry.
 	if !strings.Contains(all, `"base_url" can only be set in the server config`) {
 		t.Errorf("no warning for base_url: %s", all)
 	}
-	if !strings.Contains(all, `menu link "Secret"`) || strings.Contains(all, "Example") {
+	if !strings.Contains(all, `primary_links: "not a link"`) {
+		t.Errorf("no warning for a bad main link: %s", all)
+	}
+	if strings.Count(all, `menu link "Secret"`) != 2 || strings.Contains(all, "Example") {
 		t.Errorf("menu link warnings: %s", all)
 	}
 }
@@ -267,5 +286,30 @@ func TestHomeNoteNotInFolder(t *testing.T) {
 	}
 	if got, want := folderTitles(site.Root.Children[0]), []string{"Kontakt"}; !reflect.DeepEqual(got, want) {
 		t.Errorf("folder notes: %v, want %v", got, want)
+	}
+}
+
+// secondary_links sets the Links section and replaces the list in the
+// body, so the two can't mix.
+func TestSettingsSecondaryLinks(t *testing.T) {
+	site := buildVault(t, map[string]string{
+		"Kvist/About me.md": "About.",
+		"Kvist/_site.md": `---
+secondary_links:
+  - "[[About me]]"
+  - https://github.com/ada
+---
+- [Old](/old/)
+`,
+	})
+	want := []NavItem{
+		{Title: "About me", URL: "/kvist/about-me/"},
+		{Title: "GitHub", URL: "https://github.com/ada"},
+	}
+	if !reflect.DeepEqual(site.Config.Nav, want) {
+		t.Errorf("nav = %+v", site.Config.Nav)
+	}
+	if _, ok := site.Config.Params["secondary_links"]; ok {
+		t.Error("secondary_links became a theme setting")
 	}
 }

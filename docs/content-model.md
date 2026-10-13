@@ -30,7 +30,8 @@ folder, note ↔ tag, backlinks) are written as note ids.
 
 `Title`, `Description`, `BaseURL` (no trailing slash), `Language`, `Author`,
 `StrictLineBreaks` (single line breaks were rendered as spaces, not `<br>`),
-`Nav` (list of `{Title, URL}`), `Params` (theme parameters), `Image` (the
+`Nav` (list of `{Title, URL}`), `PrimaryNav` (like `Nav`, for the top of the
+menu), `Params` (theme parameters), `Image` (the
 default social preview image, as `Note.Image`), `Favicon` (the browser tab
 icon, as `Image`; empty means the theme's own), `Analytics` (nil, or
 `{Provider, ID, Script, Endpoint}`: `plausible`, `umami` or `goatcounter`,
@@ -40,8 +41,8 @@ set: `{Avatar, Bio, Links}`, each link `{Title, URL, Kind}` with `Kind` one of
 `github`, `gitlab`, `mastodon`, `bluesky`, `linkedin`, `x`, `youtube`,
 `email`, `website`).
 
-The server config sets these. `image`, `favicon`, `avatar` (or `logo`), `bio` and
-`profile_links` come from the settings note only. The vault may override `title`,
+The server config sets these. `image`, `favicon`, `avatar` (or `logo`), `bio`,
+`profile_links`, `primary_links` (`PrimaryNav`) and `secondary_links` come from the settings note only. The vault may override `title`,
 `description`, `author`, `language`, `strict_line_breaks`, `home`, the menu (`Nav`) and theme
 parameters with a **settings note**: a note named `_site.md` in any folder,
 never published as a page. Clients push its content as `.kvist/site.md`.
@@ -52,18 +53,21 @@ title: Alex's garden
 home: "[[Welcome]]"
 groups: [articles, projects]
 accent: "#3f7d4e"
+primary_links: ["[[About]]"]
+secondary_links: ["[[Reading list]]"]
 ---
-- [About](/about/)
-- [[Reading list]]
 ```
 
 Properties other than the site fields become theme parameters; empty ones
 are ignored. Obsidian's own properties (`tags`, `aliases`, `cssclasses`,
 `publish`) are skipped, and server-only keys (`base_url`, publish rules, …)
-are ignored with a warning. `Nav` comes from the list items in the body that
-are a single link: URLs are kept, `[[wikilinks]]` and links to `.md` files resolve to published notes
-(links to anything else are dropped with a warning). Links in comments and
-code blocks don't count.
+are ignored with a warning. `Nav` comes from `secondary_links` and
+`PrimaryNav` from `primary_links`: lists whose items are `[[wikilinks]]`,
+Markdown links, `Title: URL` or bare http(s)/mailto: addresses. URLs are
+kept; links to notes resolve to published notes (others are dropped with a
+warning). Without `secondary_links`, `Nav` comes from the list items in
+the body that are a single link; links in comments and code blocks don't
+count.
 
 ## Note
 

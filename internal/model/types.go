@@ -46,9 +46,11 @@ type SiteConfig struct {
 	Language    string `json:"language"`
 	Author      string `json:"author,omitempty"`
 	// StrictLineBreaks: single line breaks in notes are spaces, not <br>.
-	StrictLineBreaks bool           `json:"strict_line_breaks,omitempty"`
-	Nav              []NavItem      `json:"nav,omitempty"`
-	Params           map[string]any `json:"params,omitempty"`
+	StrictLineBreaks bool      `json:"strict_line_breaks,omitempty"`
+	Nav              []NavItem `json:"nav,omitempty"`
+	// PrimaryNav are the settings note's primary_links, for the top of the menu.
+	PrimaryNav []NavItem      `json:"primary_nav,omitempty"`
+	Params     map[string]any `json:"params,omitempty"`
 	// Image is the default social preview image: the URL of a published
 	// attachment, or an http(s) URL.
 	Image   string   `json:"image,omitempty"`
