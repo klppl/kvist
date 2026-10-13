@@ -67,6 +67,8 @@ list: update it too when an item is done or added.
   note. (Publish, Quartz's Explorer sort)
 - [x] **Folder icons.** An `icon` property on the folder note: an emoji or
   a theme icon name (Lucide names, Iconize's `LiBook` too). (Iconize)
+- [x] **Links at the top of the menu.** `primary_links` and
+  `secondary_links` in `_site.md`, both list properties. (Publish)
 - [x] **Search engine metadata.** schema.org JSON-LD (articles,
   breadcrumbs), Open Graph article dates and tags, sitemap dates for folder
   and tag pages, descriptions for list pages, one address per page, image

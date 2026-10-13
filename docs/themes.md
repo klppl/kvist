@@ -202,8 +202,9 @@ Params (set them in the settings note `_site.md`, or in `theme_params` on the se
 | `mermaid_url`, `mermaid_integrity` | jsDelivr, pinned with an SRI hash | see below |
 | `analytics`, `analytics_id`, `analytics_url` | none | visitor statistics; kvist checks them and themes get `Site.Config.Analytics` ([content model](content-model.md#siteconfig)) |
 
-Pages have three panes: the nav pane (main links, the folder tree or
-`groups`, and the menu links from the settings note), the list pane, and
+Pages have three panes: the nav pane (main links with
+`Site.Config.PrimaryNav`, the folder tree or `groups`, and
+`Site.Config.Nav` under Links), the list pane, and
 the page. The list pane shows
 the notes around the page: a note's folder, a folder's notes, a tag's notes,
 or the most recent notes on the home page. It has a filter box, and on

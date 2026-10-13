@@ -170,10 +170,11 @@ language: en
 home: "[[Welcome]]"
 groups: [articles, projects]
 accent: "#8a4f9e"
----
-## Links
-- [About](/about/)
-- [[Reading list]]</code></pre>
+primary_links:
+  - "[[About]]"
+secondary_links:
+  - "[[Reading list]]"
+---</code></pre>
 <table>
   <thead><tr><th>Property</th><th></th></tr></thead>
   <tbody>
@@ -183,13 +184,14 @@ accent: "#8a4f9e"
     <tr><td><code>strict_line_breaks</code></td><td><code>true</code>: a single line break is a space, not a line break.</td></tr>
     <tr><td><code>image</code></td><td>Default social preview image: <code>"[[preview.png]]"</code>, a vault path or a web address.</td></tr>
     <tr><td><code>favicon</code></td><td>The browser tab icon: <code>"[[icon.png]]"</code>, a vault path or a web address. PNG or SVG.</td></tr>
+    <tr><td><code>primary_links</code>, <code>secondary_links</code></td><td><a href="customizing.html#menu-links">Menu links</a>: at the top of the menu, and under <em>Links</em>. Each is a list of <code>"[[Note]]"</code>, <code>"[Text](https://…)"</code>, <code>Text: https://…</code> or a bare address.</td></tr>
     <tr><td><code>avatar</code> (or <code>logo</code>), <code>bio</code>, <code>profile_links</code></td><td>The <a href="customizing.html#profile">profile</a> in the menu.</td></tr>
     <tr><td><code>analytics</code>, <code>analytics_id</code>, <code>analytics_url</code></td><td><a href="customizing.html#analytics">Visitor statistics</a> with Plausible, Umami or GoatCounter.</td></tr>
     <tr><td>Anything else</td><td>A <a href="customizing.html#theme">theme setting</a>.</td></tr>
   </tbody>
 </table>
 <p>Empty properties keep their default. Obsidian's own properties (<code>tags</code>, <code>aliases</code>, <code>cssclasses</code>) are ignored. Server-only keys such as <code>base_url</code> or <code>exclude_folders</code> are ignored with a warning in the publish report.</p>
-<p><strong>Menu links</strong> are the list items in the note's text that are a single link: <code>[Text](https://…)</code>, <code>[Text](/path/)</code>, <code>[[Note]]</code> or <code>[[Note|Text]]</code>. Links to notes that aren't published are left out with a warning. Links inside <code>%% comments %%</code> and code blocks don't count, so you can keep examples there.</p>
+<p>Links to notes that aren't published are left out of the menu with a warning. Without <code>secondary_links</code>, the <em>Links</em> come from the list items in the note's text that are a single link, as in older settings notes; links inside <code>%% comments %%</code> and code blocks don't count.</p>
 
 <h2 id="plugin">Plugin settings</h2>
 <table>

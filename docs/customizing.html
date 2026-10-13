@@ -66,13 +66,13 @@ home: "[[Welcome]]"
 groups: [articles, projects, books]
 accent: "#8a4f9e"
 footer: © 2026 Ada · [Contact](mailto:ada@example.com)
+primary_links:
+  - "[[About]]"
+secondary_links:
+  - "[[Reading list]]"
+  - https://mastodon.social/@ada
 ---
-Settings for my website.
-
-## Links
-- [About](/about/)
-- [[Reading list]]
-- [Mastodon](https://mastodon.social/@ada)</code></pre>
+Settings for my website.</code></pre>
 <p>Settings are the note's properties, so you can edit them in Obsidian's property editor. <strong>Leave a property empty to keep its default.</strong></p>
 <table>
   <thead><tr><th>Property</th><th>What it does</th></tr></thead>
@@ -155,7 +155,7 @@ groups: [articles, projects, books]
 <p>The built-in theme, <em>garden</em>, has three columns on a computer screen:</p>
 <figure class="shot"><img src="assets/screens/note-dark.webp" width="2000" height="1125" alt="A note in dark mode with the menu and folder tree, the folder's notes, the note under its breadcrumbs, and a graph and contents list on the right." loading="lazy"><figcaption>The three columns, in dark mode. On wide screens, contents and connections appear on the right.</figcaption></figure>
 <ul>
-  <li><strong>Menu</strong>: Home, Search, Graph, Tags, your folder tree or groups, and your links.</li>
+  <li><strong>Menu</strong>: Home, Search, Graph, Tags and your <code>primary_links</code>, then your folder tree or groups, and your <code>secondary_links</code>.</li>
   <li><strong>List</strong>: the notes around the current page, with a filter box. On the home page, the most recently updated notes.</li>
   <li><strong>Note</strong>: the page itself, with its folders above the title (breadcrumbs) and backlinks at the bottom. On wide screens, the table of contents and a small graph of connected notes sit beside it. The book button in the top corner (reader mode) hides the menu and the list, for reading.</li>
 </ul>
