@@ -117,7 +117,7 @@ func TestI18nOverrides(t *testing.T) {
 	if got := th.Messages("sv").T("planted"); got != "Sådd" {
 		t.Errorf("overridden word = %q", got)
 	}
-	if got := th.Messages("sv").T("tended"); got != "Skött" {
+	if got := th.Messages("sv").T("tended"); got != "Uppdaterad" {
 		t.Errorf("the rest of sv.toml should stay: %q", got)
 	}
 	if got := th.Messages("nb").T("planted"); got != "Plantet" {

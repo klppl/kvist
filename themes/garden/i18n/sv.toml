@@ -17,7 +17,7 @@ rss = "RSS"
 about_author = "Om författaren"
 
 explore = "Utforska"
-recently_tended = "Nyligen skötta"
+recently_tended = "Senast uppdaterade"
 notes = { one = "%d anteckning", other = "%d anteckningar" }
 folders = { one = "%d mapp", other = "%d mappar" }
 tag_count = { one = "%d tagg", other = "%d taggar" }
@@ -29,8 +29,8 @@ no_matching_notes = "Inga anteckningar här matchar."
 search_everywhere = "Sök överallt"
 
 planted = "Planterad"
-tended = "Skött"
-last_tended = "Senast skött"
+tended = "Uppdaterad"
+last_tended = "Senast uppdaterad"
 reading_time = "%d min läsning"
 growth_stage = "Växtstadium"
 stage_seedling = "grodd"
