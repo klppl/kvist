@@ -535,7 +535,7 @@ pre.mermaid { background: none; text-align: center; }
 
 .tag-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); gap: 1rem; }
 .tag-card {
-  display: flex; flex-direction: column; gap: .75rem; margin: 0; padding: 1.1rem 1.2rem 1.15rem;
+  display: flex; flex-direction: column; gap: .75rem; min-width: 0; margin: 0; padding: 1.1rem 1.2rem 1.15rem;
   border: 1px solid var(--border); border-radius: 12px; background: var(--bg); transition: border-color .15s;
 }
 .tag-card:hover { border-color: color-mix(in srgb, var(--fg) 35%, var(--border)); }
@@ -548,11 +548,11 @@ pre.mermaid { background: none; text-align: center; }
   content: ""; display: block; height: 100%; border-radius: inherit; background: var(--accent); opacity: .75;
   width: calc(var(--n) / var(--max) * 100%);
 }
-.tag-card-notes { list-style: none; margin: 0; padding: 0; display: grid; gap: .1rem; }
+.tag-card-notes { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: .1rem; }
 .tag-card-notes li { display: flex; align-items: baseline; gap: .6rem; margin: 0; padding: .2rem 0; font-size: .92rem; }
 .tag-card-notes a { flex: 1; min-width: 0; color: var(--fg); text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tag-card-notes a:hover { color: var(--accent); }
-.tag-card-notes time { flex: none; color: var(--muted); font-size: .76rem; }
+.tag-card-notes time { flex: none; color: var(--muted); font-size: .76rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .tag-card-foot { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem; margin-top: auto; padding-top: .7rem; border-top: 1px solid var(--border); }
 .tag-card-foot .tag { margin: 0; }
 .tag-card-more { margin-left: auto; font-size: .82rem; font-weight: 500; text-decoration: none; }
