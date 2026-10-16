@@ -564,6 +564,8 @@
     nodes.forEach(function (n) { byId[n.id] = n; });
     var links = data.edges.filter(function (e) { return byId[e.source] && byId[e.target] && e.source !== e.target; })
       .map(function (e) { byId[e.source].deg++; byId[e.target].deg++; return { s: byId[e.source], t: byId[e.target] }; });
+    // Label order: most linked first, ties in data order.
+    var ranked = nodes.slice().sort(function (a, b) { return b.deg - a.deg; });
     var current = byId[opts.current];
     var view = { x: 0, y: 0, k: 1 }, w = 0, h = 0, hover = null, alpha = 1, raf = 0, dragging = null;
 
@@ -630,12 +632,23 @@
         ctx.beginPath(); ctx.arc(p[0], p[1], r, 0, 6.2832);
         if (n.tag && n !== hover) { ctx.strokeStyle = accent; ctx.lineWidth = 1.5; ctx.stroke(); ctx.lineWidth = 1; }
         else ctx.fill();
-        if (n === current || n === hover || near[n.id] && hover || view.k > 1.6 || opts.labels) {
-          ctx.fillStyle = fg;
-          ctx.font = (n === current ? "600 " : "") + "12px system-ui, sans-serif";
-          ctx.textAlign = "center";
-          ctx.fillText(n.title, p[0], p[1] + r + 13);
-        }
+      });
+      // Labels: the current note and the hovered one with its neighbors
+      // always; then the most linked notes first, each only where it
+      // doesn't overlap a label already drawn.
+      var placed = [];
+      var must = function (n) { return n === current || n === hover || !!(hover && near[n.id]); };
+      ctx.textAlign = "center";
+      ranked.filter(must).concat(ranked.filter(function (n) { return !must(n); })).forEach(function (n) {
+        var m = must(n), p = toScreen(n), r = radius(n) * Math.max(0.7, Math.min(1.6, view.k));
+        if (p[0] < -100 || p[0] > w + 100 || p[1] < -20 || p[1] > h + 20) return;
+        ctx.font = (n === current ? "600 " : "") + "12px system-ui, sans-serif";
+        var tw = ctx.measureText(n.title).width, box = [p[0] - tw / 2 - 3, p[1] + r + 1, p[0] + tw / 2 + 3, p[1] + r + 17];
+        if (!m && placed.some(function (b) { return box[0] < b[2] && b[0] < box[2] && box[1] < b[3] && b[1] < box[3]; })) return;
+        placed.push(box);
+        ctx.globalAlpha = hover && !near[n.id] ? 0.25 : m ? 1 : 0.8;
+        ctx.fillStyle = m ? fg : muted;
+        ctx.fillText(n.title, p[0], p[1] + r + 13);
       });
       ctx.globalAlpha = 1;
     }
@@ -785,7 +798,7 @@
       var sub = neighborhood(data, id, 2);
       if (sub.nodes.length < 2 || !local.isConnected) return;
       local.hidden = false;
-      new Graph($(".graph-canvas", local), sub, { current: id, labels: sub.nodes.length <= 6, page: true });
+      new Graph($(".graph-canvas", local), sub, { current: id, page: true });
     }).catch(function () {});
   }
 
@@ -810,7 +823,7 @@
         gdialog.showModal();
         getJSON("/graph.json").then(function (data) {
           data = globalGraph(data);
-          allGraph = new Graph(area, data, { current: noteId, labels: data.nodes.length <= 40 });
+          allGraph = new Graph(area, data, { current: noteId });
         }).catch(function () { area.textContent = tr("graph_unavailable", "The graph is not available."); });
         return;
       }
