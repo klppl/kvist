@@ -1,5 +1,6 @@
 # kvist
 
+[![License: Lagom](https://img.shields.io/badge/license-lagom-9E2B25)](https://klppl.github.io/lagom-license/)
 [![100% vibecoded](https://img.shields.io/badge/vibecoded-100%25-ff69b4?logo=sparkles&logoColor=white)](#)
 [![Made with love](https://img.shields.io/badge/made%20with-%E2%9D%A4%EF%B8%8F%20%26%20a%20suspicious%20eye-blueviolet)](#)
 [![Code reviewed by](https://img.shields.io/badge/code%20reviewed%20by-an%20actual%20human-success)](#)
