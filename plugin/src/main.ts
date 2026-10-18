@@ -171,6 +171,23 @@ export default class KvistPlugin extends Plugin {
     this.setStatus("idle", "kvist");
   }
 
+  /** Obsidian's own "Default location for new attachments" (a vault setting, not stored by kvist). */
+  attachmentFolder(): string {
+    const v = (this.app.vault as unknown as { getConfig(key: string): unknown }).getConfig("attachmentFolderPath");
+    return typeof v === "string" && v !== "/" ? v : "";
+  }
+
+  setAttachmentFolder(folder: string) {
+    const f = folder.trim().replace(/^\/+|\/+$/g, "");
+    (this.app.vault as unknown as { setConfig(key: string, value: unknown): void }).setConfig("attachmentFolderPath", f === "" ? "/" : f);
+  }
+
+  /** An uploads folder inside the first always-public folder, so new attachments are never in an excluded one. */
+  suggestedAttachmentFolder(): string {
+    const folder = (this.rules?.always_public_folders ?? []).map((f) => f.replace(/^\/+|\/+$/g, "")).find((f) => f !== "");
+    return `${folder ?? "Kvist"}/uploads`;
+  }
+
   publishing(): boolean {
     return this.running;
   }
@@ -559,6 +576,11 @@ class KvistSettingTab extends PluginSettingTab {
     new Setting(containerEl).setName(t("settings.siteSettings"))
       .setDesc(t("settings.siteSettingsDesc", { name: SETTINGS_NOTE_NAME }))
       .addButton((b) => b.setButtonText(t("settings.openSettingsNote")).onClick(() => p.openSettingsNote()));
+
+    new Setting(containerEl).setName(t("settings.attachments")).setDesc(t("settings.attachmentsDesc"))
+      .addText((t) => t.setPlaceholder(p.suggestedAttachmentFolder()).setValue(p.attachmentFolder()).onChange((v) => {
+        p.setAttachmentFolder(v);
+      }));
 
     containerEl.createEl("h3", { text: t("settings.device") });
     containerEl.createEl("p", {

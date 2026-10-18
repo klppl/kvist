@@ -85,6 +85,9 @@ export const sv: Catalog = {
   "settings.siteDesc": "Webbplatsens id i serverns konfiguration",
   "settings.siteSettings": "Webbplatsinställningar",
   "settings.siteSettingsDesc": "Titel, startsida, meny och färger finns i en anteckning som heter {name}, så att du kan ändra dem från vilken enhet som helst.",
+  "settings.attachments": "Mapp för nya bilagor",
+  "settings.attachmentsDesc":
+    "Var Obsidian sparar bilder och filer du klistrar in eller släpper i en anteckning. Använd en mapp inuti en publik mapp, till exempel den som föreslås, så hålls de samlade och utanför valvets rot. Tomt betyder valvets rot. Det är samma sak som Obsidians \"Standardplats för nya bilagor\".",
   "settings.openSettingsNote": "Öppna inställningsanteckningen",
   "settings.device": "Den här enheten",
   "settings.deviceDesc": "De här inställningarna sparas bara på den här enheten och synkas inte till dina andra enheter.",

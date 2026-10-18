@@ -91,6 +91,9 @@ export const en = {
   "settings.siteDesc": "The site id from the server config",
   "settings.siteSettings": "Site settings",
   "settings.siteSettingsDesc": "Title, home page, menu and colors live in a note called {name}, so you can change them from any device.",
+  "settings.attachments": "Folder for new attachments",
+  "settings.attachmentsDesc":
+    "Where Obsidian saves images and files you paste or drop into a note. Use a folder inside a public folder, for example the one suggested, to keep them together and out of the vault root. Empty means the vault root. This is the same as Obsidian's \"Default location for new attachments\".",
   "settings.openSettingsNote": "Open settings note",
   "settings.device": "This device",
   "settings.deviceDesc": "These settings are stored on this device only and are not synced to your other devices.",
