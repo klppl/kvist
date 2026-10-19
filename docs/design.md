@@ -410,6 +410,9 @@ Note
   Aliases, Tags []*Tag
   Created, Updated              frontmatter dates, else mtime of revision
   Description                   frontmatter or first paragraph
+  Lead                          Description only when set in frontmatter
+  Layout                        page | cover | about | intro, "" = article
+                                (frontmatter `layout`, unknown values warn)
   Params        map             allowlisted frontmatter only
   Content       template.HTML
   TOC           []*Heading      nested
@@ -491,7 +494,9 @@ Uses `requestUrl` (avoids CORS on mobile) and `crypto.subtle` for SHA-256.
   hints file. Hash cache keyed by (path, mtime, size) to avoid rehashing.
 - **Commands:** "Publish now", "Toggle publish for current note" (writes
   frontmatter via `processFrontMatter`, also in file menu), "Open publish
-  report", "Open site settings note", "Open published page".
+  report", "Open site settings note", "Open published page", "Set page
+  layout" (a list of the layouts; writes `layout` via `processFrontMatter`,
+  also in the file menu).
 - **Auto-publish:** debounced after modify/rename/delete/metadata change of
   any file that was or would become published; never forces through a
   stale-state warning.

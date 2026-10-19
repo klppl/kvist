@@ -41,6 +41,11 @@ them. Use one token per device, so you can revoke one without the others.
   `publish: true` or `publish: false` to the note's frontmatter. If a rule
   wins anyway (an excluded folder, a `#private` tag), it tells you.
 - **Open published page** opens the note on your site.
+- **Set page layout**, also in the file menu as *Page layout*: pick how the
+  note is laid out on the site (article, page, cover, about or intro) and
+  it writes the `layout` property for you. Article removes the property.
+  Picking *cover* for a note without an `image` or `cover` reminds you to
+  add one. See [Page layouts](https://klppl.github.io/kvist/writing.html#layouts).
 - **Open site settings note** opens `_site.md`, the note with the site's
   title, home page, menu and theme settings, and creates it from a template
   the first time. It's never published as a page.

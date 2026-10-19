@@ -71,7 +71,7 @@ Pipeline: plugin/`kvist push` → `api` → `syncer` → `store` → `source/pus
 | `internal/pushclient/` | Go reference client: scan a folder like the plugin does, push it |
 | `internal/config/` | Server TOML config: load and validate |
 | `themes/garden/` | The built-in theme (embedded via `themes/embed.go`): `templates/`, `static/`, `i18n/*.toml`, `theme.toml` |
-| `plugin/src/` | `main.ts` (Obsidian glue, settings note template), `publisher.ts` (flow), `scan.ts` (manifest), `rules.ts`, `slug.ts`, `canvas.ts`, `client.ts`, `i18n/` |
+| `plugin/src/` | `main.ts` (Obsidian glue, settings note template), `publisher.ts` (flow), `scan.ts` (manifest), `rules.ts`, `slug.ts`, `canvas.ts`, `layouts.ts`, `client.ts`, `i18n/` |
 | `plugin/test/` | Node tests bundled by `run.mjs`; `memvault.ts` fakes a vault; `e2e.test.ts` runs against a real server |
 | `testdata/leaks/basic/` | Leak fixtures: every file with `LEAKMARK` in it must never appear in output |
 | `testdata/parity/` | JSON fixtures both Go and plugin tests run (rules, URLs, image properties) |
@@ -98,6 +98,7 @@ Pipeline: plugin/`kvist push` → `api` → `syncer` → `store` → `source/pus
    - `internal/vault/image.go` ↔ `imageProperty` in `plugin/src/rules.ts`
    - `internal/pushclient/scan.go` ↔ `plugin/src/scan.ts`
    - `internal/protocol` ↔ `plugin/src/protocol.ts`
+   - `model.Layouts` and `builder.layout` ↔ `plugin/src/layouts.ts`
 3. **Contracts are versioned.** The sync protocol (`docs/protocol.md`) and
    the content model (`docs/content-model.md`) accept additive changes;
    anything else needs a version bump and a doc entry.
@@ -118,6 +119,7 @@ Pipeline: plugin/`kvist push` → `api` → `syncer` → `store` → `source/pus
 | Word in the theme | `themes/garden/i18n/en.toml` first, then every other language (tests fail until all have it) |
 | Word in the plugin | `plugin/src/i18n/en.ts` first, then `sv.ts` (`plugin/test/i18n.test.ts` checks) |
 | Markdown/Obsidian syntax | `internal/markdown` (+ test), a note in `example-vault/Kvist/Features/`, `docs/writing.html` |
+| Page layout | `model.Layouts` + `plugin/src/layouts.ts` + `testdata/parity/layouts.json`, the `note-head` template in `themes/garden/templates/partials/note-parts.html` and its CSS, plugin words `layout.*` (en, sv), `docs/writing.html#layouts`, `docs/content-model.md` |
 | Content model field | `internal/model/types.go`, `docs/content-model.md`, leak check that it can't carry private data |
 | Protocol field/endpoint | `internal/protocol`, `internal/api`/`syncer`, `plugin/src/protocol.ts` + `client.ts`, `internal/pushclient`, `docs/protocol.md` |
 | CLI command or flag | `cmd/kvist/*.go` (+ the `usage` text in `main.go`), `docs/server.html` |

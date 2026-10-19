@@ -146,7 +146,7 @@ export const sv: Catalog = {
 
 - **title** och **description**: webbplatsens namn och undertitel.
 - **language**: en kod som \`sv\` eller \`en\`, för webbplatsens egna ord och datum.
-- **home**: en anteckning som ska vara startsida, skriven som en länk: \`[[Välkommen]]\`. Tom: en genererad startsida.
+- **home**: en anteckning som ska vara startsida, skriven som en länk: \`[[Välkommen]]\`. Tom: en genererad startsida. Ge den anteckningen \`layout: intro\` för en stor välkomstrubrik (kommandot Välj sidlayout väljer den åt dig).
 - **groups**: taggar som grupperar menyn, som \`artiklar\` och \`projekt\`. Tom: dina mappar.
 - **primary_links**: länkar högst upp i menyn. **secondary_links**: länkar under Länkar, nedanför dina mappar. Varje punkt är en publicerad anteckning (\`[[Om]]\`), en webbplats (\`https://mastodon.social/@du\`) eller \`Namn: https://…\`. Gör båda till listegenskaper, så att varje länk blir en egen punkt.
 - **accent**: länkarnas färg, som \`#3f7d4e\`.

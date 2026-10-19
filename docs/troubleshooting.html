@@ -111,6 +111,15 @@
 <h3 id="note-order">Notes in a folder are in the wrong order</h3>
 <p>Folders list the newest notes first, by the <code>updated</code> property, or by when the file last changed if a note has none. Syncing or copying the vault can change those file times, so give the notes an <code>updated</code> date. To list a folder A to Z or by <code>created</code> date instead, or to pin a note to the top, see <a href="writing.html#order">The order of notes</a>.</p>
 
+<h3 id="layout-ignored">A page doesn't use its layout</h3>
+<ul>
+  <li>The property is <code>layout</code>, with one of <code>article</code>, <code>page</code>, <code>cover</code>, <code>about</code> or <code>intro</code> as plain text, not a list. Anything else is ignored, and the publish report says so.</li>
+  <li>No picture on a <code>cover</code> or <code>intro</code> page? The note needs an <code>image</code> or <code>cover</code> property pointing at a published image. Check the report for an image warning.</li>
+  <li>No text under the title? That is the <code>description</code> property. Without it, the title stands alone.</li>
+  <li>No links on an <code>about</code> page? They are the <code>profile_links</code> in the <a href="customizing.html#profile">settings note</a>.</li>
+  <li>A theme of your own lays out only what its templates handle; see <a href="themes.html">Writing a theme</a>.</li>
+</ul>
+
 <h3 id="still-visible">A page is still visible after I unpublished it</h3>
 <p>Pages are cached for up to 60 seconds. With Cloudflare, set up the <a href="server.html#purge">cache purge</a> so it disappears immediately.</p>
 

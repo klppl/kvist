@@ -157,7 +157,7 @@ export const en = {
 
 - **title** and **description**: the site's name and tagline.
 - **language**: a code such as \`en\` or \`sv\`, for the site's own words and dates.
-- **home**: a note to use as the home page, written as a link: \`[[Welcome]]\`. Empty: a generated home page.
+- **home**: a note to use as the home page, written as a link: \`[[Welcome]]\`. Empty: a generated home page. Give that note \`layout: intro\` for a large welcome title (the Set page layout command picks it for you).
 - **groups**: tags that group the menu, such as \`articles\` and \`projects\`. Empty: your folders.
 - **primary_links**: links at the top of the menu. **secondary_links**: links under Links, below your folders. Each item is a published note (\`[[About]]\`), a website (\`https://mastodon.social/@you\`) or \`Name: https://…\`. Make both List properties, so each link is its own item.
 - **accent**: the color of links, such as \`#3f7d4e\`.
