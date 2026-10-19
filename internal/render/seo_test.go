@@ -96,6 +96,30 @@ func TestStructuredData(t *testing.T) {
 	if got, _ := sd(&Page{Kind: "home", Site: site, URL: "/", Canonical: "/"}); !strings.Contains(string(got), `"@type":"WebSite"`) {
 		t.Errorf("home: %s", got)
 	}
+	// Layouts: an about page is the author's profile page, with the
+	// avatar as their picture; page and intro are web pages.
+	site.Config.Profile.Avatar = "/_assets/x/ada.png"
+	about := &model.Note{Title: "About", URL: "/about/", Layout: "about", Created: day, Updated: day}
+	got, _ = sd(&Page{Kind: "note", Site: site, Title: about.Title, URL: about.URL, Canonical: about.URL, Note: about})
+	var pp map[string]any
+	if err := json.Unmarshal([]byte(got), &pp); err != nil || pp["@type"] != "ProfilePage" || pp["dateCreated"] != "2026-03-01T00:00:00Z" {
+		t.Fatalf("about page: %v %s", err, got)
+	}
+	if m, _ := pp["mainEntity"].(map[string]any); m["@type"] != "Person" || m["name"] != "Ada" || m["image"] != "https://example.com/_assets/x/ada.png" {
+		t.Errorf("about page person: %v", pp["mainEntity"])
+	}
+	for _, l := range []string{"page", "intro"} {
+		n := &model.Note{Title: "Now", URL: "/now/", Layout: l, Created: day, Updated: day}
+		got, _ = sd(&Page{Kind: "note", Site: site, Title: n.Title, URL: n.URL, Canonical: n.URL, Note: n})
+		if !strings.Contains(string(got), `"@type":"WebPage"`) || strings.Contains(string(got), "Article") {
+			t.Errorf("%s layout: %s", l, got)
+		}
+	}
+	site.Config.Author = ""
+	got, _ = sd(&Page{Kind: "note", Site: site, Title: about.Title, URL: about.URL, Canonical: about.URL, Note: about})
+	if !strings.Contains(string(got), `"@type":"WebPage"`) {
+		t.Errorf("about page without an author: %s", got)
+	}
 	if got, _ := sd(&Page{Kind: "404", Site: site}); got != "" {
 		t.Errorf("404 has structured data: %s", got)
 	}

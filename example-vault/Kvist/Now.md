@@ -1,6 +1,7 @@
 ---
 title: Now
 permalink: /now/
+layout: page
 created: 2026-03-01
 updated: 2026-10-03
 stage: budding

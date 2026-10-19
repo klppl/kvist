@@ -3,12 +3,13 @@
 // works on desktop and mobile.
 
 import {
-  App, ItemView, Menu, Modal, Notice, Platform, Plugin, PluginSettingTab, Setting, TAbstractFile, TFile,
+  App, ItemView, Menu, Modal, Notice, Platform, Plugin, PluginSettingTab, Setting, SuggestModal, TAbstractFile, TFile,
   WorkspaceLeaf, getAllTags, getLanguage, normalizePath, requestUrl,
 } from "obsidian";
 import { Client, Transport } from "./client";
 import { HashCache, HashEntry } from "./hash";
 import { language, setLanguage, t } from "./i18n";
+import { LAYOUTS, Layout, readLayout } from "./layouts";
 import { ProtocolError, Regression, Rules, SETTINGS_NOTE_NAME, SITE_NOTE_PATH, Warning } from "./protocol";
 import { DeviceState, PublishResult, Publisher, StaleCancelled } from "./publisher";
 import { evaluate, isNote, isSettingsNote } from "./rules";
@@ -97,6 +98,16 @@ export default class KvistPlugin extends Plugin {
     this.addCommand({ id: "open-report", name: t("command.report"), callback: () => this.openReport() });
     this.addCommand({ id: "settings-note", name: t("command.settingsNote"), callback: () => this.openSettingsNote() });
     this.addCommand({
+      id: "set-layout",
+      name: t("command.layout"),
+      checkCallback: (checking) => {
+        const f = this.app.workspace.getActiveFile();
+        if (!f || f.extension !== "md" || isSettingsNote(f.path)) return false;
+        if (!checking) this.pickLayout(f);
+        return true;
+      },
+    });
+    this.addCommand({
       id: "open-published",
       name: t("command.openPublished"),
       checkCallback: (checking) => {
@@ -114,6 +125,7 @@ export default class KvistPlugin extends Plugin {
         menu.addItem((item) =>
           item.setTitle(t(published ? "menu.unpublish" : "menu.publish")).setIcon("globe").onClick(() => this.togglePublish(file)),
         );
+        menu.addItem((item) => item.setTitle(t("menu.layout")).setIcon("layout-template").onClick(() => this.pickLayout(file)));
       }),
     );
 
@@ -297,6 +309,22 @@ export default class KvistPlugin extends Plugin {
     return this.rules;
   }
 
+  /** Asks for a page layout and writes it to the note's layout property. */
+  pickLayout(file: TFile) {
+    const fm = this.app.metadataCache.getFileCache(file)?.frontmatter ?? {};
+    const current = readLayout(fm.layout) || "article";
+    new LayoutModal(this.app, current, async (layout) => {
+      await this.app.fileManager.processFrontMatter(file, (fm) => {
+        for (const k of Object.keys(fm)) if (k.toLowerCase() === "layout") delete fm[k];
+        // An article is the default: no property needed.
+        if (layout !== "article") fm.layout = layout;
+      });
+      new Notice(t("notice.layoutSet", { name: file.basename, layout: t(`layout.${layout}`) }));
+      const hasImage = Object.keys(fm).some((k) => ["image", "cover"].includes(k.toLowerCase()) && fm[k]);
+      if (layout === "cover" && !hasImage) new Notice(t("notice.layoutNeedsImage", { name: file.basename }));
+    }).open();
+  }
+
   async togglePublish(file: TFile) {
     if (isSettingsNote(file.path)) {
       new Notice(t("notice.isSettingsNote"));
@@ -442,6 +470,26 @@ class ObsidianVault implements VaultLike {
 
   resolve(linkpath: string, source: string): string | null {
     return this.app.metadataCache.getFirstLinkpathDest(linkpath, source)?.path ?? null;
+  }
+}
+
+/** The page layouts to pick from, each with what it shows. */
+class LayoutModal extends SuggestModal<Layout> {
+  constructor(app: App, private current: Layout, private choose: (layout: Layout) => void) {
+    super(app);
+    this.setPlaceholder(t("layout.placeholder"));
+  }
+  getSuggestions(query: string): Layout[] {
+    const q = query.trim().toLowerCase();
+    return LAYOUTS.filter((l) => !q || l.includes(q) || t(`layout.${l}`).toLowerCase().includes(q));
+  }
+  renderSuggestion(layout: Layout, el: HTMLElement) {
+    const title = el.createDiv({ text: t(`layout.${layout}`) });
+    if (layout === this.current) title.createSpan({ cls: "kvist-layout-current", text: ` · ${t("layout.current")}` });
+    el.createEl("small", { text: t(`layout.${layout}.desc`), cls: "kvist-layout-desc" });
+  }
+  onChooseSuggestion(layout: Layout) {
+    this.choose(layout);
   }
 }
 

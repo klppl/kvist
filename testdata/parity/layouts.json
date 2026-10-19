@@ -1,0 +1,17 @@
+{
+  "layouts": ["article", "page", "cover", "about", "intro"],
+  "cases": [
+    {"value": "", "layout": ""},
+    {"value": "article", "layout": ""},
+    {"value": "default", "layout": ""},
+    {"value": "About", "layout": "about"},
+    {"value": " intro ", "layout": "intro"},
+    {"value": "page", "layout": "page"},
+    {"value": "cover", "layout": "cover"},
+    {"value": "profil", "layout": null},
+    {"value": "post", "layout": null},
+    {"value": null, "layout": ""},
+    {"value": ["cover"], "layout": null},
+    {"value": 3, "layout": null}
+  ]
+}

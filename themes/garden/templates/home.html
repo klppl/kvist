@@ -1,7 +1,7 @@
 {{define "main" -}}
 {{- with .Note}}
-<article class="note home-note">
-  <header class="note-header"><h1>{{.Title}}</h1></header>
+<article class="note home-note{{with .Layout}} layout-{{.}}{{end}}">
+  {{template "note-head" (dict "Note" . "Site" $.Site "Home" true)}}
   <div class="content">{{.Content}}</div>
 </article>
 {{- else}}

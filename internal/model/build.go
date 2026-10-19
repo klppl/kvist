@@ -7,6 +7,7 @@ import (
 	"math"
 	"mime"
 	"path"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -37,6 +38,7 @@ const (
 	WarnImage            = "image"
 	WarnSort             = "sort"
 	WarnIcon             = "icon"
+	WarnLayout           = "layout"
 )
 
 // BuildError lists the problems that make a build fail.
@@ -255,6 +257,8 @@ func (b *builder) makeNotes(s *Site) {
 		n.folderSort = firstString(fm, "sort")
 		n.folderIcon = firstString(fm, "icon")
 		n.Description = firstString(fm, "description", "summary") // else the first paragraph, once resolved (render)
+		n.Lead = n.Description
+		n.Layout = b.layout(p, fm)
 		for k, v := range fm {
 			if expose[k] {
 				if n.Params == nil {
@@ -267,6 +271,9 @@ func (b *builder) makeNotes(s *Site) {
 		if ref, ok := vault.ImageProperty(fm, vault.NoteImageKeys); ok {
 			n.Image = b.imageURL(p, p, ref)
 			n.ImageThumb, n.ImageCard = n.Image, n.Image
+		}
+		if n.Layout == "cover" && n.Image == "" {
+			b.warn(WarnLayout, p, "layout cover has no image or cover property to show")
 		}
 		ns.doc.RemoveLeadingTitle(n.Title)
 		n.TOC = toc(ns.doc.Headings)
@@ -867,6 +874,40 @@ func (b *builder) makeFolders(s *Site) {
 		}
 	}
 	finish(s.Root)
+}
+
+// Layouts are the values of the layout property. Themes may lay
+// out fewer of them; the garden theme lays out all five:
+//   - article: a note with its dates, tags and links (the default)
+//   - page: a page of its own, without dates, tags or related notes
+//   - cover: an article under its image or cover property, wide
+//   - about: a page about the site's author, with a portrait and links
+//   - intro: a welcome page with a large title, for the home note
+var Layouts = []string{"article", "page", "cover", "about", "intro"}
+
+// layout reads a note's layout property. Unknown values (and lists or
+// numbers) are left out with a warning, so a typo shows in the report
+// instead of silently giving an article. "default" (common in notes moved
+// from Jekyll or Hugo) is an article too.
+func (b *builder) layout(p string, fm map[string]any) string {
+	vals := vault.FrontmatterValue(fm, "layout")
+	if len(vals) == 0 || vals[0] == nil {
+		return ""
+	}
+	v, ok := vals[0].(string)
+	if !ok {
+		b.warn(WarnLayout, p, "layout ignored; use one of %s", strings.Join(Layouts, ", "))
+		return ""
+	}
+	l := strings.ToLower(strings.TrimSpace(v))
+	switch {
+	case l == "" || l == "article" || l == "default":
+		return ""
+	case slices.Contains(Layouts, l):
+		return l
+	}
+	b.warn(WarnLayout, p, "layout %q ignored; use one of %s", truncate(strings.TrimSpace(v), 40), strings.Join(Layouts, ", "))
+	return ""
 }
 
 // maxIconLen is the longest icon property kept, in bytes: room for an

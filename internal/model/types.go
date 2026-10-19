@@ -96,10 +96,17 @@ type Note struct {
 	Updated  time.Time `json:"updated"`
 	// Order: frontmatter order (or weight). Notes with one come first in
 	// their folder, lowest first; nil for the rest.
-	Order       *float64       `json:"order,omitempty"`
-	Description string         `json:"description,omitempty"`
-	Params      map[string]any `json:"params,omitempty"`
-	Image       string         `json:"image,omitempty"` // social preview image, like SiteConfig.Image
+	Order       *float64 `json:"order,omitempty"`
+	Description string   `json:"description,omitempty"`
+	// Lead is Description when the frontmatter sets it; empty when
+	// Description was taken from the first paragraph. A layout can show it
+	// under the title without repeating the note's first lines.
+	Lead string `json:"lead,omitempty"`
+	// Layout is how the page is laid out: one of Layouts, from the
+	// frontmatter layout property; "" (an article) when not set.
+	Layout string         `json:"layout,omitempty"`
+	Params map[string]any `json:"params,omitempty"`
+	Image  string         `json:"image,omitempty"` // social preview image, like SiteConfig.Image
 	// ImageThumb (a square) and ImageCard (16:9) are small copies of Image
 	// for note lists and cards, made by the build (internal/build). They are
 	// Image itself when it can't be made smaller (an SVG, a web address),

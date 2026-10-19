@@ -1,6 +1,8 @@
 ---
 title: About
 permalink: /about/
+layout: about
+description: Imaginary gardener. Grows tomatoes, bakes bread and keeps notes about both.
 created: 2026-01-04
 updated: 2026-09-12
 stage: evergreen

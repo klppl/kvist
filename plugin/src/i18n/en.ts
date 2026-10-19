@@ -10,6 +10,22 @@ export const en = {
   "command.openPublished": "Open published page",
   "menu.publish": "Publish (kvist)",
   "menu.unpublish": "Unpublish (kvist)",
+  "command.layout": "Set page layout",
+  "menu.layout": "Page layout (kvist)",
+
+  // Page layouts (the layout property), in the order of LAYOUTS
+  "layout.placeholder": "Pick how this page is laid out on the site",
+  "layout.current": "current",
+  "layout.article": "Article",
+  "layout.article.desc": "A note with its dates, tags and links. The default.",
+  "layout.page": "Page",
+  "layout.page.desc": "A page of its own, for contact or now pages: the title and description, no dates or tags.",
+  "layout.cover": "Cover",
+  "layout.cover.desc": "For posts and projects: the note's image wide above the title, then like an article.",
+  "layout.about": "About me",
+  "layout.about.desc": "A portrait, the title, the description and your profile links.",
+  "layout.intro": "Intro",
+  "layout.intro.desc": "For the home note: the image as a banner, a large title and the description.",
 
   // Status bar (lowercase: it follows "● kvist" style text)
   "status.label": "kvist: {status} (click for the report)",
@@ -47,6 +63,8 @@ export const en = {
   "notice.connected": "kvist: connected to “{site}” ({url}).",
   "notice.waitForPublish": "kvist: wait for the publish to finish.",
   "notice.reset": "kvist: settings reset.",
+  "notice.layoutSet": "kvist: “{name}” now uses the {layout} layout.",
+  "notice.layoutNeedsImage": "kvist: add an image or cover property to “{name}” for the picture.",
 
   // Why a rule overrides the publish property
   "reason.excluded_folder": "it is in an excluded folder",

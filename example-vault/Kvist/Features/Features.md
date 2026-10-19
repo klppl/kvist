@@ -23,4 +23,5 @@ One note per feature. Each shows the Markdown and how it looks on the site. Ever
 | [[Links and previews]] | wikilinks, headings, blocks, hover previews |
 | [[Graph]] | the graph of links |
 | [[Properties]] | dates, stage, social image |
+| [[Layouts]] | about pages, welcome pages, cover images |
 | [[Printing]] | what a printed page looks like |

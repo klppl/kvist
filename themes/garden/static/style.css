@@ -469,6 +469,64 @@ pre.mermaid { background: none; text-align: center; }
 .toc a { color: var(--muted); text-decoration: none; }
 .toc a:hover { color: var(--accent); }
 
+/* layouts (Note.Layout). about and intro size themselves to the note's
+   width, not the window's, so they also fit a stacked pane. */
+.layout-about, .layout-intro { container-type: inline-size; }
+.note-header .lead {
+  margin: .1rem 0 .9rem; max-width: 38rem; font-size: 1.2rem; line-height: 1.5;
+  color: color-mix(in srgb, var(--fg) 68%, var(--bg)); text-wrap: pretty;
+}
+.note-header h1 { text-wrap: balance; }
+/* cover and intro: the note's image, wide, above the title */
+.note-cover { margin: 0 0 2rem; }
+.note-cover img {
+  display: block; width: 100%; aspect-ratio: 2 / 1; object-fit: cover; border-radius: 14px;
+  background: var(--hover); outline: 1px solid color-mix(in srgb, var(--fg) 8%, transparent); outline-offset: -1px;
+}
+.layout-intro .note-cover img { aspect-ratio: 5 / 2; }
+/* intro: a large title and lead; without an image, the avatar above */
+.intro-head { padding-top: .5rem; }
+.intro-avatar {
+  display: block; width: 5rem; height: 5rem; margin: 0 0 1.5rem; border-radius: 50%; object-fit: cover;
+  background: var(--hover); box-shadow: 0 0 0 4px var(--bg), 0 0 0 5px var(--border);
+}
+.note-header.intro-head h1 {
+  font-size: clamp(2.5rem, 1.7rem + 4cqi, 4rem); line-height: 1.04; letter-spacing: -.035em; margin: 0 0 1rem;
+}
+.intro-head .lead { font-size: clamp(1.15rem, 1rem + .9cqi, 1.4rem); line-height: 1.45; margin-bottom: 0; }
+.layout-intro .content { margin-top: 2.4rem; }
+/* without a lead, the first paragraph reads as one */
+.layout-intro .note-header:not(:has(.lead)) + .content > p:first-child { font-size: 1.2rem; line-height: 1.6; }
+/* about: portrait, name, lead and the profile links, side by side when
+   there is room */
+.about-head { display: grid; gap: 1.8rem; align-items: center; }
+.about-portrait { position: relative; width: 10rem; margin: .4rem 0 .2rem .2rem; }
+.about-portrait::before {
+  content: ""; position: absolute; inset: 0; border-radius: 22px; transform: rotate(5deg);
+  background: color-mix(in srgb, var(--accent) 24%, transparent);
+}
+.about-portrait img {
+  position: relative; display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; object-position: 50% 30%;
+  border-radius: 20px; background: var(--hover);
+  outline: 1px solid color-mix(in srgb, var(--fg) 8%, transparent); outline-offset: -1px;
+}
+.note-header.about-head h1 { font-size: clamp(2.2rem, 1.6rem + 3cqi, 3.2rem); line-height: 1.08; letter-spacing: -.03em; margin: 0 0 .7rem; }
+.about-head .lead { margin-bottom: 0; }
+.about-links { list-style: none; margin: 1.4rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .5rem; }
+.about-links a {
+  display: inline-flex; align-items: center; gap: .45rem; padding: .42rem .9rem; border: 1px solid var(--border);
+  border-radius: 999px; color: var(--fg); font-size: .9rem; font-weight: 500; text-decoration: none;
+  transition: border-color .15s, color .15s, background .15s;
+}
+.about-links a:hover { border-color: var(--accent); color: var(--accent); background: color-mix(in srgb, var(--accent) 7%, transparent); }
+.about-links .icon { color: var(--muted); transition: color .15s; }
+.about-links a:hover .icon { color: inherit; }
+.layout-about .content { margin-top: 2.6rem; padding-top: 2.2rem; border-top: 1px solid var(--border); }
+@container (min-width: 34rem) {
+  .about-head.has-portrait { grid-template-columns: 12rem minmax(0, 1fr); gap: 2.8rem; }
+  .about-portrait { width: auto; margin: .6rem 0; }
+}
+
 /* home & listings */
 .lead { font-size: 1.15rem; color: var(--muted); margin-top: 0; }
 .explore, .recent { margin-top: 3rem; }
@@ -589,6 +647,9 @@ pre.mermaid { background: none; text-align: center; }
   .page { padding: 2rem 1rem 3rem; }
   .note-header h1, .intro h1, .listing h1 { font-size: 2rem; }
   img.align-left, img.align-right { float: none; display: block; max-width: 100%; margin: 1rem auto; }
+  /* the cover runs to the screen's edges, under the top bar */
+  .note-cover { margin: -2rem -1rem 1.6rem; }
+  .note-cover img, .layout-intro .note-cover img { aspect-ratio: 16 / 10; border-radius: 0; outline: 0; }
 }
 
 /* print: only the note, in light colors */
@@ -609,5 +670,8 @@ pre.mermaid { background: none; text-align: center; }
   .content h1, .content h2, .content h3, .content h4 { break-after: avoid; }
   pre, blockquote, table, img, figure, .callout, .embed { break-inside: avoid; }
   pre { white-space: pre-wrap; }
+  .note-cover img { max-height: 8cm; }
+  .about-portrait::before { display: none; }
+  .about-links a { padding: 0; border: 0; }
   .tag { border: 1px solid var(--border); }
 }

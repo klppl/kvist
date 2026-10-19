@@ -67,6 +67,10 @@ list: update it too when an item is done or added.
   note. (Publish, Quartz's Explorer sort)
 - [x] **Folder icons.** An `icon` property on the folder note: an emoji or
   a theme icon name (Lucide names, Iconize's `LiBook` too). (Iconize)
+- [x] **Page layouts.** A `layout` property: `about` (portrait, lead,
+  profile links), `intro` (banner, large title), `cover` (wide picture
+  above a post) and `page` (no dates or tags), with a plugin command to
+  pick one. (Ghost and Hugo page templates)
 - [x] **Links at the top of the menu.** `primary_links` and
   `secondary_links` in `_site.md`, both list properties. (Publish)
 - [x] **Search engine metadata.** schema.org JSON-LD (articles,

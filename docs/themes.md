@@ -236,6 +236,14 @@ tag (`#projects/kvist`) count too. On a note page, the list pane shows the
 note's group, the first `groups` tag it carries, and falls back to its
 folder for notes without one. Tags with no published notes are left out.
 
+**Layouts.** A note's `Layout` (`page`, `cover`, `about`, `intro`, or
+empty for an article) picks its header in the `note-head` template in
+`partials/note-parts.html`, which the home page uses for the home note too.
+`cover` and `intro` put `Image` above the title, `about` puts it (or the
+profile avatar) beside it with `Profile.Links`. All but the article show
+`Lead` under the title, and `page`, `about` and `intro` leave out dates,
+tags, backlinks, related notes and the local graph. See `docs/content-model.md` (Layouts).
+
 It shows the growth stage from the frontmatter `stage` (`seedling`,
 `budding`, `evergreen`) when `stage` is listed in `expose_frontmatter`.
 

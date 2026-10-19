@@ -1,3 +1,69 @@
+{{/* The top of a note: its title and, by the note's layout (Note.Layout),
+     its picture. Takes (dict "Note" note "Site" site "Home" bool); on the
+     home page the note shows its title only, as it is the site's front.
+       article: folders, title, dates, properties and tags
+       page:    title and lead (the frontmatter description)
+       cover:   the note's image wide on top, then like an article
+       about:   portrait (the note's image, else the avatar), title, lead
+                and the profile links
+       intro:   the note's image as a banner (else the avatar), a large
+                title and the lead */}}
+{{define "note-head" -}}
+{{- $n := .Note}}{{$l := $n.Layout}}{{$home := .Home}}
+{{- $profile := .Site.Config.Profile}}
+{{- $avatar := ""}}{{with $profile}}{{$avatar = .Avatar}}{{end}}
+{{- if and (eq $l "cover" "intro") $n.Image}}
+<figure class="note-cover"><img src="{{$n.Image}}" alt="" fetchpriority="high" decoding="async"></figure>
+{{- end}}
+{{- if eq $l "about"}}
+{{- $pic := or $n.Image $avatar}}
+<header class="note-header about-head{{if $pic}} has-portrait{{end}}">
+  {{- with $pic}}
+  <div class="about-portrait"><img src="{{.}}" alt="{{$.Site.Config.Author}}" fetchpriority="high" decoding="async"></div>
+  {{- end}}
+  <div class="about-text">
+    <h1>{{$n.Title}}</h1>
+    {{- with $n.Lead}}
+    <p class="lead">{{.}}</p>{{end}}
+    {{- with $profile}}{{with .Links}}
+    <ul class="about-links" aria-label="{{t "links"}}">
+      {{- range .}}
+      <li><a href="{{.URL}}" rel="me noopener">{{template "link-icon" .Kind}}<span>{{.Title}}</span></a></li>
+      {{- end}}
+    </ul>{{end}}{{end}}
+  </div>
+</header>
+{{- else if eq $l "intro" "page"}}
+<header class="note-header{{if eq $l "intro"}} intro-head{{end}}">
+  {{- if and (eq $l "intro") (not $n.Image) $avatar}}
+  <img class="intro-avatar" src="{{$avatar}}" alt="" width="80" height="80" decoding="async">
+  {{- end}}
+  <h1>{{$n.Title}}</h1>
+  {{- with $n.Lead}}
+  <p class="lead">{{.}}</p>{{end}}
+</header>
+{{- else}}
+<header class="note-header">
+  {{- if and (not $home) (param "show_breadcrumbs")}}{{template "breadcrumbs" $n}}{{end}}
+  {{- if not $home}}{{with $n.Params}}{{with .stage}}{{template "stage" .}}{{end}}{{end}}{{end}}
+  <h1>{{$n.Title}}</h1>
+  {{- if eq $l "cover"}}{{with $n.Lead}}
+  <p class="lead">{{.}}</p>{{end}}{{end}}
+  {{- if not $home}}
+  <p class="meta">
+    <span>{{t "planted"}} <time datetime="{{isoDate $n.Created}}">{{dateFormat (param "date_format") $n.Created}}</time></span>
+    {{- if ne (isoDate $n.Created) (isoDate $n.Updated)}}
+    <span>{{t "tended"}} <time datetime="{{isoDate $n.Updated}}">{{dateFormat (param "date_format") $n.Updated}}</time></span>{{end}}
+    <span>{{t "reading_time" $n.ReadingTime}}</span>
+  </p>
+  {{- if and (param "show_properties") $n.Params}}{{template "properties" $n.Params}}{{end}}
+  {{- with $n.Tags}}
+  <p class="tags">{{range .}}<a class="tag" href="{{.URL}}">#{{.Name}}</a> {{end}}</p>{{end}}
+  {{- end}}
+</header>
+{{- end}}
+{{- end}}
+
 {{define "stage" -}}
 {{- $s := lower (str .) -}}
 <span class="stage stage-{{$s}}" title="{{t "growth_stage"}}">

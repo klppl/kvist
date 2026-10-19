@@ -109,10 +109,15 @@
   {{- with .Profile.Links}}
   <ul class="profile-links">
     {{- range .}}
-    <li><a href="{{.URL}}" rel="me noopener" title="{{.Title}}">{{template "icon" (index (dict "github" "code" "gitlab" "code" "mastodon" "at" "bluesky" "at" "x" "at" "linkedin" "briefcase" "youtube" "play" "email" "mail" "website" "globe") .Kind)}}<span>{{.Title}}</span></a></li>
+    <li><a href="{{.URL}}" rel="me noopener" title="{{.Title}}">{{template "link-icon" .Kind}}<span>{{.Title}}</span></a></li>
     {{- end}}
   </ul>{{end}}
 </section>
+{{- end}}
+
+{{/* The icon for a profile link, by its kind (ProfileLink.Kind). */}}
+{{define "link-icon" -}}
+{{template "icon" (index (dict "github" "code" "gitlab" "code" "mastodon" "at" "bluesky" "at" "x" "at" "linkedin" "briefcase" "youtube" "play" "email" "mail" "website" "globe") .)}}
 {{- end}}
 
 {{/* A folder's icon: the one its folder note names, its emoji, or the

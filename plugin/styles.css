@@ -4,3 +4,5 @@
 .kvist-report-list li { margin: 0.3em 0; word-break: break-word; }
 .kvist-muted { color: var(--text-muted); }
 .kvist-report-status { color: var(--text-muted); }
+.kvist-layout-current { color: var(--text-accent); font-size: var(--font-ui-smaller); }
+.kvist-layout-desc { display: block; color: var(--text-muted); }

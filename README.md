@@ -34,6 +34,9 @@ Publish, and your site updates. Private notes never leave your device.
   `#tag`, images open full size with a click, and a note's `cover:`
   shows beside its title in lists (cards without one can get a generated
   color cover).
+- **Page layouts:** `layout: about` gives a page about you with a portrait
+  and your profile links, `intro` a welcome page with a banner and a large
+  title, `cover` a post under a wide picture, `page` a page without dates.
 - **Shares well:** every note gets a preview image with its title for
   chats and social media, and `unlisted: true` publishes a note without
   listing it anywhere.

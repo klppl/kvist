@@ -117,7 +117,8 @@ func noteTitles(notes []*model.Note) []string {
 }
 
 // structuredData returns the schema.org JSON-LD of a page (an Article,
-// the WebSite or a CollectionPage, and its breadcrumbs), or "" for none.
+// a ProfilePage or WebPage for notes with those layouts, the WebSite or a
+// CollectionPage, and its breadcrumbs), or "" for none.
 // Maps marshal with sorted keys, so the output is deterministic.
 func structuredData(msg messages, site *model.Site) func(*Page) (template.JS, error) {
 	return func(p *Page) (template.JS, error) {
@@ -187,6 +188,33 @@ func structuredData(msg messages, site *model.Site) func(*Page) (template.JS, er
 			set(main, "keywords", strings.Join(n.TagNames, ", "))
 			if n.WordCount > 0 {
 				main["wordCount"] = n.WordCount
+			}
+			// Pages of their own (Note.Layout) aren't articles: an about
+			// page is the author's profile page, the others web pages.
+			switch {
+			case n.Layout == "about" && author != nil:
+				person := map[string]any{}
+				for k, v := range author {
+					person[k] = v
+				}
+				pic := n.Image
+				if pic == "" && c.Profile != nil {
+					pic = c.Profile.Avatar
+				}
+				if pic != "" {
+					person["image"] = abs(pic)
+				}
+				main = map[string]any{"@type": "ProfilePage", "name": p.Title, "url": abs(p.Canonical), "mainEntity": person, "isPartOf": website}
+				set(main, "description", p.Description)
+				set(main, "dateCreated", n.Created)
+				set(main, "dateModified", n.Updated)
+				set(main, "inLanguage", c.Language)
+			case n.Layout == "about" || n.Layout == "page" || n.Layout == "intro":
+				main = map[string]any{"@type": "WebPage", "name": p.Title, "url": abs(p.Canonical), "isPartOf": website}
+				set(main, "description", p.Description)
+				set(main, "dateModified", n.Updated)
+				set(main, "inLanguage", c.Language)
+				set(main, "image", img)
 			}
 			// Like the theme's breadcrumbs: a folder note is its folder's
 			// page, so its trail ends at the folder above.

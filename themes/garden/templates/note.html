@@ -1,27 +1,17 @@
 {{define "main" -}}
-<article class="note">
-  <header class="note-header">
-    {{- if param "show_breadcrumbs"}}{{template "breadcrumbs" .Note}}{{end}}
-    {{- with .Note.Params}}{{with .stage}}{{template "stage" .}}{{end}}{{end}}
-    <h1>{{.Note.Title}}</h1>
-    <p class="meta">
-      <span>{{t "planted"}} <time datetime="{{isoDate .Note.Created}}">{{dateFormat (param "date_format") .Note.Created}}</time></span>
-      {{- if ne (isoDate .Note.Created) (isoDate .Note.Updated)}}
-      <span>{{t "tended"}} <time datetime="{{isoDate .Note.Updated}}">{{dateFormat (param "date_format") .Note.Updated}}</time></span>{{end}}
-      <span>{{t "reading_time" .Note.ReadingTime}}</span>
-    </p>
-    {{- if and (param "show_properties") .Note.Params}}{{template "properties" .Note.Params}}{{end}}
-    {{- with .Note.Tags}}
-    <p class="tags">{{range .}}<a class="tag" href="{{.URL}}">#{{.Name}}</a> {{end}}</p>{{end}}
-  </header>
+{{- $own := eq .Note.Layout "page" "about" "intro"}}
+<article class="note{{with .Note.Layout}} layout-{{.}}{{end}}">
+  {{template "note-head" (dict "Note" .Note "Site" .Site "Home" false)}}
   <div class="content">{{.Note.Content}}</div>
+  {{- if not $own}}
   {{- if param "show_backlinks"}}{{template "backlinks" .Note}}{{end}}
   {{- if param "show_related"}}{{template "related" .Note}}{{end}}
+  {{- end}}
 </article>
 {{- end}}
 
 {{define "aside" -}}
-{{- if param "show_graph"}}
+{{- if and (param "show_graph") (not (eq .Note.Layout "page" "about" "intro"))}}
 <section class="local-graph" aria-label="{{t "local_graph"}}" hidden><h2>{{t "connections"}}</h2><div class="graph-canvas"></div></section>
 {{- end}}
 {{- if and (param "show_toc") .Note.TOC}}

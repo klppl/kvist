@@ -83,6 +83,8 @@ count.
 | `Created`, `Updated` | time | `Updated`: frontmatter `updated`/`modified`/`lastmod`, else the file's modification time. `Created`: `created`/`date`, else `Updated`. |
 | `Order` | *float64 | Frontmatter `order`, else `weight` (a number, or text that is one); nil without. Puts the note first in its folder, lowest first. |
 | `Description` | string | Frontmatter `description`/`summary`, else the first paragraph (≤ 200 characters). |
+| `Lead` | string | `Description` when the frontmatter sets it; empty when it was taken from the first paragraph. Show it under the title without repeating the note's first lines. |
+| `Layout` | string | Frontmatter `layout`, lowercased: `page`, `cover`, `about` or `intro` (the list is `model.Layouts`); empty for an article, the default, also when the property is `article` or `default`. Other values are left out with a `layout` warning. A theme lays out what it can and treats the rest as articles. See [Layouts](#layouts). |
 | `Params` | map | Only the frontmatter keys listed in `expose_frontmatter`. Other keys never reach a theme. |
 | `Image` | string | Social preview image from the `image` or `cover` property: the URL of a published image (`/_assets/…`), or an http(s) URL; empty if unset or not a published image. The value may be `"[[cover.png]]"`, a vault path, or a URL. |
 | `ImageThumb` | string | A small copy of `Image` for note lists: 128×128, cropped from the middle, never enlarged, as JPEG (PNG if it has transparency) without metadata. Empty when `Image` is. It is `Image` itself when that can't be made smaller (an SVG, a web address, a file that can't be read) and in `kvist build --emit-model`, which doesn't build the site. |
@@ -191,6 +193,27 @@ never output, since it names the vault paths of every card.
   a link, an attachment as its embed. Link cards show http(s) links only.
 - A file card pointing to anything unpublished is left out, with the
   arrows to and from it (and their labels), as an embed would be.
+
+### Layouts
+
+`Note.Layout` is how a note asks to be laid out. It is a request, not a
+template name: every theme gets the same few values and decides what each
+looks like. The garden theme:
+
+| Layout | Shows |
+|---|---|
+| (empty) | An article: folders, stage, title, dates, properties, tags; backlinks and related notes below. |
+| `cover` | `Image` wide above an article's header, with `Lead` under the title. |
+| `page` | The title and `Lead`. No dates, tags, backlinks, related notes or local graph. |
+| `about` | `Image` (else `SiteConfig.Profile.Avatar`) as a portrait beside the title, `Lead` and `Profile.Links`. Left out like `page`. |
+| `intro` | `Image` as a banner (else the avatar, small), a large title and `Lead`. Left out like `page`. |
+
+On the home page the home note's article shows its title only, as before.
+Its article gets the class `layout-<name>` (`note layout-about`), and the
+header comes from the `note-head` template in `partials/note-parts.html`,
+which the home page uses for the home note too. Structured data follows the
+layout: `about` is a schema.org `ProfilePage` about the site's author,
+`page` and `intro` are `WebPage`s.
 
 ## Asset
 

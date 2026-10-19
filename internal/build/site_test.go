@@ -345,3 +345,62 @@ func TestStackedPagesSetting(t *testing.T) {
 		}
 	}
 }
+
+// TestLayoutOutput checks what the garden theme shows for each layout
+// property: pictures, the lead, profile links and what pages of their
+// own leave out.
+func TestLayoutOutput(t *testing.T) {
+	out := writeVault(t, map[string]string{
+		"_site.md": "---\nhome: \"[[Start]]\"\nauthor: Ada\navatar: https://example.com/avatar.png\n" +
+			"profile_links:\n  - https://github.com/ada\n---\n",
+		"Garden/Start.md":   "---\nlayout: intro\ndescription: Startlead.\n---\nStart text.",
+		"Garden/About.md":   "---\nlayout: about\nimage: https://example.com/me.jpg\ndescription: Aboutlead.\n---\nAbout text.",
+		"Garden/Me.md":      "---\nlayout: about\n---\nMe text.",
+		"Garden/Cover.md":   "---\nlayout: cover\ncover: https://example.com/wide.jpg\ndescription: Coverlead.\n---\nCover text.",
+		"Garden/Page.md":    "---\nlayout: page\n---\nPage text.",
+		"Garden/Note.md":    "---\ndescription: Notelead.\n---\nLinks [[About]], [[Page]] and [[Cover]].",
+		"Garden/Related.md": "Links [[Note]].",
+	})
+	read := func(p string) string {
+		b, err := os.ReadFile(filepath.Join(out, p))
+		if err != nil {
+			t.Fatalf("missing %s", p)
+		}
+		return string(b)
+	}
+	for _, tc := range []struct {
+		page       string
+		want, lack []string
+	}{
+		{"index.html",
+			[]string{`class="note home-note layout-intro"`, `class="note-header intro-head"`, `<img class="intro-avatar" src="https://example.com/avatar.png"`, `<p class="lead">Startlead.</p>`},
+			[]string{`class="note-cover"`, `class="meta"`}},
+		{"garden/about/index.html",
+			[]string{`class="note layout-about"`, `about-head has-portrait`, `<img src="https://example.com/me.jpg" alt="Ada"`, `<p class="lead">Aboutlead.</p>`, `<ul class="about-links"`, `href="https://github.com/ada" rel="me noopener"`},
+			[]string{`class="meta"`, `class="crumbs"`, `id="backlinks-title"`, `class="local-graph"`}},
+		{"garden/me/index.html",
+			[]string{`about-head has-portrait`, `<img src="https://example.com/avatar.png"`},
+			[]string{`class="lead"`}},
+		{"garden/cover/index.html",
+			[]string{`class="note layout-cover"`, `<figure class="note-cover"><img src="https://example.com/wide.jpg"`, `<p class="lead">Coverlead.</p>`, `class="meta"`, `id="backlinks-title"`},
+			nil},
+		{"garden/page/index.html",
+			[]string{`class="note layout-page"`, "Page text."},
+			[]string{`class="meta"`, `id="backlinks-title"`, `class="lead"`, `class="local-graph"`}},
+		{"garden/note/index.html",
+			[]string{`<article class="note">`, `class="meta"`, `id="backlinks-title"`, `class="local-graph"`},
+			[]string{`class="lead"`, `class="note-cover"`}},
+	} {
+		s := read(tc.page)
+		for _, w := range tc.want {
+			if !strings.Contains(s, w) {
+				t.Errorf("%s lacks %s", tc.page, w)
+			}
+		}
+		for _, l := range tc.lack {
+			if strings.Contains(s, l) {
+				t.Errorf("%s has %s", tc.page, l)
+			}
+		}
+	}
+}

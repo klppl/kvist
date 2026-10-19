@@ -101,7 +101,7 @@ func TestFixtureModel(t *testing.T) {
 	for _, n := range site.Notes {
 		paths = append(paths, n.Path)
 	}
-	want := []string{"Garden/Board.canvas", "Garden/Boards.md", "Garden/Collide.md", "Garden/Covered by path.md", "Garden/Covered.md", "Garden/Embedder.md", "Garden/HintUser.md", "Garden/Hub.md", "Garden/Leaf.md", "Garden/Shed/Tool.md", "Journal/Linked.canvas"}
+	want := []string{"Garden/Board.canvas", "Garden/Boards.md", "Garden/Collide.md", "Garden/Covered by path.md", "Garden/Covered.md", "Garden/Embedder.md", "Garden/HintUser.md", "Garden/Hub.md", "Garden/Intro.md", "Garden/Leaf.md", "Garden/Portrait.md", "Garden/Shed/Tool.md", "Journal/Linked.canvas"}
 	sort.Strings(paths)
 	if strings.Join(paths, ",") != strings.Join(want, ",") {
 		t.Fatalf("published = %v\nwant %v", paths, want)

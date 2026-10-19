@@ -5,6 +5,8 @@ created: 2026-01-04
 updated: 2026-10-04
 tags: [meta]
 image: "[[site-cover.png]]"
+layout: intro
+description: Notes on growing food, cooking it and thinking in notes, published from an Obsidian vault.
 ---
 This is the demo garden for **kvist**, a tool that publishes selected notes from an Obsidian vault as a website like this one. It is written like a real garden: notes about [[Garden|growing food]], [[Kitchen|cooking it]], [[Ideas|thinking in notes]], a few [[Projects|projects]] and some [[Books|books]]. Hover any link to preview it.
 

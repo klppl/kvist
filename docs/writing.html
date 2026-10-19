@@ -116,12 +116,13 @@ permalink: /about/
 order: 1
 publish: true
 stage: budding
+layout: cover
 ---</code></pre>
 <table>
   <thead><tr><th>Property</th><th>What it does</th></tr></thead>
   <tbody>
     <tr><td><code>title</code></td><td>The page title. Without it, kvist uses the first <code># Heading</code>, then the file name.</td></tr>
-    <tr><td><code>description</code> or <code>summary</code></td><td>Shown in lists, search results and link previews. Without it, kvist uses the first paragraph.</td></tr>
+    <tr><td><code>description</code> or <code>summary</code></td><td>Shown in lists, search results and link previews. Without it, kvist uses the first paragraph. The <code>page</code>, <code>cover</code>, <code>about</code> and <code>intro</code> <a href="#layouts">layouts</a> also show it under the title.</td></tr>
     <tr><td><code>created</code> or <code>date</code></td><td>The “Planted” date. Without it, the “Tended” date.</td></tr>
     <tr><td><code>updated</code>, <code>modified</code> or <code>lastmod</code></td><td>The “Tended” date, and the order of “Recently tended”. Without it, the time the file was last changed.</td></tr>
     <tr><td><code>tags</code></td><td>Tags, in addition to the ones written in the text.</td></tr>
@@ -133,6 +134,7 @@ stage: budding
     <tr><td><code>publish</code></td><td><code>true</code> or <code>false</code>; see <a href="publishing.html">Publishing notes</a>.</td></tr>
     <tr><td><code>unlisted</code></td><td><code>true</code> publishes the note at its address but leaves it out of the menu, lists, tag pages, search, the graph, backlinks, related notes, the RSS feed and the sitemap, and asks search engines not to index it (<code>noindex</code>). Links to it still work. A folder with only unlisted notes leaves the menu too. Tags that only unlisted notes carry get no page.</td></tr>
     <tr><td><code>image</code> or <code>cover</code></td><td>The picture shown when the page is shared on social media or in chats: <code>"[[cover.jpg]]"</code>, a vault path, or a web address. The image is published even if the note doesn't show it. Without it, the site makes a picture with the note's title (see <a href="customizing.html#theme"><code>social_images</code></a>). Social media don't show SVG or AVIF, so a note with one of those gets the generated picture too. The same picture shows, made small, beside the note's title in lists and atop its card on folder pages (see <a href="customizing.html#theme"><code>list_images</code></a>). Pictures are cropped from the middle, so keep the subject there.</td></tr>
+    <tr><td><code>layout</code></td><td>How the page is laid out: <code>article</code> (the default), <code>page</code>, <code>cover</code>, <code>about</code> or <code>intro</code>. See <a href="#layouts">Page layouts</a>.</td></tr>
     <tr><td><code>stage</code></td><td>Growth stage: <code>seedling</code> 🌱, <code>budding</code> 🌿 or <code>evergreen</code> 🌳, shown as a badge.</td></tr>
   </tbody>
 </table>
@@ -186,7 +188,47 @@ order: 1
 <pre data-label="Kvist/_site.md"><code>---
 home: "[[Welcome]]"
 ---</code></pre>
-<p>The home note is the home page, so it isn't listed in its folder or among the recent notes.</p>
+<p>The home note is the home page, so it isn't listed in its folder or among the recent notes. Give it <code>layout: intro</code> for a large welcome title, or <code>layout: about</code> if your home page is about you (see <a href="#layouts">Page layouts</a>). The folder cards follow the note either way.</p>
+
+<h2 id="layouts">Page layouts</h2>
+<p>Most notes are articles: the title with dates, tags and growth stage above the text, backlinks and related notes below it. A few pages want something else, like a page about you or a welcome page. Pick one with the <code>layout</code> property:</p>
+<table>
+  <thead><tr><th><code>layout</code></th><th>For</th><th>What the page shows</th></tr></thead>
+  <tbody>
+    <tr><td><code>article</code></td><td>Notes. The default.</td><td>Folders, title, dates, tags, then the text, backlinks and related notes.</td></tr>
+    <tr><td><code>cover</code></td><td>Posts and projects</td><td>The note's <code>image</code> or <code>cover</code> wide above the title, the <code>description</code> under it, then like an article.</td></tr>
+    <tr><td><code>page</code></td><td>Contact, colophon, now pages</td><td>The title and the <code>description</code>, then the text. No dates or tags.</td></tr>
+    <tr><td><code>about</code></td><td>A page about you</td><td>A portrait beside the title, the <code>description</code> and your profile links, then the text.</td></tr>
+    <tr><td><code>intro</code></td><td>The home note</td><td>The note's image as a banner, a large title and the <code>description</code>, then the text.</td></tr>
+  </tbody>
+</table>
+<p>A page about you, at <code>/about/</code>:</p>
+<pre data-label="Kvist/About.md"><code>---
+title: Hi, I'm Alex
+permalink: /about/
+layout: about
+image: "[[me.jpg]]"
+description: I fix phones by day and build small tools at night.
+---
+The longer story goes here.</code></pre>
+<p>A welcome page, set as the <a href="#home">home note</a>:</p>
+<pre data-label="Kvist/Welcome.md"><code>---
+title: Hej hallå 👋
+layout: intro
+image: "[[harbor.jpg]]"
+description: Notes, projects and recipes from a vault I keep in Obsidian.
+---</code></pre>
+<p>In Obsidian, the kvist plugin's <strong>Set page layout</strong> command (also <strong>Page layout</strong> in a note's menu) lists the layouts and sets the property for you.</p>
+<h3 id="layout-tips">Getting them right</h3>
+<ul>
+  <li><strong>The description is the lead.</strong> Write one or two short sentences: they show large under the title. An <code>intro</code> page without one makes its first paragraph a little larger instead.</li>
+  <li><strong>Pictures.</strong> <code>cover</code> crops the image to 2:1 and <code>intro</code> to 5:2 (a little taller on phones, where it runs to the screen's edges), so pick a wide picture with the subject in the middle. <code>about</code> crops to a 4:5 portrait around the upper middle, where faces usually are.</li>
+  <li><strong>Without a picture.</strong> <code>about</code> uses the <code>avatar</code> from the <a href="customizing.html#settings-note">settings note</a>, and <code>intro</code> shows the avatar small and round above the title. A <code>cover</code> page without a picture is an article with a lead, and the publish report warns about it.</li>
+  <li><strong>Profile links.</strong> The links on an <code>about</code> page are the <code>profile_links</code> from the settings note.</li>
+  <li><strong>What is left out.</strong> <code>page</code>, <code>about</code> and <code>intro</code> are pages of their own, not notes in the garden: they leave out the dates, stage, tags, folders above the title, backlinks, related notes and the local graph. A table of contents still shows when they have headings.</li>
+  <li><strong>Search engines.</strong> An <code>about</code> page tells search engines it is a profile page about the site's <code>author</code>, with your picture and profile links. <code>page</code> and <code>intro</code> are plain web pages instead of articles.</li>
+</ul>
+<p>A <code>layout</code> kvist doesn't know is ignored, with a warning in the publish report naming the ones it does. <code>default</code>, common in notes from Jekyll or Hugo, is an article.</p>
 
 <h2 id="tags">Tags</h2>
 <p>Every tag on a published note gets a page at <code>/tags/&lt;tag&gt;/</code> listing its notes, newest first. <code>/tags/</code> shows every topic as a card with its size, its newest notes and its sub-tags, with a filter and an A–Z or “most notes” order. Nested tags like <code>#projects/kvist</code> get their own page, and the parent tag's page includes them. Tags can also <a href="customizing.html#groups">group the menu</a>.</p>
