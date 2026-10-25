@@ -1,60 +1,62 @@
 /* kvist garden theme: nav pane, list pane, content */
 :root {
-  /* --accent-base is the accent param, set in base.html. Dark mode raises
-     it to a lightness that reads on dark panes, whatever the param is. */
-  --accent: var(--accent-base, #3f7d4e);
-  --bg: #ffffff;
-  --pane: #f8f9fa;
-  --hover: #eef0f2;
-  --fg: #16181d;
-  --muted: #62676f;
-  --border: #e4e6ea;
-  --sel-bg: #1d2128;
-  --sel-fg: #f5f6f8;
-  --sel-muted: #b9bec7;
-  --mark: #f6e7a6;
-  --code-bg: #f3f4f6;
+  /* Dark first, with a light scheme beside it (color_scheme param). The
+     ground is charcoal with a faint grey-green cast, the text linen, and
+     the default accent oak. --accent-base is the accent param, set in
+     base.html; each scheme moves its lightness so links stay readable
+     whatever the param is. */
+  --accent: var(--accent-base, #c9a66b);
+  --accent: oklch(from var(--accent-base, #c9a66b) min(l, .5) c h);
+  --bg: #f6f5f2;
+  --pane: #efeeea;
+  --hover: #e6e5e0;
+  --fg: #1b1d1c;
+  --muted: #5f625e;
+  --border: #dcdbd5;
+  --sel-bg: #e6e5e0;
+  --mark: #eadfb8;
+  --code-bg: #f2f1ed;
   --radius: 8px;
-  --font: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font: "Albert Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --nav-w: 15.5rem;
   --list-w: 22rem;
   color-scheme: light;
 }
 :root[data-theme="dark"] {
-  --bg: #121417;
-  --pane: #181a1e;
-  --hover: #23262b;
-  --fg: #e6e8eb;
-  --muted: #989ea8;
-  --border: #2b2e34;
-  --accent: color-mix(in oklch, var(--accent-base, #3f7d4e), white 40%);
-  --accent: oklch(from var(--accent-base, #3f7d4e) max(l, .72) c h);
-  --sel-bg: color-mix(in srgb, var(--accent) 16%, var(--pane));
-  --sel-fg: var(--fg);
-  --sel-muted: var(--muted);
-  --mark: #5a4f1c;
-  --code-bg: #1c1f23;
+  --bg: #121414;
+  --pane: #161918;
+  --hover: #1f2322;
+  --fg: #e8e6e1;
+  --muted: #9b9f9a;
+  --border: #262b29;
+  --accent: color-mix(in oklch, var(--accent-base, #c9a66b), white 40%);
+  --accent: oklch(from var(--accent-base, #c9a66b) max(l, .72) c h);
+  --sel-bg: #1f2322;
+  --mark: #4d4430;
+  --code-bg: #181b1a;
   color-scheme: dark;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #121417;
-    --pane: #181a1e;
-    --hover: #23262b;
-    --fg: #e6e8eb;
-    --muted: #989ea8;
-    --border: #2b2e34;
-    --accent: color-mix(in oklch, var(--accent-base, #3f7d4e), white 40%);
-    --accent: oklch(from var(--accent-base, #3f7d4e) max(l, .72) c h);
-    --sel-bg: color-mix(in srgb, var(--accent) 16%, var(--pane));
-    --sel-fg: var(--fg);
-    --sel-muted: var(--muted);
-    --mark: #5a4f1c;
-    --code-bg: #1c1f23;
+    --bg: #121414;
+    --pane: #161918;
+    --hover: #1f2322;
+    --fg: #e8e6e1;
+    --muted: #9b9f9a;
+    --border: #262b29;
+    --accent: color-mix(in oklch, var(--accent-base, #c9a66b), white 40%);
+    --accent: oklch(from var(--accent-base, #c9a66b) max(l, .72) c h);
+    --sel-bg: #1f2322;
+    --mark: #4d4430;
+    --code-bg: #181b1a;
     color-scheme: dark;
   }
 }
+/* Albert Sans (OFL, fonts/OFL.txt): a geometric sans after Scandinavian
+   modernist lettering. Latin only; other scripts use the system font. */
+@font-face { font-family: "Albert Sans"; src: url(fonts/albert-sans.woff2) format("woff2"); font-weight: 300 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "Albert Sans"; src: url(fonts/albert-sans-italic.woff2) format("woff2"); font-weight: 300 700; font-style: italic; font-display: swap; }
 
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
@@ -64,8 +66,11 @@ body {
   color: var(--fg);
   font: 16px/1.6 var(--font);
 }
-a { color: var(--accent); text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
-a:hover { text-decoration-thickness: 2px; }
+a { color: var(--accent); text-underline-offset: 0.2em; text-decoration-thickness: 1px; text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+a:hover { text-decoration-color: currentColor; }
+::selection { background: color-mix(in srgb, var(--accent) 30%, transparent); }
+html { scrollbar-color: var(--border) transparent; caret-color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 img, video, iframe { max-width: 100%; }
 img { height: auto; border-radius: 6px; }
 img.align-center { display: block; margin: 1rem auto; }
@@ -109,7 +114,7 @@ main { min-width: 0; }
 /* nav pane */
 .nav-pane { background: var(--pane); display: flex; flex-direction: column; padding: 1.1rem .8rem 1rem; }
 .nav-head { display: flex; align-items: flex-start; gap: .5rem; padding: 0 .45rem; }
-.site-title { flex: 1; font-size: 1.05rem; font-weight: 700; line-height: 1.35; color: var(--fg); text-decoration: none; letter-spacing: -.01em; }
+.site-title { flex: 1; font-size: 1.05rem; font-weight: 600; line-height: 1.35; color: var(--fg); text-decoration: none; letter-spacing: -.01em; }
 .menu-toggle { display: none; }
 .nav-body { margin-top: 1.6rem; }
 .nav-section {
@@ -154,7 +159,7 @@ main { min-width: 0; }
 /* profile */
 .profile { margin: 0 .45rem 1.3rem; padding-bottom: 1.1rem; border-bottom: 1px solid var(--border); }
 .profile-avatar { display: block; width: 4rem; height: 4rem; object-fit: cover; border-radius: 50%; margin-bottom: .7rem; }
-.profile-name { margin: 0; font-weight: 650; font-size: .95rem; }
+.profile-name { margin: 0; font-weight: 600; font-size: .95rem; }
 .profile-bio { margin-top: .25rem; color: var(--muted); font-size: .85rem; line-height: 1.5; }
 .profile-bio p { margin: 0 0 .3rem; }
 .profile-links { list-style: none; margin: .7rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .35rem; }
@@ -171,7 +176,7 @@ main { min-width: 0; }
   position: sticky; top: 0; z-index: 1; background: var(--bg);
   padding: 1.1rem 1rem .8rem; border-bottom: 1px solid var(--border);
 }
-.list-head h2 { font-size: 1.05rem; font-weight: 700; margin: 0; line-height: 1.35; }
+.list-head h2 { font-size: 1.05rem; font-weight: 600; margin: 0; line-height: 1.35; }
 .list-head h2 a { color: inherit; text-decoration: none; }
 .list-head h2 a:hover { color: var(--accent); }
 .list-filter {
@@ -187,16 +192,16 @@ main { min-width: 0; }
 /* On the right, so titles line up whether or not a note has a picture. */
 .list-thumb { flex: none; width: 44px; height: 44px; margin-top: .1rem; border-radius: 6px; object-fit: cover; background: var(--hover); }
 .list-note a:hover { background: var(--hover); }
-.list-title { font-weight: 600; line-height: 1.35; }
+.list-title { font-weight: 500; line-height: 1.35; }
 .list-desc { color: var(--muted); font-size: .86rem; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.list-meta { display: flex; gap: .6rem; align-items: center; color: var(--muted); font-size: .76rem; }
-.list-note a[aria-current] { background: var(--sel-bg); color: var(--sel-fg); }
-:root[data-theme="dark"] .list-note a[aria-current] { box-shadow: inset 3px 0 var(--accent); }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .list-note a[aria-current] { box-shadow: inset 3px 0 var(--accent); }
+.list-meta { display: flex; gap: .6rem; align-items: center; color: var(--muted); font-size: .76rem; font-variant-numeric: tabular-nums; }
+/* The current note: a quiet tone and a dot in the accent before its title. */
+.list-note a[aria-current] { background: var(--sel-bg); }
+.list-note a[aria-current] .list-title { font-weight: 600; }
+.list-note a[aria-current] .list-title::before {
+  content: ""; display: inline-block; width: .42em; height: .42em; margin: 0 .5em .12em 0;
+  border-radius: 50%; background: var(--accent); vertical-align: middle;
 }
-.list-note a[aria-current] .list-desc, .list-note a[aria-current] .list-meta { color: var(--sel-muted); }
-.list-note a[aria-current] .stage { color: inherit; border-color: color-mix(in srgb, var(--sel-muted) 50%, transparent); }
 .list-folder a { display: flex; align-items: center; gap: .6rem; padding: .6rem 1rem; color: var(--fg); font-size: .9rem; font-weight: 500; text-decoration: none; }
 .list-folder a:hover { background: var(--hover); }
 .list-folder .icon { color: var(--muted); }
@@ -272,20 +277,17 @@ main { min-width: 0; }
 
 /* notes */
 .note-header h1, .intro h1, .listing h1 {
-  font-size: 2.6rem; line-height: 1.15; letter-spacing: -.025em; font-weight: 800; margin: .3rem 0 .7rem;
+  font-size: 2.4rem; line-height: 1.15; letter-spacing: -.02em; font-weight: 600; margin: .3rem 0 .7rem;
 }
 .meta { color: var(--muted); font-size: .88rem; display: flex; flex-wrap: wrap; gap: .3rem 1rem; margin: 0; }
 .tags { margin: .7rem 0 0; }
 .tag {
-  display: inline-block; font-size: .82em; text-decoration: none; color: var(--fg);
-  background: var(--hover); border-radius: 999px; padding: .05em .65em; margin: 0 .1em .25em 0;
+  display: inline-block; font-size: .82em; text-decoration: none; color: var(--muted);
+  border: 1px solid var(--border); border-radius: 999px; padding: .05em .65em; margin: 0 .1em .25em 0;
 }
-.tag:hover { background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); }
+.tag:hover { border-color: var(--accent); color: var(--accent); }
 .tag-hidden { display: none; }
-.stage {
-  display: inline-block; font-size: .74rem; color: var(--muted);
-  border: 1px solid var(--border); border-radius: 999px; padding: 0 .55rem; text-transform: capitalize;
-}
+.stage { display: inline-block; font-size: .76rem; color: var(--muted); text-transform: capitalize; }
 .properties { display: grid; grid-template-columns: max-content 1fr; gap: .25rem 1.2rem; margin: 1rem 0 0; font-size: .88rem; }
 .properties > div { display: contents; }
 .properties dt { color: var(--muted); }
@@ -305,6 +307,9 @@ mark { background: var(--mark); color: inherit; padding: 0 .15em; border-radius:
 code { font-family: var(--font-mono); font-size: .88em; background: var(--code-bg); padding: .1em .35em; border-radius: 5px; }
 pre { font-family: var(--font-mono); font-size: .86rem; line-height: 1.5; background: var(--code-bg); padding: 1rem; border-radius: var(--radius); overflow-x: auto; }
 pre code { background: none; padding: 0; font-size: inherit; }
+/* Code sits on the theme's own ground, not the highlighting style's; these
+   selectors outrank the scheme selectors in syntax.css. */
+:root .content pre:not(.mermaid), :root .code-block > .chroma { background-color: var(--code-bg); }
 .code-block { position: relative; margin: 1rem 0; }
 .code-block > pre { margin: 0; }
 .code-title {
@@ -345,7 +350,7 @@ pre .line.hl { margin: 0 -1rem; padding: 0 1rem; box-shadow: inset 3px 0 var(--a
   background: var(--bg); color: var(--fg); border: 1px solid var(--border); border-radius: 10px;
   box-shadow: 0 12px 36px rgba(0, 0, 0, .18); padding: .8rem 1rem .9rem;
 }
-.link-preview-title { display: block; font-weight: 700; font-size: 1.05rem; line-height: 1.3; color: var(--fg); text-decoration: none; }
+.link-preview-title { display: block; font-weight: 600; font-size: 1.05rem; line-height: 1.3; color: var(--fg); text-decoration: none; }
 .link-preview-title:hover { color: var(--accent); }
 .content.link-preview-body { margin-top: .5rem; font-size: .9rem; line-height: 1.6; }
 .link-preview-body > :first-child { margin-top: 0; }
@@ -359,7 +364,7 @@ a.internal-link { text-decoration-style: solid; }
 a.external-link::after { content: "↗"; font-size: .75em; margin-left: .1em; }
 
 /* embeds */
-.embed { border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: var(--radius); padding: .4rem 1.1rem; margin: 1.2rem 0; background: var(--pane); }
+.embed { border: 1px solid var(--border); border-radius: var(--radius); padding: .4rem 1.1rem; margin: 1.2rem 0; background: var(--pane); }
 .embed-title { font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; }
 .embed-title a { text-decoration: none; }
 .embed-content > :first-child { margin-top: .4rem; }
@@ -393,7 +398,7 @@ iframe.embed-pdf { width: 100%; height: 70vh; border: 1px solid var(--border); b
 .canvas-color-6 { --canvas-color: #a882ff; }
 
 /* callouts */
-.callout { --c: 70, 120, 200; border-radius: var(--radius); margin: 1.2rem 0; padding: .7rem 1rem; background: rgba(var(--c), .1); border-left: 4px solid rgb(var(--c)); }
+.callout { --c: 70, 120, 200; border-radius: var(--radius); margin: 1.2rem 0; padding: .7rem 1rem; background: rgba(var(--c), .07); border: 1px solid rgba(var(--c), .3); }
 .callout-title { font-weight: 600; color: color-mix(in srgb, rgb(var(--c)) 62%, black); }
 /* The pure callout colour is too light for text on a light page and too
    dark on a dark one; the title keeps its hue and moves toward the ink. */
@@ -527,7 +532,7 @@ pre.mermaid { background: none; text-align: center; }
   border-radius: 20px; background: var(--hover);
   outline: 1px solid color-mix(in srgb, var(--fg) 8%, transparent); outline-offset: -1px;
 }
-.note-header.about-head h1 { font-size: clamp(2.2rem, 1.6rem + 3cqi, 3.2rem); line-height: 1.08; letter-spacing: -.03em; margin: 0 0 .7rem; }
+.note-header.about-head h1 { font-size: clamp(2.2rem, 1.6rem + 3cqi, 3.2rem); line-height: 1.08; letter-spacing: -.02em; font-weight: 600; margin: 0 0 .7rem; }
 .about-head .lead { margin-bottom: 0; }
 .about-links { list-style: none; margin: 1.4rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .5rem; }
 .about-links a {
@@ -579,7 +584,7 @@ pre.mermaid { background: none; text-align: center; }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .card-art { --art-l: .52; --art-c: .075; }
 }
-.card-title { font-size: 1.02rem; font-weight: 650; line-height: 1.35; }
+.card-title { font-size: 1.02rem; font-weight: 600; line-height: 1.35; }
 .card-desc { color: var(--muted); font-size: .9rem; }
 .card-meta { margin-top: auto; display: flex; gap: .6rem; align-items: center; color: var(--muted); font-size: .8rem; }
 .folders { padding-left: 1.2rem; }
@@ -615,7 +620,7 @@ pre.mermaid { background: none; text-align: center; }
 }
 .tag-card:hover { border-color: color-mix(in srgb, var(--fg) 35%, var(--border)); }
 .tag-card-head { display: flex; align-items: baseline; justify-content: space-between; gap: .8rem; color: var(--fg); text-decoration: none; }
-.tag-card-name { font-size: 1.15rem; font-weight: 700; letter-spacing: -.01em; overflow-wrap: anywhere; }
+.tag-card-name { font-size: 1.15rem; font-weight: 600; letter-spacing: -.01em; overflow-wrap: anywhere; }
 .tag-card-head:hover .tag-card-name { color: var(--accent); }
 .tag-card-count { flex: none; color: var(--muted); font-size: .8rem; }
 .tag-meter { display: block; height: 4px; border-radius: 4px; background: var(--hover); overflow: hidden; }

@@ -4,7 +4,8 @@ license = "Lagom"
 model   = [1]
 
 [params]
-accent           = "#3f7d4e"   # links and highlights
+accent           = "#c9a66b"   # links and highlights; each color scheme adjusts its lightness to stay readable
+color_scheme     = "dark"      # "dark" or "light": the scheme readers get until they switch; "system" follows the device
 date_format      = "2 Jan 2006"
 home_recent      = 12          # notes in the home page list
 show_list        = true        # list pane: the notes in the current folder

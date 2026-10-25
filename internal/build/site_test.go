@@ -91,7 +91,7 @@ func TestSiteOutput(t *testing.T) {
 	for _, frag := range []string{
 		`<title>Hub · garden</title>`,
 		`<link rel="canonical" href="https://garden.example.com/garden/hub/">`,
-		`🌿 budding`,
+		`<span class="stage stage-budding" title="Growth stage">budding</span>`,
 		`<span class="link-unpublished">a private note</span>`,
 		`href="/garden/leaf/"`,
 		// a generated social preview image

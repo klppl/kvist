@@ -1,5 +1,6 @@
 <!doctype html>
-<html lang="{{.Site.Config.Language}}">
+{{- $scheme := str (param "color_scheme")}}{{if not (eq $scheme "dark" "light")}}{{$scheme = ""}}{{end}}
+<html lang="{{.Site.Config.Language}}"{{with $scheme}} data-theme="{{.}}" data-scheme="{{.}}"{{end}}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">

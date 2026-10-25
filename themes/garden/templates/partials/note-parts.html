@@ -67,7 +67,7 @@
 {{define "stage" -}}
 {{- $s := lower (str .) -}}
 <span class="stage stage-{{$s}}" title="{{t "growth_stage"}}">
-{{- if eq $s "seedling"}}🌱{{else if eq $s "budding"}}🌿{{else if eq $s "evergreen"}}🌳{{else}}•{{end}} {{if eq $s "seedling" "budding" "evergreen"}}{{t (print "stage_" $s)}}{{else}}{{$s}}{{end}}</span>
+{{- if eq $s "seedling" "budding" "evergreen"}}{{t (print "stage_" $s)}}{{else}}{{$s}}{{end}}</span>
 {{- end}}
 
 {{/* The note's exposed properties (only keys in expose_frontmatter reach

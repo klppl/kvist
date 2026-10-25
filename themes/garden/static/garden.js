@@ -71,17 +71,19 @@
     return Promise.all(waits);
   }
 
-  // ---- color theme: system → light → dark → system ----
+  // ---- color theme: system → light → dark → system, or between the
+  // site's scheme (color_scheme, on <html> as data-scheme) and the other ----
   var toggle = $(".theme-toggle");
   if (toggle) {
     toggle.hidden = false;
-    var order = ["", "light", "dark"];
+    var fixed = root.dataset.scheme;
+    var order = fixed ? [fixed, fixed === "dark" ? "light" : "dark"] : ["", "light", "dark"];
     var label = function () { toggle.title = tr("theme", "Theme: %s", tr("theme_" + (root.dataset.theme || "system"), root.dataset.theme || "system")); };
     label();
     toggle.addEventListener("click", function () {
       var next = order[(order.indexOf(root.dataset.theme || "") + 1) % order.length];
       if (next) root.dataset.theme = next; else delete root.dataset.theme;
-      try { next ? localStorage.setItem("kvist-theme", next) : localStorage.removeItem("kvist-theme"); } catch (e) {}
+      try { next && next !== fixed ? localStorage.setItem("kvist-theme", next) : localStorage.removeItem("kvist-theme"); } catch (e) {}
       label();
       onThemeChange.concat(pageHooks).forEach(function (f) { f(); });
     });

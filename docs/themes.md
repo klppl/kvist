@@ -174,7 +174,8 @@ Params (set them in the settings note `_site.md`, or in `theme_params` on the se
 
 | Param | Default | |
 |---|---|---|
-| `accent` | `#3f7d4e` | link and highlight color; dark mode lightens it so links stay readable |
+| `accent` | `#c9a66b` | link and highlight color; each color scheme adjusts its lightness so links stay readable (darker in light, lighter in dark) |
+| `color_scheme` | `"dark"` | the scheme a reader gets until they switch: `"dark"` or `"light"` (set on `<html>`, so it works without JavaScript; the switch then toggles between the two), or `"system"` to follow the device |
 | `date_format` | `2 Jan 2006` | Go time layout |
 | `home_recent` | `12` | notes in the home page's list |
 | `show_list` | `true` | the list pane (below) |

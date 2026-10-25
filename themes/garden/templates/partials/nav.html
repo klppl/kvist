@@ -131,7 +131,7 @@
 {{/* Icon names follow Lucide (lucide.dev) where they overlap, so a
      folder note's icon property can use the same names. */}}
 {{define "icon" -}}
-<svg class="icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+<svg class="icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
 {{- if or (eq . "home") (eq . "house")}}<path d="M4 11 12 4l8 7v8.5a.5.5 0 0 1-.5.5H15v-6H9v6H4.5a.5.5 0 0 1-.5-.5z"/>
 {{- else if eq . "search"}}<circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/>
 {{- else if eq . "graph"}}<circle cx="6" cy="7" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8.3 8.2 10.8 15.8M15.7 7.4 13.2 15.7M8.5 6.8l7-.6"/>
