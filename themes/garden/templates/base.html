@@ -23,7 +23,7 @@
 <link rel="icon" href="{{asset "favicon.svg"}}" type="image/svg+xml">{{end}}
 <link rel="alternate" type="application/rss+xml" title="{{.Site.Config.Title}}" href="/index.xml">
 <script>try{var t=localStorage.getItem("kvist-theme");if(t)document.documentElement.dataset.theme=t{{if param "reader_mode"}};if(localStorage.getItem("kvist-reader"))document.documentElement.dataset.reader=""{{end}}}catch(e){}</script>
-<style>:root{--accent:{{param "accent"}}}</style>
+<style>:root{--accent-base:{{param "accent"}}}</style>
 <link rel="stylesheet" href="{{asset "style.css"}}">
 {{- if .Features.Code}}
 <link rel="stylesheet" href="{{asset "syntax.css"}}">{{end}}

@@ -213,7 +213,9 @@ var cssSelectorRe = regexp.MustCompile(`\.chroma|\.bg\b`)
 
 // syntaxCSS builds light and dark code highlighting styles. Dark applies
 // with data-theme="dark", or with the system preference unless the reader
-// chose light.
+// chose light. Light is scoped the same way rather than left as a base
+// layer: the two styles don't define the same token classes, and a light
+// colour the dark style doesn't override is unreadable on a dark background.
 func syntaxCSS(light, dark any) (string, error) {
 	ls, _ := light.(string)
 	ds, _ := dark.(string)
@@ -231,8 +233,11 @@ func syntaxCSS(light, dark any) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	explicit := cssSelectorRe.ReplaceAllStringFunc(d, func(s string) string { return `:root[data-theme="dark"] ` + s })
-	system := cssSelectorRe.ReplaceAllStringFunc(d, func(s string) string { return `:root:not([data-theme="light"]) ` + s })
-	return "/* light: " + ls + " */\n" + l + "\n/* dark: " + ds + " */\n" + explicit +
-		"\n@media (prefers-color-scheme: dark) {\n" + system + "}\n", nil
+	scope := func(css, prefix string) string {
+		return cssSelectorRe.ReplaceAllStringFunc(css, func(s string) string { return prefix + s })
+	}
+	return "/* light: " + ls + " */\n" + scope(l, `:root[data-theme="light"] `) +
+		"\n@media not all and (prefers-color-scheme: dark) {\n" + scope(l, `:root:not([data-theme="dark"]) `) + "}\n" +
+		"/* dark: " + ds + " */\n" + scope(d, `:root[data-theme="dark"] `) +
+		"\n@media (prefers-color-scheme: dark) {\n" + scope(d, `:root:not([data-theme="light"]) `) + "}\n", nil
 }

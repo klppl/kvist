@@ -174,7 +174,7 @@ Params (set them in the settings note `_site.md`, or in `theme_params` on the se
 
 | Param | Default | |
 |---|---|---|
-| `accent` | `#3f7d4e` | link and highlight color |
+| `accent` | `#3f7d4e` | link and highlight color; dark mode lightens it so links stay readable |
 | `date_format` | `2 Jan 2006` | Go time layout |
 | `home_recent` | `12` | notes in the home page's list |
 | `show_list` | `true` | the list pane (below) |

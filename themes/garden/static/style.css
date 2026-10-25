@@ -1,11 +1,13 @@
 /* kvist garden theme: nav pane, list pane, content */
 :root {
-  --accent: #3f7d4e;
+  /* --accent-base is the accent param, set in base.html. Dark mode raises
+     it to a lightness that reads on dark panes, whatever the param is. */
+  --accent: var(--accent-base, #3f7d4e);
   --bg: #ffffff;
   --pane: #f8f9fa;
   --hover: #eef0f2;
   --fg: #16181d;
-  --muted: #6b7079;
+  --muted: #62676f;
   --border: #e4e6ea;
   --sel-bg: #1d2128;
   --sel-fg: #f5f6f8;
@@ -26,9 +28,11 @@
   --fg: #e6e8eb;
   --muted: #989ea8;
   --border: #2b2e34;
-  --sel-bg: #e6e8eb;
-  --sel-fg: #15171a;
-  --sel-muted: #4d535c;
+  --accent: color-mix(in oklch, var(--accent-base, #3f7d4e), white 40%);
+  --accent: oklch(from var(--accent-base, #3f7d4e) max(l, .72) c h);
+  --sel-bg: color-mix(in srgb, var(--accent) 16%, var(--pane));
+  --sel-fg: var(--fg);
+  --sel-muted: var(--muted);
   --mark: #5a4f1c;
   --code-bg: #1c1f23;
   color-scheme: dark;
@@ -41,9 +45,11 @@
     --fg: #e6e8eb;
     --muted: #989ea8;
     --border: #2b2e34;
-    --sel-bg: #e6e8eb;
-    --sel-fg: #15171a;
-    --sel-muted: #4d535c;
+    --accent: color-mix(in oklch, var(--accent-base, #3f7d4e), white 40%);
+    --accent: oklch(from var(--accent-base, #3f7d4e) max(l, .72) c h);
+    --sel-bg: color-mix(in srgb, var(--accent) 16%, var(--pane));
+    --sel-fg: var(--fg);
+    --sel-muted: var(--muted);
     --mark: #5a4f1c;
     --code-bg: #1c1f23;
     color-scheme: dark;
@@ -67,6 +73,7 @@ img.align-left { float: left; margin: .3rem 1.4rem .8rem 0; max-width: 50%; }
 img.align-right { float: right; margin: .3rem 0 .8rem 1.4rem; max-width: 50%; }
 .content::after { content: ""; display: block; clear: both; }
 .muted { color: var(--muted); }
+::placeholder { color: var(--muted); opacity: 1; }
 .skip { position: absolute; left: -9999px; }
 .skip:focus { left: 1rem; top: 1rem; z-index: 10; background: var(--bg); padding: .5rem 1rem; }
 [hidden] { display: none !important; }
@@ -184,6 +191,10 @@ main { min-width: 0; }
 .list-desc { color: var(--muted); font-size: .86rem; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .list-meta { display: flex; gap: .6rem; align-items: center; color: var(--muted); font-size: .76rem; }
 .list-note a[aria-current] { background: var(--sel-bg); color: var(--sel-fg); }
+:root[data-theme="dark"] .list-note a[aria-current] { box-shadow: inset 3px 0 var(--accent); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .list-note a[aria-current] { box-shadow: inset 3px 0 var(--accent); }
+}
 .list-note a[aria-current] .list-desc, .list-note a[aria-current] .list-meta { color: var(--sel-muted); }
 .list-note a[aria-current] .stage { color: inherit; border-color: color-mix(in srgb, var(--sel-muted) 50%, transparent); }
 .list-folder a { display: flex; align-items: center; gap: .6rem; padding: .6rem 1rem; color: var(--fg); font-size: .9rem; font-weight: 500; text-decoration: none; }
@@ -383,7 +394,13 @@ iframe.embed-pdf { width: 100%; height: 70vh; border: 1px solid var(--border); b
 
 /* callouts */
 .callout { --c: 70, 120, 200; border-radius: var(--radius); margin: 1.2rem 0; padding: .7rem 1rem; background: rgba(var(--c), .1); border-left: 4px solid rgb(var(--c)); }
-.callout-title { font-weight: 600; color: rgb(var(--c)); }
+.callout-title { font-weight: 600; color: color-mix(in srgb, rgb(var(--c)) 62%, black); }
+/* The pure callout colour is too light for text on a light page and too
+   dark on a dark one; the title keeps its hue and moves toward the ink. */
+:root[data-theme="dark"] .callout-title { color: color-mix(in srgb, rgb(var(--c)) 65%, white); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .callout-title { color: color-mix(in srgb, rgb(var(--c)) 65%, white); }
+}
 summary.callout-title { cursor: pointer; }
 .callout-content > :first-child { margin-top: .3rem; }
 .callout-content > :last-child { margin-bottom: 0; }
@@ -656,7 +673,7 @@ pre.mermaid { background: none; text-align: center; }
 @media print {
   :root, :root[data-theme="dark"], :root:not([data-theme="light"]) {
     --bg: #fff; --pane: #fff; --hover: #f1f2f4; --fg: #000; --muted: #555; --border: #ccc;
-    --mark: #f6e7a6; --code-bg: #f5f5f5; color-scheme: light;
+    --mark: #f6e7a6; --code-bg: #f5f5f5; --accent: var(--accent-base, #3f7d4e); color-scheme: light;
   }
   body { font-size: 11pt; }
   .shell, .has-list .shell { display: block; min-height: 0; }
